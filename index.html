@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>IRON NATIONS</title>
 
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -11,386 +12,630 @@
 
 *{
     box-sizing:border-box;
+    user-select:none;
 }
 
-body{
+html,body{
     margin:0;
-    background:#081018;
-    color:#eef4f8;
-    font-family:Arial,Helvetica,sans-serif;
+    width:100%;
+    height:100%;
     overflow:hidden;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#7fa9c1;
+    color:#222;
 }
 
-button{
-    font-family:inherit;
-}
+/* =========================================================
+   START
+========================================================= */
 
 #start{
     position:fixed;
     inset:0;
+    z-index:1000;
+
     display:flex;
     align-items:center;
     justify-content:center;
+
     background:
-        radial-gradient(circle at center,#172b3b 0%,#081018 65%);
-    z-index:1000;
+        linear-gradient(
+            rgba(22,32,34,.35),
+            rgba(22,32,34,.65)
+        ),
+        #30434a;
 }
 
 .startBox{
-    width:460px;
-    max-width:90%;
-    padding:40px;
-    background:rgba(13,24,34,.96);
-    border:1px solid #294153;
-    border-radius:18px;
-    box-shadow:0 30px 100px #000;
+    width:470px;
+    max-width:92%;
+    padding:42px;
+
+    background:#d8d3b8;
+
+    border:4px solid #45483c;
+    border-radius:4px;
+
+    box-shadow:
+        0 15px 40px #0008;
+
     text-align:center;
 }
 
 .logo{
-    font-size:48px;
+    font-size:42px;
     font-weight:900;
     letter-spacing:5px;
-    margin-bottom:8px;
+    color:#282b25;
+
+    text-shadow:
+        2px 2px 0 #eee7ca;
 }
 
 .subtitle{
-    color:#8797a5;
-    margin-bottom:30px;
+    margin:12px 0 30px;
+    color:#5f6254;
 }
 
 .startButton{
     width:100%;
-    padding:15px;
+    padding:14px;
     margin-top:10px;
-    border:0;
-    border-radius:10px;
-    background:#1d91ff;
+
+    border:2px solid #565a4b;
+    border-radius:3px;
+
+    background:#879c6d;
     color:white;
+
+    font-size:15px;
     font-weight:bold;
-    font-size:16px;
+
     cursor:pointer;
+
+    box-shadow:
+        0 3px 0 #4f5942;
 }
 
 .startButton:hover{
-    background:#42a5ff;
+    background:#9db783;
 }
+
+/* =========================================================
+   GAME
+========================================================= */
 
 #game{
     display:none;
-    width:100vw;
-    height:100vh;
+
+    position:fixed;
+    inset:0;
 }
+
+/* =========================================================
+   TOP BAR
+========================================================= */
 
 .topbar{
     position:absolute;
     top:0;
     left:0;
     right:0;
-    height:68px;
-    z-index:100;
+
+    height:64px;
+
+    z-index:200;
+
     display:flex;
     align-items:center;
-    gap:20px;
-    padding:10px 18px;
-    background:rgba(7,15,22,.94);
-    border-bottom:1px solid #263846;
+    gap:22px;
+
+    padding:8px 16px;
+
+    background:#272d27;
+    color:#eee8cf;
+
+    border-bottom:3px solid #171b17;
+
+    box-shadow:
+        0 3px 10px #0006;
 }
 
 .gameTitle{
     font-weight:900;
-    letter-spacing:2px;
-    margin-right:20px;
+    letter-spacing:3px;
+    font-size:18px;
+
+    margin-right:10px;
 }
 
 .stat{
     display:flex;
     flex-direction:column;
-    min-width:85px;
+    min-width:75px;
 }
 
 .stat small{
-    color:#71818e;
-    font-size:10px;
+    color:#9da594;
+    font-size:9px;
 }
 
 .stat b{
-    font-size:14px;
+    color:#eee8cf;
+    font-size:13px;
+    margin-top:2px;
 }
 
 .date{
     margin-left:auto;
     font-weight:bold;
+    color:#eee8cf;
 }
 
 .speedBox{
     display:flex;
-    gap:4px;
+    gap:3px;
 }
 
 .speedBtn{
-    border:1px solid #304555;
-    background:#101d27;
-    color:#b9c7d0;
+    border:1px solid #596052;
+    background:#394036;
+    color:#e8e4ce;
+
     padding:7px 10px;
-    border-radius:6px;
+
+    border-radius:2px;
     cursor:pointer;
 }
 
+.speedBtn:hover,
 .speedBtn.active{
-    background:#1d91ff;
-    color:white;
+    background:#83966b;
 }
+
+/* =========================================================
+   LEFT MENU
+========================================================= */
 
 .leftbar{
     position:absolute;
-    left:15px;
-    top:85px;
-    z-index:50;
-    width:150px;
+
+    left:12px;
+    top:76px;
+
+    z-index:150;
+
+    width:155px;
+
     display:flex;
     flex-direction:column;
-    gap:7px;
+    gap:6px;
 }
 
 .menuBtn{
-    border:1px solid #2b4050;
-    background:rgba(11,23,32,.94);
-    color:#dbe6ed;
-    padding:11px;
-    border-radius:8px;
+    border:2px solid #666957;
+
+    background:#d4d0b5;
+    color:#303329;
+
+    padding:9px 11px;
+
+    border-radius:2px;
+
     cursor:pointer;
     text-align:left;
+
+    font-weight:bold;
+
+    box-shadow:
+        0 2px 4px #0004;
 }
 
 .menuBtn:hover{
-    background:#19303f;
+    background:#e3dfc4;
 }
+
+/* =========================================================
+   MAP
+========================================================= */
 
 #mapContainer{
     position:absolute;
-    inset:68px 0 0 0;
+    inset:64px 0 0;
+
     overflow:hidden;
+
     background:
-        radial-gradient(circle,#162a36,#091219);
+        linear-gradient(
+            135deg,
+            #a9c4c0,
+            #d7d4b9 48%,
+            #9fbea7
+        );
 }
 
 #world{
     width:100%;
     height:100%;
+
     cursor:grab;
+
+    display:block;
 }
 
-#world:active{
+#world.dragging{
     cursor:grabbing;
 }
 
+/* =========================================================
+   MAP COLORS
+========================================================= */
+
 .land{
-    stroke:#1b2a34;
-    stroke-width:.7;
-    transition:fill .2s;
+    stroke:#878878;
+    stroke-width:1;
+
+    vector-effect:non-scaling-stroke;
+
+    transition:
+        fill .15s;
 }
 
 .neutralLand{
-    fill:#34434d;
+    fill:#d6d4b9;
 }
 
 .playerLand{
-    fill:#2575c7;
+    fill:#78a45d;
 }
 
 .enemyLand{
-    fill:#713f49;
+    fill:#b97465;
 }
 
 .conqueredLand{
-    fill:#267bcf;
+    fill:#78a45d;
 }
 
 .selectedLand{
-    fill:#4c9ee8;
-    stroke:#ffffff;
-    stroke-width:1.5;
+    fill:#91b86e;
+
+    stroke:#34382d;
+    stroke-width:2;
+
+    vector-effect:non-scaling-stroke;
 }
 
+/* =========================================================
+   WATER
+========================================================= */
+
+.water{
+    fill:#5f98b8;
+}
+
+/* =========================================================
+   COUNTRY LABELS
+========================================================= */
+
+.countryLabel{
+    pointer-events:none;
+}
+
+.countryName{
+    font-size:14px;
+    font-weight:900;
+
+    fill:#394133;
+
+    paint-order:stroke;
+    stroke:#d9d7bb;
+    stroke-width:4px;
+    stroke-linejoin:round;
+}
+
+.countryArmy{
+    font-size:10px;
+    font-weight:bold;
+
+    fill:#48503d;
+
+    paint-order:stroke;
+    stroke:#d9d7bb;
+    stroke-width:3px;
+}
+
+/* =========================================================
+   OCCUPATION
+========================================================= */
+
 .occupiedTerritory{
-    fill:#247fd1;
-    opacity:.9;
+    fill:#d45e54;
+    opacity:.48;
+
     pointer-events:none;
 }
 
 .occupationFront{
-    stroke:#ffffff;
-    stroke-width:1.3;
-    stroke-dasharray:4 3;
-    opacity:.8;
+    stroke:#fff3d8;
+    stroke-width:2;
+
+    stroke-dasharray:6 4;
+
     pointer-events:none;
+
+    vector-effect:non-scaling-stroke;
 }
 
+/* =========================================================
+   FRONT
+========================================================= */
+
 .frontGlow{
-    stroke:#ff5252;
-    stroke-width:9;
-    opacity:.12;
+    stroke:#d72e2e;
+    stroke-width:12;
+
+    opacity:.15;
+
     pointer-events:none;
+
+    vector-effect:non-scaling-stroke;
 }
 
 .frontLine{
-    stroke:#ff6262;
-    stroke-width:2.5;
-    stroke-dasharray:7 4;
+    stroke:#a82b2b;
+    stroke-width:3;
+
+    stroke-dasharray:8 5;
+
     pointer-events:none;
+
+    vector-effect:non-scaling-stroke;
 }
 
 .frontDot{
-    fill:#ff6868;
+    fill:#c73535;
+    stroke:#f4e9cf;
+    stroke-width:1;
+
+    vector-effect:non-scaling-stroke;
 }
+
+/* =========================================================
+   ARMY
+========================================================= */
 
 .armyGroup{
     cursor:pointer;
 }
 
 .armyCircle{
-    fill:#0c1720;
-    stroke:#58aaff;
+    fill:#ded9bd;
+
+    stroke:#4c5144;
     stroke-width:2;
+
+    vector-effect:non-scaling-stroke;
 }
 
 .armyIcon{
-    font-size:15px;
+    font-size:16px;
+
     text-anchor:middle;
 }
 
 .armyNumber{
-    fill:white;
+    fill:#292d26;
+
     font-size:10px;
-    font-weight:bold;
+    font-weight:900;
+
     text-anchor:middle;
 }
 
 .battleIcon{
-    fill:#ff9b9b;
+    fill:#8e2929;
+
     font-size:10px;
     font-weight:bold;
+
     text-anchor:middle;
+
     pointer-events:none;
+
+    paint-order:stroke;
+    stroke:#e0dcc0;
+    stroke-width:3px;
 }
 
 .frontProgress{
-    fill:#dcecff;
-    font-size:9px;
-    font-weight:bold;
+    fill:#363b30;
+
+    font-size:10px;
+    font-weight:900;
+
     text-anchor:middle;
+
     pointer-events:none;
+
+    paint-order:stroke;
+    stroke:#d8d4b9;
+    stroke-width:3px;
 }
+
+/* =========================================================
+   RIGHT PANEL
+========================================================= */
 
 #right{
     display:none;
+
     position:absolute;
-    right:15px;
-    top:85px;
-    width:260px;
-    z-index:80;
-    background:rgba(10,20,29,.95);
-    border:1px solid #2b4150;
-    border-radius:12px;
-    padding:15px;
-    box-shadow:0 15px 40px #0008;
+
+    right:14px;
+    top:78px;
+
+    width:280px;
+
+    z-index:180;
+
+    background:#d8d4b9;
+
+    border:3px solid #55594b;
+    border-radius:3px;
+
+    padding:14px;
+
+    box-shadow:
+        0 10px 30px #0007;
 }
 
 .header{
     display:flex;
     align-items:center;
     gap:10px;
-    margin-bottom:15px;
+
+    margin-bottom:12px;
+
+    padding-bottom:10px;
+
+    border-bottom:2px solid #aaa991;
 }
 
 .flag{
-    font-size:34px;
+    font-size:32px;
 }
 
 .name{
-    font-weight:bold;
+    font-weight:900;
     font-size:16px;
+    color:#30342a;
 }
 
 .tag{
-    color:#71818e;
-    font-size:11px;
+    color:#6b705f;
+    font-size:10px;
 }
 
 .row{
     display:flex;
     justify-content:space-between;
-    gap:15px;
-    padding:8px 0;
-    border-bottom:1px solid #20303b;
+
+    padding:7px 0;
+
+    border-bottom:1px solid #b8b49b;
+
+    color:#4d5145;
+}
+
+.row b{
+    color:#292d25;
 }
 
 .action{
     width:100%;
-    margin-top:12px;
+
+    margin-top:10px;
+
     padding:10px;
-    border:0;
-    border-radius:7px;
-    background:#1d91ff;
+
+    border:2px solid #58604e;
+
+    border-radius:2px;
+
+    background:#7f9c65;
+
     color:white;
+
     font-weight:bold;
+
     cursor:pointer;
 }
 
-.warBtn{
-    background:#a9434e;
+.action:hover{
+    background:#94ad78;
 }
+
+.warBtn{
+    background:#a84c4c;
+    border-color:#713838;
+}
+
+.warBtn:hover{
+    background:#bf5d5d;
+}
+
+/* =========================================================
+   BOXES
+========================================================= */
 
 .armyBox,
 .frontBox{
-    background:#101e28;
-    border:1px solid #263b49;
-    border-radius:10px;
-    padding:13px;
-    margin:10px 0;
+    background:#c9c6aa;
+
+    border:2px solid #aaa991;
+
+    border-radius:2px;
+
+    padding:11px;
+
+    margin:9px 0;
 }
 
 .armyTitle{
-    color:#7e8d99;
-    font-size:11px;
+    color:#666b5c;
+    font-size:10px;
 }
 
 .armyNumber{
     font-size:20px;
-    font-weight:bold;
-    margin-top:4px;
+    font-weight:900;
+
+    margin-top:3px;
+
+    color:#30342a;
 }
 
 .bar{
-    height:7px;
-    background:#26343d;
-    border-radius:5px;
+    height:8px;
+
+    background:#9e9c89;
+
     overflow:hidden;
-    margin-top:9px;
+
+    margin-top:8px;
 }
 
 .fill{
     height:100%;
-    background:#2998ff;
+    background:#6e9658;
 }
 
 .redFill{
-    background:#e04f5f;
+    background:#bd4f4f;
 }
 
 .bigFront{
     font-size:30px;
     text-align:center;
-    margin-bottom:5px;
+
+    margin-bottom:4px;
 }
+
+/* =========================================================
+   MODAL
+========================================================= */
 
 #overlay{
     display:none;
+
     position:fixed;
     inset:0;
+
     z-index:500;
-    background:#0009;
+
+    background:#0008;
+
     align-items:center;
     justify-content:center;
 }
@@ -399,47 +644,70 @@ button{
     width:700px;
     max-width:92vw;
     max-height:85vh;
+
     overflow:auto;
-    padding:25px;
-    background:#0d1922;
-    border:1px solid #304555;
-    border-radius:15px;
-    box-shadow:0 30px 100px #000;
+
+    padding:24px;
+
+    background:#d8d4b9;
+
+    border:3px solid #55594b;
+
+    box-shadow:
+        0 20px 60px #000;
+
+    color:#30342a;
 }
 
 .close{
     float:right;
-    border:0;
-    background:#182732;
-    color:#aaa;
-    border-radius:6px;
-    padding:5px 9px;
+
+    border:2px solid #656957;
+
+    background:#c4c1a7;
+
+    color:#34372d;
+
+    border-radius:2px;
+
+    padding:4px 9px;
+
     cursor:pointer;
 }
 
+/* =========================================================
+   COUNTRY GRID
+========================================================= */
+
 .countryGrid{
     display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:8px;
+
+    grid-template-columns:
+        repeat(2,1fr);
+
+    gap:7px;
 }
 
 .country{
     display:flex;
     align-items:center;
-    gap:12px;
-    padding:10px;
-    background:#111f29;
-    border:1px solid #263b49;
-    border-radius:8px;
+    gap:10px;
+
+    padding:9px;
+
+    background:#c9c6aa;
+
+    border:2px solid #aaa991;
+
     cursor:pointer;
 }
 
 .country:hover{
-    background:#19303f;
+    background:#ded9bd;
 }
 
 .countryFlag{
-    font-size:27px;
+    font-size:25px;
 }
 
 .countryName{
@@ -447,26 +715,46 @@ button{
 }
 
 .countryPower{
-    color:#8495a2;
-    font-size:11px;
-    margin-top:3px;
+    color:#6d725f;
+    font-size:10px;
+    margin-top:2px;
 }
+
+/* =========================================================
+   TOAST
+========================================================= */
 
 #toast{
     display:none;
+
     position:fixed;
-    bottom:25px;
+
+    bottom:22px;
     left:50%;
+
     transform:translateX(-50%);
+
     z-index:900;
-    background:#10202c;
-    border:1px solid #345062;
-    padding:12px 18px;
-    border-radius:9px;
-    box-shadow:0 10px 30px #0008;
+
+    background:#292e28;
+
+    color:#eee8cf;
+
+    border:2px solid #5b6253;
+
+    padding:10px 17px;
+
+    border-radius:2px;
+
+    box-shadow:
+        0 6px 20px #0008;
 }
 
-@media(max-width:800px){
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:850px){
 
     .stat{
         display:none;
@@ -477,7 +765,15 @@ button{
     }
 
     #right{
-        width:220px;
+        width:230px;
+    }
+
+    .leftbar{
+        width:130px;
+    }
+
+    .countryGrid{
+        grid-template-columns:1fr;
     }
 
 }
@@ -488,7 +784,7 @@ button{
 <body>
 
 <!-- =====================================================
-     START
+     START SCREEN
 ===================================================== -->
 
 <div id="start">
@@ -503,21 +799,18 @@ button{
             Build your nation. Research. Fight. Conquer.
         </div>
 
-        <button
-            class="startButton"
-            onclick="newGame()">
+        <button class="startButton"
+                onclick="newGame()">
             🌍 NEW GAME
         </button>
 
-        <button
-            class="startButton"
-            onclick="loadGame()">
+        <button class="startButton"
+                onclick="loadGame()">
             📂 LOAD GAME
         </button>
 
-        <button
-            class="startButton"
-            onclick="settings()">
+        <button class="startButton"
+                onclick="settings()">
             ⚙️ SETTINGS
         </button>
 
@@ -563,35 +856,30 @@ button{
             <b id="factories">0</b>
         </div>
 
-        <div
-            class="date"
-            id="date">
+        <div class="date"
+             id="date">
             January 1936
         </div>
 
         <div class="speedBox">
 
-            <button
-                class="speedBtn active"
-                onclick="setSpeed(0,this)">
+            <button class="speedBtn active"
+                    onclick="setSpeed(0,this)">
                 ⏸
             </button>
 
-            <button
-                class="speedBtn"
-                onclick="setSpeed(1,this)">
+            <button class="speedBtn"
+                    onclick="setSpeed(1,this)">
                 ▶
             </button>
 
-            <button
-                class="speedBtn"
-                onclick="setSpeed(2,this)">
+            <button class="speedBtn"
+                    onclick="setSpeed(2,this)">
                 ▶▶
             </button>
 
-            <button
-                class="speedBtn"
-                onclick="setSpeed(4,this)">
+            <button class="speedBtn"
+                    onclick="setSpeed(4,this)">
                 ▶▶▶
             </button>
 
@@ -600,67 +888,66 @@ button{
     </div>
 
 
+    <!-- =================================================
+         LEFT MENU
+    ================================================= -->
+
     <div class="leftbar">
 
-        <button
-            class="menuBtn"
-            onclick="openNations()">
+        <button class="menuBtn"
+                onclick="openNations()">
             🌍 Nations
         </button>
 
-        <button
-            class="menuBtn"
-            onclick="openArmy()">
+        <button class="menuBtn"
+                onclick="openArmy()">
             🪖 Army
         </button>
 
-        <button
-            class="menuBtn"
-            onclick="construction()">
+        <button class="menuBtn"
+                onclick="construction()">
             🏭 Construction
         </button>
 
-        <button
-            class="menuBtn"
-            onclick="research()">
+        <button class="menuBtn"
+                onclick="research()">
             🔬 Research
         </button>
 
-        <button
-            class="menuBtn"
-            onclick="diplomacy()">
+        <button class="menuBtn"
+                onclick="diplomacy()">
             🤝 Diplomacy
         </button>
 
-        <button
-            class="menuBtn"
-            onclick="taxes()">
+        <button class="menuBtn"
+                onclick="taxes()">
             💰 Collect Taxes
         </button>
 
-        <button
-            class="menuBtn"
-            onclick="saveGame()">
+        <button class="menuBtn"
+                onclick="saveGame()">
             💾 Save
         </button>
 
-        <button
-            class="menuBtn"
-            onclick="mainMenu()">
+        <button class="menuBtn"
+                onclick="mainMenu()">
             🏠 Main Menu
         </button>
 
     </div>
 
 
+    <!-- =================================================
+         MAP
+    ================================================= -->
+
     <div id="mapContainer">
 
-        <svg
-            id="world"
-            viewBox="0 0 1200 650"
-            preserveAspectRatio="xMidYMid slice">
+        <svg id="world"
+             viewBox="0 0 1200 650"
+             preserveAspectRatio="xMidYMid slice">
 
-            <defs id="occupationDefs"></defs>
+            <defs id="defs"></defs>
 
             <g id="countriesLayer"></g>
 
@@ -670,10 +957,16 @@ button{
 
             <g id="armyLayer"></g>
 
+            <g id="labelLayer"></g>
+
         </svg>
 
     </div>
 
+
+    <!-- =================================================
+         RIGHT COUNTRY PANEL
+    ================================================= -->
 
     <div id="right"></div>
 
@@ -688,9 +981,8 @@ button{
 
     <div class="modal">
 
-        <button
-            class="close"
-            onclick="closeModal()">
+        <button class="close"
+                onclick="closeModal()">
             ✕
         </button>
 
@@ -707,53 +999,220 @@ button{
 <script>
 
 /* =========================================================
-   IRON NATIONS
-   COMPLETE GAME ENGINE
-========================================================= */
-
-
-/* =========================================================
    COUNTRIES
 ========================================================= */
 
-const countries = {
+const countries={
 
-DEU:{name:"Germany",flag:"🇩🇪",army:100000,pop:69000000,manpower:1200000,factories:35,money:2500,income:250,pos:[10,51]},
-POL:{name:"Poland",flag:"🇵🇱",army:50000,pop:34000000,manpower:650000,factories:18,money:1500,income:120,pos:[19,52]},
-FRA:{name:"France",flag:"🇫🇷",army:85000,pop:41000000,manpower:800000,factories:30,money:2200,income:210,pos:[2,46]},
-GBR:{name:"United Kingdom",flag:"🇬🇧",army:90000,pop:48000000,manpower:900000,factories:40,money:3000,income:280,pos:[-2,54]},
-ITA:{name:"Italy",flag:"🇮🇹",army:75000,pop:44000000,manpower:850000,factories:25,money:2000,income:180,pos:[12,42]},
-ESP:{name:"Spain",flag:"🇪🇸",army:45000,pop:25000000,manpower:500000,factories:14,money:1300,income:100,pos:[-4,40]},
-RUS:{name:"Russia",flag:"🇷🇺",army:180000,pop:108000000,manpower:2500000,factories:55,money:3500,income:300,pos:[37,56]},
-UKR:{name:"Ukraine",flag:"🇺🇦",army:65000,pop:30000000,manpower:700000,factories:20,money:1600,income:130,pos:[32,49]},
-USA:{name:"United States",flag:"🇺🇸",army:140000,pop:128000000,manpower:2500000,factories:80,money:6000,income:500,pos:[-97,38]},
-CAN:{name:"Canada",flag:"🇨🇦",army:30000,pop:11000000,manpower:250000,factories:12,money:1500,income:110,pos:[-106,56]},
-MEX:{name:"Mexico",flag:"🇲🇽",army:35000,pop:19000000,manpower:400000,factories:10,money:1100,income:90,pos:[-102,23]},
-BRA:{name:"Brazil",flag:"🇧🇷",army:60000,pop:40000000,manpower:800000,factories:18,money:1700,income:140,pos:[-52,-10]},
-ARG:{name:"Argentina",flag:"🇦🇷",army:40000,pop:13000000,manpower:300000,factories:12,money:1200,income:90,pos:[-64,-35]},
-TUR:{name:"Turkey",flag:"🇹🇷",army:70000,pop:35000000,manpower:750000,factories:20,money:1800,income:150,pos:[35,39]},
-EGY:{name:"Egypt",flag:"🇪🇬",army:55000,pop:16000000,manpower:400000,factories:12,money:1000,income:80,pos:[30,27]},
-SAU:{name:"Saudi Arabia",flag:"🇸🇦",army:30000,pop:7000000,manpower:150000,factories:8,money:2500,income:180,pos:[45,24]},
-IRN:{name:"Iran",flag:"🇮🇷",army:50000,pop:14000000,manpower:350000,factories:14,money:1300,income:100,pos:[53,32]},
-IND:{name:"India",flag:"🇮🇳",army:120000,pop:350000000,manpower:4000000,factories:35,money:3000,income:280,pos:[79,22]},
-CHN:{name:"China",flag:"🇨🇳",army:220000,pop:500000000,manpower:5000000,factories:45,money:3000,income:260,pos:[103,35]},
-JPN:{name:"Japan",flag:"🇯🇵",army:110000,pop:70000000,manpower:1300000,factories:35,money:2800,income:250,pos:[138,36]},
-KOR:{name:"South Korea",flag:"🇰🇷",army:45000,pop:20000000,manpower:500000,factories:18,money:1800,income:160,pos:[128,36]},
-AUS:{name:"Australia",flag:"🇦🇺",army:35000,pop:7000000,manpower:200000,factories:14,money:1800,income:140,pos:[133,-25]},
-SWE:{name:"Sweden",flag:"🇸🇪",army:35000,pop:6000000,manpower:180000,factories:14,money:1600,income:130,pos:[15,62]},
-NOR:{name:"Norway",flag:"🇳🇴",army:22000,pop:3000000,manpower:90000,factories:8,money:1300,income:90,pos:[12,65]},
-FIN:{name:"Finland",flag:"🇫🇮",army:30000,pop:3500000,manpower:120000,factories:9,money:1300,income:100,pos:[26,64]},
-NLD:{name:"Netherlands",flag:"🇳🇱",army:28000,pop:8500000,manpower:150000,factories:12,money:1500,income:120,pos:[5,52]},
-BEL:{name:"Belgium",flag:"🇧🇪",army:25000,pop:8500000,manpower:140000,factories:10,money:1300,income:100,pos:[4.5,50.8]},
-CZE:{name:"Czechoslovakia",flag:"🇨🇿",army:45000,pop:10000000,manpower:250000,factories:16,money:1400,income:110,pos:[15.5,49.8]},
-ROU:{name:"Romania",flag:"🇷🇴",army:40000,pop:19000000,manpower:300000,factories:12,money:1200,income:100,pos:[25,46]},
-GRC:{name:"Greece",flag:"🇬🇷",army:28000,pop:7000000,manpower:140000,factories:8,money:1000,income:80,pos:[22,39]}
+    DEU:{
+        name:"Germany",
+        flag:"🇩🇪",
+        army:100000,
+        pop:69000000,
+        manpower:1200000,
+        factories:35,
+        money:2500,
+        income:250,
+        pos:[10,51]
+    },
+
+    POL:{
+        name:"Poland",
+        flag:"🇵🇱",
+        army:50000,
+        pop:34000000,
+        manpower:650000,
+        factories:18,
+        money:1500,
+        income:120,
+        pos:[19,52]
+    },
+
+    FRA:{
+        name:"France",
+        flag:"🇫🇷",
+        army:85000,
+        pop:41000000,
+        manpower:800000,
+        factories:30,
+        money:2200,
+        income:210,
+        pos:[2,46]
+    },
+
+    GBR:{
+        name:"United Kingdom",
+        flag:"🇬🇧",
+        army:90000,
+        pop:48000000,
+        manpower:900000,
+        factories:40,
+        money:3000,
+        income:280,
+        pos:[-2,54]
+    },
+
+    ITA:{
+        name:"Italy",
+        flag:"🇮🇹",
+        army:75000,
+        pop:44000000,
+        manpower:850000,
+        factories:25,
+        money:2000,
+        income:180,
+        pos:[12,42]
+    },
+
+    ESP:{
+        name:"Spain",
+        flag:"🇪🇸",
+        army:45000,
+        pop:25000000,
+        manpower:500000,
+        factories:14,
+        money:1300,
+        income:100,
+        pos:[-4,40]
+    },
+
+    RUS:{
+        name:"Russia",
+        flag:"🇷🇺",
+        army:180000,
+        pop:108000000,
+        manpower:2500000,
+        factories:55,
+        money:3500,
+        income:300,
+        pos:[37,56]
+    },
+
+    UKR:{
+        name:"Ukraine",
+        flag:"🇺🇦",
+        army:65000,
+        pop:30000000,
+        manpower:700000,
+        factories:20,
+        money:1600,
+        income:130,
+        pos:[32,49]
+    },
+
+    TUR:{
+        name:"Turkey",
+        flag:"🇹🇷",
+        army:70000,
+        pop:35000000,
+        manpower:750000,
+        factories:20,
+        money:1800,
+        income:150,
+        pos:[35,39]
+    },
+
+    SWE:{
+        name:"Sweden",
+        flag:"🇸🇪",
+        army:35000,
+        pop:6000000,
+        manpower:180000,
+        factories:14,
+        money:1600,
+        income:130,
+        pos:[15,62]
+    },
+
+    NOR:{
+        name:"Norway",
+        flag:"🇳🇴",
+        army:22000,
+        pop:3000000,
+        manpower:90000,
+        factories:8,
+        money:1300,
+        income:90,
+        pos:[12,65]
+    },
+
+    FIN:{
+        name:"Finland",
+        flag:"🇫🇮",
+        army:30000,
+        pop:3500000,
+        manpower:120000,
+        factories:9,
+        money:1300,
+        income:100,
+        pos:[26,64]
+    },
+
+    CZE:{
+        name:"Czechoslovakia",
+        flag:"🇨🇿",
+        army:45000,
+        pop:10000000,
+        manpower:250000,
+        factories:16,
+        money:1400,
+        income:110,
+        pos:[15.5,49.8]
+    },
+
+    ROU:{
+        name:"Romania",
+        flag:"🇷🇴",
+        army:40000,
+        pop:19000000,
+        manpower:300000,
+        factories:12,
+        money:1200,
+        income:100,
+        pos:[25,46]
+    },
+
+    GRC:{
+        name:"Greece",
+        flag:"🇬🇷",
+        army:28000,
+        pop:7000000,
+        manpower:140000,
+        factories:8,
+        money:1000,
+        income:80,
+        pos:[22,39]
+    },
+
+    NLD:{
+        name:"Netherlands",
+        flag:"🇳🇱",
+        army:28000,
+        pop:8500000,
+        manpower:150000,
+        factories:12,
+        money:1500,
+        income:120,
+        pos:[5,52]
+    },
+
+    BEL:{
+        name:"Belgium",
+        flag:"🇧🇪",
+        army:25000,
+        pop:8500000,
+        manpower:140000,
+        factories:10,
+        money:1300,
+        income:100,
+        pos:[4.5,50.8]
+    }
 
 };
 
 
 /* =========================================================
-   STATE
+   GAME STATE
 ========================================================= */
 
 let player={
@@ -771,51 +1230,65 @@ let player={
 
 let year=1936;
 let month=1;
+
 let speed=0;
 let timer=null;
+
 let selected=null;
 
 let conquered={};
+
 let wars=[];
 
+
+/* =========================================================
+   MAP STATE
+========================================================= */
+
+let svg;
+let countryLayer;
+let occupationLayer;
+let frontLayer;
+let armyLayer;
+let labelLayer;
+
+let projection;
+let path;
+
 let mapReady=false;
-
-
-/* =========================================================
-   DOM
-========================================================= */
-
-const startScreen=document.getElementById("start");
-const gameScreen=document.getElementById("game");
-const overlay=document.getElementById("overlay");
-const modalContent=document.getElementById("modalContent");
-const rightPanel=document.getElementById("right");
-
-
-/* =========================================================
-   MAP
-========================================================= */
-
-let svg=null;
-let countryLayer=null;
-let occupationLayer=null;
-let frontLayer=null;
-let armyLayer=null;
-
-let projection=null;
-let path=null;
 
 let zoom=1;
 let offsetX=0;
 let offsetY=0;
 
 let dragging=false;
+
 let lastX=0;
 let lastY=0;
 
 
 /* =========================================================
-   HELPERS
+   DOM
+========================================================= */
+
+const startScreen=
+    document.getElementById("start");
+
+const gameScreen=
+    document.getElementById("game");
+
+const overlay=
+    document.getElementById("overlay");
+
+const modalContent=
+    document.getElementById("modalContent");
+
+const rightPanel=
+    document.getElementById("right");
+
+
+/* =========================================================
+   FORMAT
 ========================================================= */
 
 function format(n){
@@ -835,31 +1308,39 @@ function format(n){
 }
 
 
+/* =========================================================
+   TOAST
+========================================================= */
+
 let toastTimer;
 
 function showToast(text){
 
-    const toast=document.getElementById("toast");
+    const toast=
+        document.getElementById("toast");
 
     toast.textContent=text;
+
     toast.style.display="block";
 
     clearTimeout(toastTimer);
 
     toastTimer=setTimeout(()=>{
         toast.style.display="none";
-    },3000);
+    },2500);
 }
 
+
+/* =========================================================
+   START / GAME
+========================================================= */
 
 function showStart(){
 
     startScreen.style.display="flex";
     gameScreen.style.display="none";
-    overlay.style.display="none";
 
 }
-
 
 function showGame(){
 
@@ -869,12 +1350,15 @@ function showGame(){
 }
 
 
+/* =========================================================
+   MODAL
+========================================================= */
+
 function openModal(){
 
     overlay.style.display="flex";
 
 }
-
 
 function closeModal(){
 
@@ -895,13 +1379,14 @@ function newGame(){
 
         <h2>🌍 Choose your nation</h2>
 
-        <p style="color:#84929d">
-            Choose a country to start your campaign.
+        <p>
+            Select the nation you want to control.
         </p>
 
         <div class="countryGrid">
 
-            ${Object.entries(countries).map(([iso,c])=>`
+            ${Object.entries(countries).map(
+                ([iso,c])=>`
 
                 <div class="country"
                      onclick="chooseNation('${iso}')">
@@ -929,7 +1414,6 @@ function newGame(){
 
         </div>
     `;
-
 }
 
 
@@ -940,10 +1424,6 @@ function newGame(){
 function chooseNation(iso){
 
     const c=countries[iso];
-
-    if(!c)
-        return;
-
 
     player={
         nation:iso,
@@ -958,10 +1438,11 @@ function chooseNation(iso){
         stability:80
     };
 
-
     year=1936;
     month=1;
+
     speed=0;
+
     selected=iso;
 
     conquered={};
@@ -969,24 +1450,26 @@ function chooseNation(iso){
 
     wars=[];
 
-
     if(timer)
         clearInterval(timer);
 
     timer=null;
 
-
     closeModal();
+
     showGame();
 
     updateUI();
+
     updateMap();
+
+    drawLabels();
+
     redrawWars();
 
     showToast(
         `${c.flag} ${c.name} selected`
     );
-
 }
 
 
@@ -1000,28 +1483,25 @@ function setSpeed(value,button){
 
     document
         .querySelectorAll(".speedBtn")
-        .forEach(b=>b.classList.remove("active"));
+        .forEach(b=>
+            b.classList.remove("active")
+        );
 
     if(button)
         button.classList.add("active");
 
-
     if(timer)
         clearInterval(timer);
 
-
     timer=null;
-
 
     if(speed===0)
         return;
 
-
     timer=setInterval(
         advanceMonth,
-        4000/speed
+        3500/speed
     );
-
 }
 
 
@@ -1029,7 +1509,6 @@ function advanceMonth(){
 
     if(!player.nation)
         return;
-
 
     month++;
 
@@ -1040,17 +1519,14 @@ function advanceMonth(){
 
     }
 
-
     player.money +=
-        player.income +
+        player.income+
         player.factories*5;
-
 
     player.manpower +=
         Math.floor(
-            player.population*0.00008
+            player.population*.00008
         );
-
 
     player.research +=
         Math.max(
@@ -1060,15 +1536,9 @@ function advanceMonth(){
             )
         );
 
-
     if(player.research>100)
         player.research=100;
 
-
-    /*
-       EVERY MONTH:
-       battles actually happen.
-    */
 
     wars.forEach(war=>{
 
@@ -1079,7 +1549,6 @@ function advanceMonth(){
 
 
     updateUI();
-
 }
 
 
@@ -1092,26 +1561,24 @@ function battle(war){
     if(!war.active)
         return;
 
-
     if(player.army<=0){
 
         war.active=false;
+
         removeWarGraphics(war);
 
-        showToast("💀 Your army was destroyed.");
+        showToast(
+            "💀 Your army was destroyed."
+        );
 
         return;
-
     }
-
 
     if(war.enemyArmy<=0){
 
-        war.progress=100;
         victory(war);
 
         return;
-
     }
 
 
@@ -1119,21 +1586,14 @@ function battle(war){
         player.army*
         (1+player.technology*.10);
 
-
     const enemyPower=
         war.enemyArmy*
         (1+war.enemyTechnology*.05);
-
 
     const ratio=
         myPower/
         (myPower+enemyPower);
 
-
-    /*
-       Casualties are deliberately
-       relatively small so wars last.
-    */
 
     const total=
         Math.floor(
@@ -1148,7 +1608,6 @@ function battle(war){
             (1-ratio)*
             .65
         );
-
 
     let enemyLoss=
         Math.floor(
@@ -1168,7 +1627,6 @@ function battle(war){
             player.army-myLoss
         );
 
-
     war.enemyArmy=
         Math.max(
             0,
@@ -1180,15 +1638,7 @@ function battle(war){
     war.enemyLosses+=enemyLoss;
 
 
-    /*
-       SLOW FRONT.
-
-       A stronger army advances,
-       but only a tiny amount each month.
-    */
-
     let movement=0;
-
 
     if(ratio>.5){
 
@@ -1196,15 +1646,13 @@ function battle(war){
             .10+
             (ratio-.5)*1.5;
 
-    }
-    else if(ratio<.5){
+    }else{
 
         movement=
             -(
                 .04+
                 (.5-ratio)*.8
             );
-
     }
 
 
@@ -1220,7 +1668,6 @@ function battle(war){
 
     war.progress+=movement;
 
-
     war.progress=
         Math.max(
             0,
@@ -1231,29 +1678,15 @@ function battle(war){
         );
 
 
-    war.occupation=
-        war.progress;
-
-
-    /*
-       Redraw immediately.
-    */
-
     drawOccupation(war);
     drawWar(war);
 
 
     if(war.enemyArmy<=0){
 
-        war.progress=100;
-        war.occupation=100;
-
         victory(war);
 
-        return;
-
     }
-
 }
 
 
@@ -1266,36 +1699,32 @@ function declareWar(iso){
     if(!countries[iso])
         return;
 
-
     if(iso===player.nation){
 
         showToast(
-            "You cannot declare war on yourself."
+            "Du kannst dich nicht selbst angreifen."
         );
 
         return;
-
     }
 
 
     const existing=
         wars.find(
             w=>
-            w.active &&
-            w.enemy===iso
+                w.active &&
+                w.enemy===iso
         );
-
 
     if(existing){
 
         showWar(existing);
-        return;
 
+        return;
     }
 
 
-    const enemy=
-        countries[iso];
+    const enemy=countries[iso];
 
 
     const war={
@@ -1307,8 +1736,6 @@ function declareWar(iso){
         active:true,
 
         progress:0,
-
-        occupation:0,
 
         enemyArmy:enemy.army,
 
@@ -1323,20 +1750,19 @@ function declareWar(iso){
 
     wars.push(war);
 
-
     drawWar(war);
     drawOccupation(war);
 
+    updateMap();
 
     showToast(
         `⚔️ War against ${enemy.flag} ${enemy.name}`
     );
-
 }
 
 
 /* =========================================================
-   POSITION
+   MAP POSITION
 ========================================================= */
 
 function getPosition(iso){
@@ -1347,21 +1773,95 @@ function getPosition(iso){
         return [600,325];
 
     return projection(c.pos);
-
 }
 
 
 /* =========================================================
-   DRAW OCCUPATION
+   COUNTRY LABELS
+========================================================= */
+
+function drawLabels(){
+
+    if(!mapReady)
+        return;
+
+    labelLayer
+        .selectAll("*")
+        .remove();
+
+
+    Object.entries(countries)
+        .forEach(([iso,c])=>{
+
+            const pos=
+                getPosition(iso);
+
+
+            const group=
+                labelLayer
+                    .append("g")
+                    .attr(
+                        "class",
+                        "countryLabel"
+                    )
+                    .attr(
+                        "transform",
+                        `translate(${pos[0]},${pos[1]})`
+                    );
+
+
+            group
+                .append("text")
+                .attr(
+                    "class",
+                    "countryName"
+                )
+                .attr(
+                    "text-anchor",
+                    "middle"
+                )
+                .attr(
+                    "y",
+                    0
+                )
+                .text(
+                    `${c.flag} ${c.name}`
+                );
+
+
+            group
+                .append("text")
+                .attr(
+                    "class",
+                    "countryArmy"
+                )
+                .attr(
+                    "text-anchor",
+                    "middle"
+                )
+                .attr(
+                    "y",
+                    15
+                )
+                .text(
+                    format(
+                        iso===player.nation
+                        ? player.army
+                        : c.army
+                    )
+                );
+
+        });
+}
+
+
+/* =========================================================
+   OCCUPATION
 ========================================================= */
 
 function drawOccupation(war){
 
     if(!mapReady)
-        return;
-
-
-    if(!occupationLayer)
         return;
 
 
@@ -1377,8 +1877,7 @@ function drawOccupation(war){
 
 
     const countryPath=
-        countryLayer
-        .select(
+        countryLayer.select(
             `path[data-iso="${war.enemy}"]`
         );
 
@@ -1390,7 +1889,6 @@ function drawOccupation(war){
     const node=
         countryPath.node();
 
-
     const bbox=
         node.getBBox();
 
@@ -1398,27 +1896,16 @@ function drawOccupation(war){
     const start=
         getPosition(player.nation);
 
-
     const end=
         getPosition(war.enemy);
 
-
-    /*
-       Which side are we attacking from?
-    */
 
     const fromLeft=
         start[0]<end[0];
 
 
     const percentage=
-        Math.max(
-            0,
-            Math.min(
-                100,
-                war.progress
-            )
-        )/100;
+        war.progress/100;
 
 
     let x;
@@ -1433,8 +1920,7 @@ function drawOccupation(war){
             bbox.width*
             percentage;
 
-    }
-    else{
+    }else{
 
         width=
             bbox.width*
@@ -1444,40 +1930,33 @@ function drawOccupation(war){
             bbox.x+
             bbox.width-
             width;
-
     }
 
 
-    /*
-       Clip occupation to exact country shape.
-    */
-
     const clipId=
-        "clip_"+war.enemy;
+        "occupation_"+war.id;
 
 
-    d3.select("#occupationDefs")
+    d3.select("#defs")
         .select("#"+clipId)
         .remove();
 
 
     const clip=
-        d3.select("#occupationDefs")
-        .append("clipPath")
-        .attr("id",clipId);
+        d3.select("#defs")
+            .append("clipPath")
+            .attr(
+                "id",
+                clipId
+            );
 
 
-    clip
-        .append("path")
+    clip.append("path")
         .attr(
             "d",
             countryPath.attr("d")
         );
 
-
-    /*
-       Occupied area.
-    */
 
     occupationLayer
         .append("rect")
@@ -1490,25 +1969,34 @@ function drawOccupation(war){
             "occupiedTerritory"
         )
         .attr("x",x)
-        .attr("y",bbox.y-3)
-        .attr("width",Math.max(0,width))
-        .attr("height",bbox.height+6)
+        .attr(
+            "y",
+            bbox.y-5
+        )
+        .attr(
+            "width",
+            Math.max(0,width)
+        )
+        .attr(
+            "height",
+            bbox.height+10
+        )
         .attr(
             "clip-path",
             `url(#${clipId})`
         );
 
 
-    /*
-       Moving occupation border.
-    */
-
     const frontX=
         fromLeft
         ?
-        bbox.x+bbox.width*percentage
+        bbox.x+
+        bbox.width*
+        percentage
         :
-        bbox.x+bbox.width*(1-percentage);
+        bbox.x+
+        bbox.width*
+        (1-percentage);
 
 
     occupationLayer
@@ -1521,18 +2009,9 @@ function drawOccupation(war){
             "class",
             "occupationFront"
         )
-        .attr(
-            "x1",
-            frontX
-        )
-        .attr(
-            "y1",
-            bbox.y
-        )
-        .attr(
-            "x2",
-            frontX
-        )
+        .attr("x1",frontX)
+        .attr("x2",frontX)
+        .attr("y1",bbox.y)
         .attr(
             "y2",
             bbox.y+bbox.height
@@ -1541,12 +2020,11 @@ function drawOccupation(war){
             "clip-path",
             `url(#${clipId})`
         );
-
 }
 
 
 /* =========================================================
-   DRAW FRONT
+   FRONT
 ========================================================= */
 
 function drawWar(war){
@@ -1561,19 +2039,12 @@ function drawWar(war){
     const start=
         getPosition(player.nation);
 
-
     const end=
         getPosition(war.enemy);
 
 
     const p=
-        Math.max(
-            0,
-            Math.min(
-                100,
-                war.progress
-            )
-        )/100;
+        war.progress/100;
 
 
     const t=
@@ -1609,17 +2080,33 @@ function drawWar(war){
     const frontLength=55;
 
 
-    const x1=fx+px*frontLength;
-    const y1=fy+py*frontLength;
+    const x1=
+        fx+
+        px*frontLength;
 
-    const x2=fx-px*frontLength;
-    const y2=fy-py*frontLength;
+    const y1=
+        fy+
+        py*frontLength;
+
+    const x2=
+        fx-
+        px*frontLength;
+
+    const y2=
+        fy-
+        py*frontLength;
 
 
     frontLayer
         .append("line")
-        .attr("data-war",war.id)
-        .attr("class","frontGlow")
+        .attr(
+            "data-war",
+            war.id
+        )
+        .attr(
+            "class",
+            "frontGlow"
+        )
         .attr("x1",x1)
         .attr("y1",y1)
         .attr("x2",x2)
@@ -1628,17 +2115,19 @@ function drawWar(war){
 
     frontLayer
         .append("line")
-        .attr("data-war",war.id)
-        .attr("class","frontLine")
+        .attr(
+            "data-war",
+            war.id
+        )
+        .attr(
+            "class",
+            "frontLine"
+        )
         .attr("x1",x1)
         .attr("y1",y1)
         .attr("x2",x2)
         .attr("y2",y2);
 
-
-    /*
-       Little soldiers/front dots.
-    */
 
     for(let i=0;i<5;i++){
 
@@ -1646,57 +2135,87 @@ function drawWar(war){
 
         frontLayer
             .append("circle")
-            .attr("data-war",war.id)
-            .attr("class","frontDot")
+            .attr(
+                "data-war",
+                war.id
+            )
+            .attr(
+                "class",
+                "frontDot"
+            )
             .attr(
                 "cx",
-                x1+(x2-x1)*q
+                x1+
+                (x2-x1)*q
             )
             .attr(
                 "cy",
-                y1+(y2-y1)*q
+                y1+
+                (y2-y1)*q
             )
-            .attr("r",3);
-
+            .attr(
+                "r",
+                3
+            );
     }
 
 
-    /*
-       Army marker.
-    */
-
     const group=
         armyLayer
-        .append("g")
-        .attr("data-war",war.id)
-        .attr("class","armyGroup")
-        .attr(
-            "transform",
-            `translate(${fx},${fy})`
-        )
-        .on(
-            "click",
-            ()=>showWar(war)
-        );
+            .append("g")
+            .attr(
+                "data-war",
+                war.id
+            )
+            .attr(
+                "class",
+                "armyGroup"
+            )
+            .attr(
+                "transform",
+                `translate(${fx},${fy})`
+            )
+            .on(
+                "click",
+                ()=>showWar(war)
+            );
 
 
     group
         .append("circle")
-        .attr("class","armyCircle")
-        .attr("r",23);
+        .attr(
+            "class",
+            "armyCircle"
+        )
+        .attr(
+            "r",
+            23
+        );
 
 
     group
         .append("text")
-        .attr("class","armyIcon")
-        .attr("y",-5)
+        .attr(
+            "class",
+            "armyIcon"
+        )
+        .attr(
+            "y",
+            -4
+        )
         .text("🪖");
 
 
     group
         .append("text")
-        .attr("class","armyNumber")
-        .attr("y",11)
+        .attr(
+            "class",
+            "armyNumber"
+        )
+        .attr(
+            "y",
+            11
+        )
         .text(
             format(player.army)
         );
@@ -1704,10 +2223,22 @@ function drawWar(war){
 
     armyLayer
         .append("text")
-        .attr("data-war",war.id)
-        .attr("class","battleIcon")
-        .attr("x",fx)
-        .attr("y",fy-36)
+        .attr(
+            "data-war",
+            war.id
+        )
+        .attr(
+            "class",
+            "battleIcon"
+        )
+        .attr(
+            "x",
+            fx
+        )
+        .attr(
+            "y",
+            fy-35
+        )
         .text(
             "⚔️ "+
             format(war.enemyArmy)
@@ -1716,21 +2247,30 @@ function drawWar(war){
 
     armyLayer
         .append("text")
-        .attr("data-war",war.id)
-        .attr("class","frontProgress")
-        .attr("x",fx)
-        .attr("y",fy+40)
+        .attr(
+            "data-war",
+            war.id
+        )
+        .attr(
+            "class",
+            "frontProgress"
+        )
+        .attr(
+            "x",
+            fx
+        )
+        .attr(
+            "y",
+            fy+40
+        )
         .text(
-            Math.floor(
-                war.progress
-            )+"%"
+            Math.floor(war.progress)+"%"
         );
-
 }
 
 
 /* =========================================================
-   REMOVE WAR GRAPHICS
+   REMOVE FRONT
 ========================================================= */
 
 function removeWarGraphics(war){
@@ -1741,13 +2281,11 @@ function removeWarGraphics(war){
         )
         .remove();
 
-
     armyLayer
         .selectAll(
             `[data-war="${war.id}"]`
         )
         .remove();
-
 }
 
 
@@ -1759,7 +2297,6 @@ function victory(war){
 
     war.active=false;
     war.progress=100;
-    war.occupation=100;
 
 
     conquered[war.enemy]=true;
@@ -1769,7 +2306,7 @@ function victory(war){
         countries[war.enemy];
 
 
-    player.factories+=
+    player.factories +=
         Math.max(
             1,
             Math.floor(
@@ -1778,7 +2315,7 @@ function victory(war){
         );
 
 
-    player.income+=
+    player.income +=
         Math.max(
             10,
             Math.floor(
@@ -1787,24 +2324,20 @@ function victory(war){
         );
 
 
-    /*
-       Keep occupied area visible
-       after victory.
-    */
-
     drawOccupation(war);
 
     removeWarGraphics(war);
 
-
     updateMap();
+
+    drawLabels();
+
     updateUI();
 
 
     showToast(
         `🏳️ ${enemy.flag} ${enemy.name} conquered`
     );
-
 }
 
 
@@ -1822,33 +2355,40 @@ function updateMap(){
         .selectAll("path")
         .each(function(feature){
 
-            const iso=getISO(feature);
+            const iso=
+                getISO(feature);
 
-            let cls="land neutralLand";
+
+            let cls=
+                "land neutralLand";
 
 
             if(iso===player.nation)
-                cls="land playerLand";
+                cls=
+                    "land playerLand";
 
 
             if(conquered[iso])
-                cls="land conqueredLand";
+                cls=
+                    "land conqueredLand";
 
 
             const atWar=
                 wars.some(
                     w=>
-                    w.active &&
-                    w.enemy===iso
+                        w.active &&
+                        w.enemy===iso
                 );
 
 
             if(atWar)
-                cls="land enemyLand";
+                cls=
+                    "land enemyLand";
 
 
             if(selected===iso)
-                cls="land selectedLand";
+                cls=
+                    "land selectedLand";
 
 
             d3.select(this)
@@ -1858,17 +2398,17 @@ function updateMap(){
                 );
 
         });
-
 }
 
 
 /* =========================================================
-   GET ISO
+   ISO
 ========================================================= */
 
 function getISO(feature){
 
-    if(!feature || !feature.properties)
+    if(!feature ||
+       !feature.properties)
         return "";
 
 
@@ -1877,17 +2417,18 @@ function getISO(feature){
         feature.properties.ISO_A3 ||
         ""
     );
-
 }
 
 
 /* =========================================================
-   MAP INIT
+   INIT MAP
 ========================================================= */
 
 function initMap(){
 
-    svg=d3.select("#world");
+    svg=
+        d3.select("#world");
+
 
     countryLayer=
         d3.select("#countriesLayer");
@@ -1901,6 +2442,9 @@ function initMap(){
     armyLayer=
         d3.select("#armyLayer");
 
+    labelLayer=
+        d3.select("#labelLayer");
+
 
     projection=
         d3.geoNaturalEarth1();
@@ -1908,7 +2452,7 @@ function initMap(){
 
     path=
         d3.geoPath()
-        .projection(projection);
+            .projection(projection);
 
 
     setupMapControls();
@@ -1917,22 +2461,20 @@ function initMap(){
     fetch(
         "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson"
     )
-    .then(r=>{
+    .then(response=>{
 
-        if(!r.ok)
-            throw new Error(
-                "Map failed"
-            );
+        if(!response.ok)
+            throw new Error("Map failed");
 
-        return r.json();
+        return response.json();
 
     })
     .then(world=>{
 
         projection.fitExtent(
             [
-                [10,10],
-                [1190,640]
+                [30,10],
+                [1170,640]
             ],
             world
         );
@@ -1943,8 +2485,14 @@ function initMap(){
             .data(world.features)
             .enter()
             .append("path")
-            .attr("class","land neutralLand")
-            .attr("d",path)
+            .attr(
+                "class",
+                "land neutralLand"
+            )
+            .attr(
+                "d",
+                path
+            )
             .attr(
                 "data-iso",
                 d=>getISO(d)
@@ -1967,8 +2515,8 @@ function initMap(){
 
 
         updateMap();
+        drawLabels();
         redrawWars();
-
 
     })
     .catch(error=>{
@@ -1980,7 +2528,6 @@ function initMap(){
         );
 
     });
-
 }
 
 
@@ -1998,11 +2545,9 @@ function redrawWars(){
         .selectAll("*")
         .remove();
 
-
     armyLayer
         .selectAll("*")
         .remove();
-
 
     occupationLayer
         .selectAll("*")
@@ -2011,26 +2556,18 @@ function redrawWars(){
 
     wars.forEach(war=>{
 
-        if(
-            war.active &&
-            war.enemyArmy>0
-        ){
+        if(war.active){
 
             drawOccupation(war);
             drawWar(war);
 
-        }
-        else if(
-            !war.active &&
-            war.progress>=100
-        ){
+        }else if(war.progress>=100){
 
             drawOccupation(war);
 
         }
 
     });
-
 }
 
 
@@ -2040,7 +2577,8 @@ function redrawWars(){
 
 function selectCountry(iso){
 
-    const c=countries[iso];
+    const c=
+        countries[iso];
 
     if(!c)
         return;
@@ -2057,8 +2595,8 @@ function selectCountry(iso){
     const war=
         wars.find(
             w=>
-            w.active &&
-            w.enemy===iso
+                w.active &&
+                w.enemy===iso
         );
 
 
@@ -2096,50 +2634,58 @@ function selectCountry(iso){
 
         </div>
 
+
         <div class="row">
             <span>🪖 Army</span>
             <b>${format(army)}</b>
         </div>
+
 
         <div class="row">
             <span>👥 Population</span>
             <b>${format(c.pop)}</b>
         </div>
 
+
         <div class="row">
             <span>🏭 Factories</span>
             <b>${c.factories}</b>
         </div>
+
 
         <div class="row">
             <span>💰 Income</span>
             <b>${c.income}</b>
         </div>
 
+
         ${
             iso===player.nation
             ?
-            `<div class="armyBox">
+            `
+            <div class="armyBox">
                 🇺🇳 YOUR NATION
-            </div>`
+            </div>
+            `
             :
             war
             ?
-            `<button
-                class="action warBtn"
-                onclick="showWarById(${war.id})">
+            `
+            <button class="action warBtn"
+                    onclick="showWarById(${war.id})">
                 ⚔️ VIEW WAR
-            </button>`
+            </button>
+            `
             :
-            `<button
-                class="action warBtn"
-                onclick="declareWar('${iso}')">
+            `
+            <button class="action warBtn"
+                    onclick="declareWar('${iso}')">
                 ⚔️ DECLARE WAR
-            </button>`
+            </button>
+            `
         }
 
     `;
-
 }
 
 
@@ -2156,7 +2702,6 @@ function showWarById(id){
 
     if(war)
         showWar(war);
-
 }
 
 
@@ -2175,6 +2720,7 @@ function showWar(war){
             ⚔️ ${enemy.flag} ${enemy.name}
         </h2>
 
+
         <div class="armyBox">
 
             <div class="armyTitle">
@@ -2187,20 +2733,22 @@ function showWar(war){
 
             <div class="bar">
 
-                <div
-                    class="fill"
-                    style="
-                    width:${Math.min(
-                        100,
-                        player.army/
-                        countries[player.nation].army*
-                        100
-                    )}%">
+                <div class="fill"
+                     style="
+                     width:${
+                        Math.min(
+                            100,
+                            player.army/
+                            countries[player.nation].army*
+                            100
+                        )
+                     }%">
                 </div>
 
             </div>
 
         </div>
+
 
         <div class="armyBox">
 
@@ -2214,20 +2762,22 @@ function showWar(war){
 
             <div class="bar">
 
-                <div
-                    class="fill redFill"
-                    style="
-                    width:${Math.min(
-                        100,
-                        war.enemyArmy/
-                        enemy.army*
-                        100
-                    )}%">
+                <div class="fill redFill"
+                     style="
+                     width:${
+                        Math.min(
+                            100,
+                            war.enemyArmy/
+                            enemy.army*
+                            100
+                        )
+                     }%">
                 </div>
 
             </div>
 
         </div>
+
 
         <div class="frontBox">
 
@@ -2238,22 +2788,25 @@ function showWar(war){
             <b>FRONT LINE</b>
 
             <div style="
-                color:#8797a5;
-                margin-top:7px">
-                ${war.progress.toFixed(1)}% conquered
+                margin-top:7px;
+                color:#666b5b">
+
+                ${war.progress.toFixed(1)}%
+                conquered
+
             </div>
 
             <div class="bar">
 
-                <div
-                    class="fill"
-                    style="
-                    width:${war.progress}%">
+                <div class="fill"
+                     style="
+                     width:${war.progress}%">
                 </div>
 
             </div>
 
         </div>
+
 
         <div class="armyBox">
 
@@ -2270,7 +2823,6 @@ function showWar(war){
         </div>
 
     `;
-
 }
 
 
@@ -2289,14 +2841,14 @@ function openNations(){
 
         <div class="countryGrid">
 
-            ${Object.entries(countries).map(([iso,c])=>`
+            ${Object.entries(countries).map(
+                ([iso,c])=>`
 
-                <div
-                    class="country"
-                    onclick="
+                <div class="country"
+                     onclick="
                         closeModal();
                         selectCountry('${iso}');
-                    ">
+                     ">
 
                     <div class="countryFlag">
                         ${c.flag}
@@ -2325,9 +2877,7 @@ function openNations(){
             `).join("")}
 
         </div>
-
     `;
-
 }
 
 
@@ -2350,6 +2900,7 @@ function openArmy(){
 
         <h2>🪖 Army</h2>
 
+
         <div class="armyBox">
 
             <div class="armyTitle">
@@ -2361,6 +2912,7 @@ function openArmy(){
             </div>
 
         </div>
+
 
         <div class="armyBox">
 
@@ -2381,20 +2933,23 @@ function openArmy(){
 
         </div>
 
+
         <h3>Active Fronts</h3>
+
 
         ${
             active.length===0
             ?
-            `<p style="color:#82909d">
+            `
+            <p>
                 No active wars.
-            </p>`
+            </p>
+            `
             :
             active.map(w=>`
 
-                <button
-                    class="action warBtn"
-                    onclick="showWarById(${w.id})">
+                <button class="action warBtn"
+                        onclick="showWarById(${w.id})">
 
                     ⚔️
                     ${countries[w.enemy].flag}
@@ -2406,7 +2961,6 @@ function openArmy(){
         }
 
     `;
-
 }
 
 
@@ -2423,6 +2977,7 @@ function construction(){
 
         <h2>🏭 Construction</h2>
 
+
         <div class="armyBox">
 
             <div class="row">
@@ -2437,14 +2992,15 @@ function construction(){
 
         </div>
 
-        <button
-            class="action"
-            onclick="buildFactory()">
+
+        <button class="action"
+                onclick="buildFactory()">
+
             🏭 Build Factory
+
         </button>
 
     `;
-
 }
 
 
@@ -2457,17 +3013,17 @@ function buildFactory(){
         );
 
         return;
-
     }
 
 
     player.money-=500;
+
     player.factories++;
 
 
     updateUI();
-    construction();
 
+    construction();
 }
 
 
@@ -2484,36 +3040,37 @@ function research(){
 
         <h2>🔬 Research</h2>
 
+
         <div class="armyBox">
 
             <div class="armyNumber">
                 Level ${player.technology}
             </div>
 
-            <p style="color:#82909d">
+            <p>
                 ${player.research}/100 research
             </p>
 
             <div class="bar">
 
-                <div
-                    class="fill"
-                    style="
-                    width:${player.research}%">
+                <div class="fill"
+                     style="
+                     width:${player.research}%">
                 </div>
 
             </div>
 
         </div>
 
-        <button
-            class="action"
-            onclick="researchTech()">
+
+        <button class="action"
+                onclick="researchTech()">
+
             🔬 Research Technology
+
         </button>
 
     `;
-
 }
 
 
@@ -2526,17 +3083,17 @@ function researchTech(){
         );
 
         return;
-
     }
 
 
     player.research=0;
+
     player.technology++;
 
 
     updateUI();
-    research();
 
+    research();
 }
 
 
@@ -2553,6 +3110,7 @@ function diplomacy(){
 
         <h2>🤝 Diplomacy</h2>
 
+
         <div class="armyBox">
 
             <div class="row">
@@ -2568,12 +3126,11 @@ function diplomacy(){
         </div>
 
     `;
-
 }
 
 
 /* =========================================================
-   TAX
+   TAXES
 ========================================================= */
 
 function taxes(){
@@ -2595,7 +3152,6 @@ function taxes(){
     showToast(
         `💰 +${format(amount)}`
     );
-
 }
 
 
@@ -2612,7 +3168,6 @@ function saveGame(){
         );
 
         return;
-
     }
 
 
@@ -2633,7 +3188,6 @@ function saveGame(){
     showToast(
         "💾 Game saved"
     );
-
 }
 
 
@@ -2656,7 +3210,6 @@ function loadGame(){
         );
 
         return;
-
     }
 
 
@@ -2667,41 +3220,59 @@ function loadGame(){
 
 
         player=data.player;
-        year=data.year||1936;
-        month=data.month||1;
-        conquered=data.conquered||{};
-        wars=data.wars||[];
+
+        year=
+            data.year ||
+            1936;
+
+        month=
+            data.month ||
+            1;
+
+        conquered=
+            data.conquered ||
+            {};
+
+        wars=
+            data.wars ||
+            [];
 
 
-        selected=player.nation;
+        selected=
+            player.nation;
 
 
         showGame();
-        closeModal();
 
+        closeModal();
 
         updateUI();
 
 
-        if(mapReady)
+        if(mapReady){
+
+            updateMap();
+
+            drawLabels();
+
             redrawWars();
+
+        }
 
 
         showToast(
             "📂 Game loaded"
         );
 
-    }
-    catch(e){
+    }catch(error){
 
-        console.error(e);
+        console.error(error);
 
         showToast(
             "❌ Save error"
         );
 
     }
-
 }
 
 
@@ -2720,11 +3291,11 @@ function mainMenu(){
 
 
     timer=null;
+
     speed=0;
 
 
     showStart();
-
 }
 
 
@@ -2741,6 +3312,7 @@ function settings(){
 
         <h2>⚙️ Settings</h2>
 
+
         <div class="armyBox">
 
             <div class="row">
@@ -2750,67 +3322,58 @@ function settings(){
 
             <div class="row">
                 <span>Version</span>
-                <b>0.6</b>
+                <b>1.0</b>
             </div>
 
             <div class="row">
                 <span>Map</span>
-                <b>SVG World Map</b>
+                <b>World Strategy Map</b>
             </div>
 
         </div>
 
     `;
-
 }
 
 
 /* =========================================================
-   UI
+   UPDATE UI
 ========================================================= */
 
 function updateUI(){
 
-    const money=
-        document.getElementById("money");
-
-    const population=
-        document.getElementById("population");
-
-    const army=
-        document.getElementById("army");
-
-    const manpower=
-        document.getElementById("manpower");
-
-    const factories=
-        document.getElementById("factories");
-
-    const date=
-        document.getElementById("date");
-
-
-    money.textContent=
+    document.getElementById(
+        "money"
+    ).textContent=
         format(player.money);
 
 
-    population.textContent=
+    document.getElementById(
+        "population"
+    ).textContent=
         format(player.population);
 
 
-    army.textContent=
+    document.getElementById(
+        "army"
+    ).textContent=
         format(player.army);
 
 
-    manpower.textContent=
+    document.getElementById(
+        "manpower"
+    ).textContent=
         format(player.manpower);
 
 
-    factories.textContent=
+    document.getElementById(
+        "factories"
+    ).textContent=
         player.factories;
 
 
     const months=[
+
         "January",
         "February",
         "March",
@@ -2823,12 +3386,18 @@ function updateUI(){
         "October",
         "November",
         "December"
+
     ];
 
 
-    date.textContent=
+    document.getElementById(
+        "date"
+    ).textContent=
         `${months[month-1]} ${year}`;
 
+
+    if(mapReady)
+        drawLabels();
 }
 
 
@@ -2848,7 +3417,7 @@ function setupMapControls(){
             const oldZoom=zoom;
 
 
-            zoom+=
+            zoom +=
                 event.deltaY>0
                 ?
                 -.12
@@ -2868,8 +3437,10 @@ function setupMapControls(){
 
             const rect=
                 document
-                .getElementById("world")
-                .getBoundingClientRect();
+                    .getElementById(
+                        "world"
+                    )
+                    .getBoundingClientRect();
 
 
             const mouseX=
@@ -2882,12 +3453,12 @@ function setupMapControls(){
                 rect.top;
 
 
-            offsetX-=
+            offsetX -=
                 (mouseX-offsetX)*
                 (zoom/oldZoom-1);
 
 
-            offsetY-=
+            offsetY -=
                 (mouseY-offsetY)*
                 (zoom/oldZoom-1);
 
@@ -2907,6 +3478,12 @@ function setupMapControls(){
             lastX=event.clientX;
             lastY=event.clientY;
 
+            document
+                .getElementById("world")
+                .classList.add(
+                    "dragging"
+                );
+
         }
     );
 
@@ -2914,7 +3491,15 @@ function setupMapControls(){
     window.addEventListener(
         "mouseup",
         ()=>{
+
             dragging=false;
+
+            document
+                .getElementById("world")
+                .classList.remove(
+                    "dragging"
+                );
+
         }
     );
 
@@ -2927,11 +3512,10 @@ function setupMapControls(){
                 return;
 
 
-            offsetX+=
+            offsetX +=
                 event.clientX-lastX;
 
-
-            offsetY+=
+            offsetY +=
                 event.clientY-lastY;
 
 
@@ -2943,9 +3527,12 @@ function setupMapControls(){
 
         }
     );
-
 }
 
+
+/* =========================================================
+   MAP TRANSFORM
+========================================================= */
 
 function applyMapTransform(){
 
@@ -2980,6 +3567,12 @@ function applyMapTransform(){
             transform
         );
 
+
+    labelLayer
+        .attr(
+            "transform",
+            transform
+        );
 }
 
 

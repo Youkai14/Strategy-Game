@@ -3,1594 +3,944 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Iron Nations</title>
+<title>IRON NATIONS</title>
 
 <style>
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-}
-
+*{box-sizing:border-box}
 body{
-    font-family:Arial,Helvetica,sans-serif;
-    background:#071018;
-    color:#e9eef3;
+    margin:0;
+    background:#111820;
+    color:#e8edf2;
+    font-family:Arial,sans-serif;
     overflow:hidden;
 }
+button,select{
+    background:#202b36;
+    color:#fff;
+    border:1px solid #43515e;
+    padding:8px 12px;
+    border-radius:4px;
+    cursor:pointer;
+}
+button:hover{background:#30404e}
 
-/* TOPBAR */
-.topbar{
-    height:64px;
-    background:#101a24;
-    border-bottom:1px solid #263442;
+#topbar{
+    height:58px;
+    background:#18212a;
+    border-bottom:1px solid #3b4752;
     display:flex;
     align-items:center;
-    padding:0 18px;
-    gap:28px;
-    position:relative;
-    z-index:20;
-}
-
-.logo{
-    font-size:22px;
-    font-weight:900;
-    letter-spacing:3px;
-}
-
-.logo span{
-    color:#e34b4b;
-}
-
-.resources{
-    display:flex;
-    gap:10px;
-    flex:1;
-}
-
-.resource{
-    background:#17232f;
-    border:1px solid #293846;
-    border-radius:7px;
-    padding:7px 13px;
-    min-width:105px;
-}
-
-.resource small{
-    display:block;
-    color:#8293a3;
-    font-size:10px;
-    text-transform:uppercase;
-}
-
-.resource b{
-    font-size:15px;
-}
-
-/* GAME */
-.game{
+    gap:18px;
+    padding:0 14px;
     position:absolute;
-    top:64px;
-    bottom:0;
+    top:0;
     left:0;
     right:0;
-}
-
-/* MAP */
-.map-container{
-    position:absolute;
-    inset:0;
-    overflow:hidden;
-    background:
-        radial-gradient(circle at 50% 40%,#173449 0%,#0b1d2b 45%,#061018 100%);
-    cursor:grab;
-}
-
-.map-container.dragging{
-    cursor:grabbing;
-}
-
-.map{
-    position:absolute;
-    width:1500px;
-    height:850px;
-    left:50%;
-    top:50%;
-    transform-origin:center;
-    transform:translate(-50%,-50%) scale(1);
-}
-
-/* decorative ocean */
-.ocean-grid{
-    position:absolute;
-    inset:0;
-    opacity:.13;
-    background-image:
-        linear-gradient(#80a8bd 1px,transparent 1px),
-        linear-gradient(90deg,#80a8bd 1px,transparent 1px);
-    background-size:75px 75px;
-}
-
-/* LAND */
-.country{
-    position:absolute;
-    border:2px solid rgba(255,255,255,.35);
-    transition:.15s;
-    cursor:pointer;
-    filter:drop-shadow(0 4px 5px #0008);
-}
-
-.country:hover{
-    filter:brightness(1.25) drop-shadow(0 4px 8px #000);
     z-index:10;
 }
-
-.country.selected{
-    outline:3px solid #fff;
-    outline-offset:3px;
-    filter:brightness(1.35) drop-shadow(0 0 10px #fff6);
-    z-index:15;
-}
-
-.country-name{
-    position:absolute;
-    left:50%;
-    top:50%;
-    transform:translate(-50%,-50%);
+.logo{
+    font-size:21px;
     font-weight:bold;
+    letter-spacing:2px;
+}
+.stat{
     font-size:13px;
-    color:white;
-    text-shadow:0 2px 5px #000;
-    pointer-events:none;
     white-space:nowrap;
 }
+.stat b{color:#fff}
 
-/* Shapes */
-.germany{
-    left:690px;
-    top:330px;
-    width:130px;
-    height:115px;
-    background:#526f82;
-    clip-path:polygon(
-        28% 0,62% 5%,83% 20%,94% 44%,78% 60%,
-        88% 81%,65% 100%,39% 87%,22% 94%,8% 65%,
-        17% 43%,4% 20%
-    );
-}
-
-.france{
-    left:565px;
-    top:390px;
-    width:145px;
-    height:145px;
-    background:#596f88;
-    clip-path:polygon(
-        25% 0,60% 7%,85% 24%,100% 52%,81% 69%,
-        87% 94%,53% 100%,28% 82%,4% 73%,0 45%,13% 23%
-    );
-}
-
-.spain{
-    left:500px;
-    top:505px;
-    width:150px;
-    height:90px;
-    background:#735e4b;
-    clip-path:polygon(8% 17%,38% 0,84% 12%,100% 52%,84% 91%,39% 100%,8% 73%,0 39%);
-}
-
-.italy{
-    left:720px;
-    top:475px;
-    width:80px;
-    height:160px;
-    background:#62764f;
-    clip-path:polygon(30% 0,65% 11%,48% 32%,74% 45%,55% 59%,70% 76%,48% 100%,27% 83%,39% 60%,15% 44%,29% 25%);
-}
-
-.poland{
-    left:805px;
-    top:315px;
-    width:135px;
-    height:105px;
-    background:#715d78;
-    clip-path:polygon(8% 22%,36% 4%,80% 10%,100% 40%,84% 83%,49% 100%,13% 76%);
-}
-
-.uk{
-    left:460px;
-    top:275px;
-    width:75px;
-    height:125px;
-    background:#4d6f68;
-    clip-path:polygon(45% 0,73% 19%,61% 38%,82% 56%,65% 77%,74% 100%,42% 88%,27% 66%,3% 53%,18% 29%,8% 10%);
-}
-
-.norway{
-    left:630px;
-    top:120px;
-    width:90px;
-    height:200px;
-    background:#59697b;
-    clip-path:polygon(48% 0,77% 18%,62% 34%,91% 48%,68% 65%,83% 82%,52% 100%,32% 80%,8% 66%,24% 45%,4% 28%,26% 12%);
-}
-
-.sweden{
-    left:720px;
-    top:110px;
-    width:90px;
-    height:210px;
-    background:#6e6548;
-    clip-path:polygon(41% 0,74% 14%,58% 31%,89% 50%,64% 66%,81% 84%,48% 100%,27% 81%,9% 62%,23% 43%,7% 24%,28% 9%);
-}
-
-.russia{
-    left:850px;
-    top:120px;
-    width:480px;
-    height:210px;
-    background:#554e70;
-    clip-path:polygon(
-        0 25%,8% 9%,19% 15%,29% 2%,41% 13%,52% 3%,
-        65% 11%,75% 2%,89% 14%,100% 24%,95% 45%,
-        100% 61%,88% 73%,78% 66%,66% 83%,53% 73%,
-        39% 90%,24% 77%,13% 91%,4% 71%,10% 51%,0 44%
-    );
-}
-
-.ukraine{
-    left:880px;
-    top:335px;
-    width:190px;
-    height:125px;
-    background:#5f744e;
-    clip-path:polygon(9% 28%,31% 8%,63% 0,89% 19%,100% 52%,78% 75%,57% 100%,29% 83%,4% 75%,0 48%);
-}
-
-.turkey{
-    left:850px;
-    top:470px;
-    width:220px;
-    height:70px;
-    background:#704f4e;
-    clip-path:polygon(0 40%,17% 18%,41% 25%,58% 8%,79% 27%,100% 32%,92% 64%,65% 74%,45% 59%,20% 79%,4% 63%);
-}
-
-/* SIDE PANELS */
-.panel{
+#left{
     position:absolute;
-    top:15px;
-    bottom:15px;
-    width:285px;
-    background:#101a24ed;
-    border:1px solid #2b3a47;
-    backdrop-filter:blur(8px);
-    border-radius:10px;
-    z-index:12;
-    overflow:hidden;
-}
-
-.left-panel{
-    left:15px;
-}
-
-.right-panel{
-    right:15px;
-}
-
-.panel-header{
-    padding:17px;
-    border-bottom:1px solid #293845;
-    font-size:15px;
-    font-weight:bold;
-}
-
-.menu{
+    top:58px;
+    bottom:45px;
+    left:0;
+    width:190px;
+    background:#18212a;
+    border-right:1px solid #3b4752;
+    z-index:8;
     padding:10px;
 }
-
-.menu button{
+.menu{
     width:100%;
-    padding:12px;
     margin-bottom:7px;
     text-align:left;
-    border:1px solid #293947;
-    background:#16232f;
-    color:#dbe4ea;
-    border-radius:7px;
-    cursor:pointer;
 }
 
-.menu button:hover{
-    background:#213343;
-}
-
-.menu button.active{
-    background:#713737;
-    border-color:#aa5050;
-}
-
-.info{
-    margin:12px;
-    padding:13px;
-    border:1px solid #2c3b47;
-    border-radius:8px;
-    background:#0b151e;
-}
-
-.info h3{
-    margin-bottom:10px;
-}
-
-.stat{
-    display:flex;
-    justify-content:space-between;
-    padding:6px 0;
-    color:#9baab6;
-}
-
-.stat b{
-    color:#fff;
-}
-
-/* ATTACK BOX */
-.attack-box{
+#map{
     position:absolute;
-    width:420px;
-    left:50%;
-    top:50%;
-    transform:translate(-50%,-50%);
-    background:#101a24;
-    border:1px solid #40505d;
-    border-radius:12px;
-    box-shadow:0 20px 70px #000b;
-    z-index:50;
-    display:none;
+    top:58px;
+    left:190px;
+    right:310px;
+    bottom:45px;
+    background:#263a46;
+    overflow:hidden;
+    cursor:grab;
 }
+#map:active{cursor:grabbing}
 
-.attack-box.open{
-    display:block;
-}
-
-.attack-header{
-    padding:18px;
-    border-bottom:1px solid #2c3b48;
-    display:flex;
-    justify-content:space-between;
-}
-
-.close{
-    border:0;
-    background:none;
-    color:#9ba9b5;
-    font-size:22px;
-    cursor:pointer;
-}
-
-.attack-content{
-    padding:20px;
-}
-
-.war-preview{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    margin-bottom:20px;
-}
-
-.war-country{
-    text-align:center;
-    width:130px;
-}
-
-.flag{
-    width:65px;
-    height:45px;
-    margin:auto auto 8px;
-    border:1px solid #555;
-}
-
-.vs{
-    font-size:20px;
-    font-weight:bold;
-    color:#e25a5a;
-}
-
-.slider{
-    width:100%;
-    margin:14px 0;
-}
-
-.attack-number{
-    text-align:center;
-    font-size:25px;
-    font-weight:bold;
-    margin:10px;
-}
-
-.attack-btn{
-    width:100%;
-    border:0;
-    padding:14px;
-    border-radius:7px;
-    background:#a43f3f;
-    color:#fff;
-    font-size:16px;
-    font-weight:bold;
-    cursor:pointer;
-}
-
-.attack-btn:hover{
-    background:#c24c4c;
-}
-
-/* EVENT LOG */
-.events{
-    max-height:250px;
-    overflow:auto;
-}
-
-.event{
-    padding:9px 0;
-    border-bottom:1px solid #263440;
-    font-size:12px;
-    color:#aebbc4;
-}
-
-/* MAP CONTROLS */
-.map-controls{
+#world{
     position:absolute;
-    right:315px;
-    bottom:20px;
-    z-index:20;
-    display:flex;
-    gap:6px;
+    width:1600px;
+    height:850px;
+    transform-origin:0 0;
 }
 
-.map-controls button{
-    width:42px;
-    height:42px;
-    background:#14222e;
-    color:white;
-    border:1px solid #344653;
-    border-radius:6px;
-    cursor:pointer;
-    font-size:20px;
-}
-
-/* TOAST */
-.toast-container{
-    position:absolute;
-    right:315px;
-    top:20px;
-    z-index:100;
-}
-
-.toast{
-    background:#172530;
-    border:1px solid #405361;
-    padding:12px 16px;
-    margin-bottom:8px;
-    border-radius:7px;
-    box-shadow:0 8px 25px #0008;
-    animation:toast .25s ease;
-}
-
-@keyframes toast{
-    from{transform:translateX(30px);opacity:0}
-    to{transform:translateX(0);opacity:1}
-}
-
-.overlay{
+.ocean{
     position:absolute;
     inset:0;
-    background:#0008;
+    background:
+      radial-gradient(circle at 30% 30%,#35515d 0,#263a46 45%,#1d303b 100%);
+}
+
+.country{
+    position:absolute;
+    border:1px solid rgba(255,255,255,.35);
+    cursor:pointer;
+    transition:.15s;
+}
+.country:hover{
+    filter:brightness(1.35);
+    outline:2px solid #fff;
+    z-index:20;
+}
+.country.selected{
+    outline:3px solid #f4d35e;
+    z-index:30;
+}
+.province{
+    position:absolute;
+    border:1px solid rgba(255,255,255,.18);
+    pointer-events:none;
+}
+
+.c1{left:170px;top:180px;width:180px;height:110px;background:#526c83}
+.c2{left:350px;top:170px;width:160px;height:125px;background:#7b5e62}
+.c3{left:510px;top:205px;width:170px;height:100px;background:#596d58}
+.c4{left:680px;top:185px;width:180px;height:125px;background:#75624d}
+.c5{left:860px;top:210px;width:180px;height:100px;background:#5b5f7b}
+.c6{left:1040px;top:180px;width:170px;height:120px;background:#6d7654}
+.c7{left:1210px;top:215px;width:160px;height:95px;background:#805d51}
+.c8{left:220px;top:360px;width:190px;height:115px;background:#536d70}
+.c9{left:410px;top:345px;width:180px;height:130px;background:#78624e}
+.c10{left:590px;top:355px;width:170px;height:110px;background:#596b80}
+.c11{left:760px;top:350px;width:190px;height:120px;background:#735d68}
+.c12{left:950px;top:360px;width:170px;height:110px;background:#5d7659}
+.c13{left:1120px;top:350px;width:190px;height:125px;background:#79684e}
+.c14{left:300px;top:510px;width:170px;height:110px;background:#665c79}
+.c15{left:470px;top:505px;width:180px;height:125px;background:#57706a}
+.c16{left:650px;top:500px;width:160px;height:120px;background:#806250}
+.c17{left:810px;top:510px;width:190px;height:115px;background:#58677d}
+.c18{left:1000px;top:500px;width:170px;height:120px;background:#706052}
+.c19{left:1170px;top:510px;width:180px;height:110px;background:#5c765e}
+.c20{left:550px;top:650px;width:180px;height:90px;background:#75616f}
+
+.countryLabel{
+    font-size:13px;
+    font-weight:bold;
+    text-align:center;
+    margin-top:8px;
+    text-shadow:1px 1px 3px #000;
+}
+
+.army{
+    position:absolute;
+    background:#ddd;
+    color:#111;
+    border:2px solid #111;
+    border-radius:50%;
+    width:28px;
+    height:28px;
+    text-align:center;
+    line-height:24px;
+    font-size:11px;
+    font-weight:bold;
     z-index:40;
-    display:none;
+    cursor:pointer;
+}
+.army:hover{transform:scale(1.2)}
+
+.front{
+    position:absolute;
+    height:5px;
+    background:#e35d6a;
+    z-index:35;
+    transform-origin:left center;
+    box-shadow:0 0 5px #000;
 }
 
-.overlay.show{
-    display:block;
+.attack{
+    position:absolute;
+    height:4px;
+    background:#f4d35e;
+    z-index:34;
+    transform-origin:left center;
 }
 
-/* MOBILE */
-@media(max-width:900px){
-    .left-panel{
-        width:230px;
-    }
-
-    .right-panel{
-        display:none;
-    }
-
-    .resources{
-        display:none;
-    }
-
-    .map-controls{
-        right:15px;
-    }
-
-    .toast-container{
-        right:15px;
-    }
+#right{
+    position:absolute;
+    top:58px;
+    right:0;
+    bottom:45px;
+    width:310px;
+    background:#18212a;
+    border-left:1px solid #3b4752;
+    padding:12px;
+    overflow:auto;
+    z-index:8;
 }
 
-@media(max-width:600px){
-    .left-panel{
-        width:190px;
-        left:7px;
-    }
+.panel{
+    background:#202b35;
+    border:1px solid #3d4a55;
+    padding:11px;
+    margin-bottom:10px;
+}
+.panel h3{
+    margin:0 0 9px;
+    font-size:15px;
+}
+.row{
+    display:flex;
+    justify-content:space-between;
+    margin:6px 0;
+    font-size:13px;
+}
+.bar{
+    height:7px;
+    background:#111;
+    margin-top:4px;
+}
+.bar div{
+    height:100%;
+    background:#aebdca;
+}
 
-    .attack-box{
-        width:calc(100% - 20px);
-    }
+#bottom{
+    position:absolute;
+    height:45px;
+    left:0;
+    right:0;
+    bottom:0;
+    background:#18212a;
+    border-top:1px solid #3b4752;
+    z-index:10;
+    display:flex;
+    align-items:center;
+    gap:7px;
+    padding:6px 10px;
+}
+.speed{
+    min-width:42px;
+}
+#date{
+    margin-left:auto;
+    font-weight:bold;
+}
+
+#notifications{
+    position:absolute;
+    top:70px;
+    right:325px;
+    width:300px;
+    z-index:100;
+}
+.notification{
+    background:#202b35;
+    border:1px solid #596876;
+    padding:10px;
+    margin-bottom:6px;
+    box-shadow:0 3px 10px #0008;
+    font-size:12px;
 }
 </style>
 </head>
 
 <body>
 
-<header class="topbar">
-    <div class="logo">IRON <span>NATIONS</span></div>
+<div id="topbar">
+    <div class="logo">IRON NATIONS</div>
 
-    <div class="resources">
-        <div class="resource">
-            <small>Geld</small>
-            <b id="money">25.000</b>
+    <div class="stat">Politische Macht: <b id="pp">120</b></div>
+    <div class="stat">Stabilität: <b id="stability">72%</b></div>
+    <div class="stat">Kriegsunterstützung: <b id="warSupport">61%</b></div>
+    <div class="stat">Stahl: <b id="steel">80</b></div>
+    <div class="stat">Öl: <b id="oil">40</b></div>
+    <div class="stat">Aluminium: <b id="aluminium">35</b></div>
+</div>
+
+<div id="left">
+    <button class="menu" onclick="showPolitics()">Politik</button>
+    <button class="menu" onclick="showResearch()">Forschung</button>
+    <button class="menu" onclick="showProduction()">Produktion</button>
+    <button class="menu" onclick="showArmy()">Armee</button>
+    <button class="menu" onclick="showDiplomacy()">Diplomatie</button>
+    <button class="menu" onclick="showIntel()">Geheimdienst</button>
+    <button class="menu" onclick="showTrade()">Handel</button>
+    <button class="menu" onclick="toggleSupply()">Versorgung</button>
+    <button class="menu" onclick="saveGame()">Speichern</button>
+    <button class="menu" onclick="loadGame()">Laden</button>
+</div>
+
+<div id="map">
+    <div id="world">
+        <div class="ocean"></div>
+
+        <div class="country c1" onclick="selectCountry(0)">
+            <div class="countryLabel">Nordmark</div>
+            <div class="province" style="left:0;top:55px;width:60px;height:54px"></div>
+            <div class="province" style="left:60px;top:0;width:60px;height:55px"></div>
+            <div class="province" style="left:120px;top:55px;width:60px;height:55px"></div>
         </div>
 
-        <div class="resource">
-            <small>Stahl</small>
-            <b id="steel">8.500</b>
+        <div class="country c2" onclick="selectCountry(1)">
+            <div class="countryLabel">Valoria</div>
         </div>
 
-        <div class="resource">
-            <small>Öl</small>
-            <b id="oil">5.200</b>
+        <div class="country c3" onclick="selectCountry(2)">
+            <div class="countryLabel">Estara</div>
         </div>
 
-        <div class="resource">
-            <small>Bevölkerung</small>
-            <b id="population">83 Mio.</b>
+        <div class="country c4" onclick="selectCountry(3)">
+            <div class="countryLabel">Dameria</div>
+        </div>
+
+        <div class="country c5" onclick="selectCountry(4)">
+            <div class="countryLabel">Orland</div>
+        </div>
+
+        <div class="country c6" onclick="selectCountry(5)">
+            <div class="countryLabel">Ruthenia</div>
+        </div>
+
+        <div class="country c7" onclick="selectCountry(6)">
+            <div class="countryLabel">Karsia</div>
+        </div>
+
+        <div class="country c8" onclick="selectCountry(7)">
+            <div class="countryLabel">Westfalen</div>
+        </div>
+
+        <div class="country c9" onclick="selectCountry(8)">
+            <div class="countryLabel">Aurelia</div>
+        </div>
+
+        <div class="country c10" onclick="selectCountry(9)">
+            <div class="countryLabel">Belvar</div>
+        </div>
+
+        <div class="country c11" onclick="selectCountry(10)">
+            <div class="countryLabel">Lydien</div>
+        </div>
+
+        <div class="country c12" onclick="selectCountry(11)">
+            <div class="countryLabel">Sarmatia</div>
+        </div>
+
+        <div class="country c13" onclick="selectCountry(12)">
+            <div class="countryLabel">Tauron</div>
+        </div>
+
+        <div class="country c14" onclick="selectCountry(13)">
+            <div class="countryLabel">Meridia</div>
+        </div>
+
+        <div class="country c15" onclick="selectCountry(14)">
+            <div class="countryLabel">Caledon</div>
+        </div>
+
+        <div class="country c16" onclick="selectCountry(15)">
+            <div class="countryLabel">Arden</div>
+        </div>
+
+        <div class="country c17" onclick="selectCountry(16)">
+            <div class="countryLabel">Helion</div>
+        </div>
+
+        <div class="country c18" onclick="selectCountry(17)">
+            <div class="countryLabel">Dravik</div>
+        </div>
+
+        <div class="country c19" onclick="selectCountry(18)">
+            <div class="countryLabel">Ostara</div>
+        </div>
+
+        <div class="country c20" onclick="selectCountry(19)">
+            <div class="countryLabel">Zerkan</div>
+        </div>
+
+        <div class="army" style="left:250px;top:215px" onclick="selectArmy(0)">12</div>
+        <div class="army" style="left:390px;top:390px" onclick="selectArmy(1)">8</div>
+        <div class="army" style="left:720px;top:225px" onclick="selectArmy(2)">16</div>
+        <div class="army" style="left:1000px;top:390px" onclick="selectArmy(3)">10</div>
+
+        <div id="front1" class="front" style="left:345px;top:230px;width:170px;transform:rotate(2deg)"></div>
+        <div id="attack1" class="attack" style="left:300px;top:250px;width:250px;transform:rotate(-8deg)"></div>
+    </div>
+</div>
+
+<div id="right">
+
+    <div class="panel">
+        <h3 id="panelTitle">Nordmark</h3>
+        <div id="panelContent">
+            Klicke ein Land, eine Provinz oder eine Armee an.
         </div>
     </div>
 
-    <div>
-        Tag <b id="day">1</b>
-    </div>
-</header>
-
-<div class="game">
-
-    <div class="map-container" id="mapContainer">
-        <div class="map" id="map">
-
-            <div class="ocean-grid"></div>
-
-            <div class="country germany"
-                 data-country="Deutschland"
-                 onclick="selectCountry('Deutschland')">
-                <span class="country-name">Deutschland</span>
-            </div>
-
-            <div class="country france"
-                 data-country="Frankreich"
-                 onclick="selectCountry('Frankreich')">
-                <span class="country-name">Frankreich</span>
-            </div>
-
-            <div class="country spain"
-                 data-country="Spanien"
-                 onclick="selectCountry('Spanien')">
-                <span class="country-name">Spanien</span>
-            </div>
-
-            <div class="country italy"
-                 data-country="Italien"
-                 onclick="selectCountry('Italien')">
-                <span class="country-name">Italien</span>
-            </div>
-
-            <div class="country poland"
-                 data-country="Polen"
-                 onclick="selectCountry('Polen')">
-                <span class="country-name">Polen</span>
-            </div>
-
-            <div class="country uk"
-                 data-country="Großbritannien"
-                 onclick="selectCountry('Großbritannien')">
-                <span class="country-name">UK</span>
-            </div>
-
-            <div class="country norway"
-                 data-country="Norwegen"
-                 onclick="selectCountry('Norwegen')">
-                <span class="country-name">Norwegen</span>
-            </div>
-
-            <div class="country sweden"
-                 data-country="Schweden"
-                 onclick="selectCountry('Schweden')">
-                <span class="country-name">Schweden</span>
-            </div>
-
-            <div class="country russia"
-                 data-country="Russland"
-                 onclick="selectCountry('Russland')">
-                <span class="country-name">Russland</span>
-            </div>
-
-            <div class="country ukraine"
-                 data-country="Ukraine"
-                 onclick="selectCountry('Ukraine')">
-                <span class="country-name">Ukraine</span>
-            </div>
-
-            <div class="country turkey"
-                 data-country="Türkei"
-                 onclick="selectCountry('Türkei')">
-                <span class="country-name">Türkei</span>
-            </div>
-
-        </div>
+    <div class="panel">
+        <h3>Aktive Front</h3>
+        <div class="row"><span>Frontbreite</span><b>6 Provinzen</b></div>
+        <div class="row"><span>Eigene Stärke</span><b>82%</b></div>
+        <div class="row"><span>Feindstärke</span><b>76%</b></div>
+        <div class="row"><span>Versorgung</span><b>88%</b></div>
+        <button onclick="startAttack()">Angriff starten</button>
     </div>
 
-    <!-- LEFT -->
-    <aside class="panel left-panel">
-
-        <div class="panel-header">
-            Kommandomenü
-        </div>
-
-        <div class="menu">
-
-            <button onclick="mode('select')" id="selectBtn">
-                🖱️ Auswahl
-            </button>
-
-            <button onclick="mode('army')">
-                🪖 Armee
-            </button>
-
-            <button onclick="mode('build')">
-                🏭 Gebäude
-            </button>
-
-            <button onclick="mode('economy')">
-                💰 Wirtschaft
-            </button>
-
-            <button onclick="mode('diplomacy')">
-                🤝 Diplomatie
-            </button>
-
-            <button onclick="openAttack()">
-                ⚔️ Angriff planen
-            </button>
-
-        </div>
-
-        <div class="info">
-
-            <h3 id="selectedName">
-                Kein Land ausgewählt
-            </h3>
-
-            <div class="stat">
-                <span>Bevölkerung</span>
-                <b id="selectedPopulation">—</b>
-            </div>
-
-            <div class="stat">
-                <span>Armee</span>
-                <b id="selectedArmy">—</b>
-            </div>
-
-            <div class="stat">
-                <span>Industrie</span>
-                <b id="selectedIndustry">—</b>
-            </div>
-
-            <button class="attack-btn"
-                    style="margin-top:10px"
-                    onclick="openAttack()">
-                Angriff planen
-            </button>
-
-        </div>
-
-    </aside>
-
-    <!-- RIGHT -->
-    <aside class="panel right-panel">
-
-        <div class="panel-header">
-            Weltübersicht
-        </div>
-
-        <div class="info">
-            <div class="stat">
-                <span>Spielzeit</span>
-                <b id="timer">00:00</b>
-            </div>
-
-            <div class="stat">
-                <span>Spieler</span>
-                <b>12.483</b>
-            </div>
-
-            <div class="stat">
-                <span>Gebiete</span>
-                <b id="territories">1 / 11</b>
-            </div>
-        </div>
-
-        <div class="panel-header">
-            Ereignisse
-        </div>
-
-        <div class="info events" id="events">
-
-            <div class="event">
-                Spiel gestartet.
-            </div>
-
-            <div class="event">
-                Europa wartet auf deine Befehle.
-            </div>
-
-        </div>
-
-    </aside>
-
-    <!-- MAP CONTROLS -->
-    <div class="map-controls">
-        <button onclick="zoomMap(1.15)">+</button>
-        <button onclick="zoomMap(.87)">−</button>
-        <button onclick="resetMap()">⌂</button>
+    <div class="panel">
+        <h3>Produktion</h3>
+        <div class="row"><span>Gewehre</span><b>+120/Tag</b></div>
+        <div class="row"><span>Artillerie</span><b>+8/Tag</b></div>
+        <div class="row"><span>Fahrzeuge</span><b>+5/Tag</b></div>
+        <div class="row"><span>Flugzeuge</span><b>+3/Tag</b></div>
     </div>
 
-    <!-- OVERLAY -->
-    <div class="overlay" id="overlay"></div>
-
-    <!-- ATTACK WINDOW -->
-    <div class="attack-box" id="attackBox">
-
-        <div class="attack-header">
-
-            <b>⚔️ Angriff planen</b>
-
-            <button class="close"
-                    onclick="closeAttack()">×</button>
-
-        </div>
-
-        <div class="attack-content">
-
-            <div class="war-preview">
-
-                <div class="war-country">
-                    <div class="flag" id="attackerFlag"></div>
-                    <b id="attackerName">Deutschland</b>
-                    <small id="attackerArmyText">
-                        125.000 Soldaten
-                    </small>
-                </div>
-
-                <div class="vs">
-                    VS
-                </div>
-
-                <div class="war-country">
-                    <div class="flag" id="defenderFlag"></div>
-                    <b id="defenderName">—</b>
-                    <small id="defenderArmyText">
-                        — Soldaten
-                    </small>
-                </div>
-
-            </div>
-
-            <label>
-                Truppen für Angriff
-            </label>
-
-            <input
-                class="slider"
-                id="troopSlider"
-                type="range"
-                min="1000"
-                max="100000"
-                step="1000"
-                value="10000"
-                oninput="updateAttackSlider()"
-            >
-
-            <div class="attack-number">
-                <span id="troopNumber">10.000</span>
-                Soldaten
-            </div>
-
-            <div class="stat">
-                <span>Angriffsstärke</span>
-                <b id="attackPower">10.000</b>
-            </div>
-
-            <div class="stat">
-                <span>Verteidigungsstärke</span>
-                <b id="defensePower">—</b>
-            </div>
-
-            <button class="attack-btn"
-                    onclick="executeAttack()">
-                ANGRIFF STARTEN
-            </button>
-
-        </div>
+    <div class="panel">
+        <h3>Forschung</h3>
+        <div class="row"><span>Aktuell</span><b>Motorisierung</b></div>
+        <div class="row"><span>Fortschritt</span><b id="research">43%</b></div>
+        <div class="bar"><div id="researchBar" style="width:43%"></div></div>
     </div>
-
-    <div class="toast-container" id="toasts"></div>
 
 </div>
 
+<div id="notifications"></div>
+
+<div id="bottom">
+    <button class="speed" onclick="setSpeed(0)">Ⅱ</button>
+    <button class="speed" onclick="setSpeed(.5)">0.5x</button>
+    <button class="speed" onclick="setSpeed(1)">1x</button>
+    <button class="speed" onclick="setSpeed(2)">2x</button>
+    <button class="speed" onclick="setSpeed(3)">3x</button>
+    <button class="speed" onclick="setSpeed(5)">5x</button>
+    <button onclick="centerMap()">Karte zentrieren</button>
+    <button onclick="toggleMapMode()">Kartenmodus</button>
+    <span id="speedText">1x</span>
+    <span id="date">1. Januar 1940</span>
+</div>
+
 <script>
-/* =========================
-   SPIELDATEN
-========================= */
 
-const countries = {
+const countries = [
+    {name:"Nordmark",capital:"Nordstadt",population:38_000_000,industry:82,stability:72,war:61,terrain:"Ebene"},
+    {name:"Valoria",capital:"Valen",population:24_000_000,industry:61,stability:67,war:44,terrain:"Wald"},
+    {name:"Estara",capital:"Estar",population:31_000_000,industry:73,stability:76,war:51,terrain:"Ebene"},
+    {name:"Dameria",capital:"Damen",population:18_000_000,industry:48,stability:64,war:38,terrain:"Gebirge"},
+    {name:"Orland",capital:"Orla",population:27_000_000,industry:69,stability:70,war:49,terrain:"Küste"},
+    {name:"Ruthenia",capital:"Ruth",population:51_000_000,industry:95,stability:61,war:65,terrain:"Ebene"},
+    {name:"Karsia",capital:"Kars",population:14_000_000,industry:32,stability:58,war:52,terrain:"Gebirge"},
+    {name:"Westfalen",capital:"Westburg",population:22_000_000,industry:58,stability:73,war:47,terrain:"Wald"},
+    {name:"Aurelia",capital:"Aurora",population:44_000_000,industry:102,stability:79,war:35,terrain:"Stadt"},
+    {name:"Belvar",capital:"Belgrad",population:17_000_000,industry:41,stability:62,war:55,terrain:"Hügel"},
+    {name:"Lydien",capital:"Lydia",population:29_000_000,industry:54,stability:69,war:43,terrain:"Küste"},
+    {name:"Sarmatia",capital:"Sarma",population:47_000_000,industry:78,stability:57,war:68,terrain:"Ebene"},
+    {name:"Tauron",capital:"Taur",population:19_000_000,industry:43,stability:66,war:46,terrain:"Wüste"},
+    {name:"Meridia",capital:"Meris",population:26_000_000,industry:52,stability:71,war:41,terrain:"Dschungel"},
+    {name:"Caledon",capital:"Cale",population:13_000_000,industry:37,stability:81,war:29,terrain:"Wald"},
+    {name:"Arden",capital:"Arden",population:21_000_000,industry:63,stability:68,war:48,terrain:"Ebene"},
+    {name:"Helion",capital:"Helia",population:34_000_000,industry:71,stability:74,war:42,terrain:"Küste"},
+    {name:"Dravik",capital:"Drav",population:16_000_000,industry:39,stability:60,war:59,terrain:"Gebirge"},
+    {name:"Ostara",capital:"Ostar",population:23_000_000,industry:49,stability:65,war:53,terrain:"Sumpf"},
+    {name:"Zerkan",capital:"Zer",population:11_000_000,industry:28,stability:55,war:62,terrain:"Wüste"}
+];
 
-    "Deutschland":{
-        population:"83 Mio.",
-        army:125000,
-        industry:92,
-        color:"#526f82"
-    },
-
-    "Frankreich":{
-        population:"68 Mio.",
-        army:110000,
-        industry:82,
-        color:"#596f88"
-    },
-
-    "Spanien":{
-        population:"48 Mio.",
-        army:65000,
-        industry:65,
-        color:"#735e4b"
-    },
-
-    "Italien":{
-        population:"59 Mio.",
-        army:85000,
-        industry:72,
-        color:"#62764f"
-    },
-
-    "Polen":{
-        population:"37 Mio.",
-        army:90000,
-        industry:67,
-        color:"#715d78"
-    },
-
-    "Großbritannien":{
-        population:"68 Mio.",
-        army:115000,
-        industry:88,
-        color:"#4d6f68"
-    },
-
-    "Norwegen":{
-        population:"5,5 Mio.",
-        army:25000,
-        industry:55,
-        color:"#59697b"
-    },
-
-    "Schweden":{
-        population:"10,6 Mio.",
-        army:42000,
-        industry:70,
-        color:"#6e6548"
-    },
-
-    "Russland":{
-        population:"143 Mio.",
-        army:450000,
-        industry:95,
-        color:"#554e70"
-    },
-
-    "Ukraine":{
-        population:"37 Mio.",
-        army:190000,
-        industry:58,
-        color:"#5f744e"
-    },
-
-    "Türkei":{
-        population:"86 Mio.",
-        army:220000,
-        industry:78,
-        color:"#704f4e"
-    }
+let game = {
+    day:1,
+    month:1,
+    year:1940,
+    speed:1,
+    paused:false,
+    politicalPower:120,
+    stability:72,
+    warSupport:61,
+    steel:80,
+    oil:40,
+    aluminium:35,
+    research:43,
+    selectedCountry:0,
+    selectedArmy:null,
+    mapMode:"political"
 };
 
+let armies = [
+    {name:"1. Armee",general:"Max Berger",divisions:24,strength:91,organization:72,supply:88,fuel:64,x:250,y:215},
+    {name:"2. Armee",general:"Erik Falk",divisions:18,strength:82,organization:64,supply:79,fuel:58,x:390,y:390},
+    {name:"Nordarmee",general:"Karl Dorn",divisions:31,strength:87,organization:70,supply:91,fuel:73,x:720,y:225},
+    {name:"Südarmee",general:"Lena Wolf",divisions:20,strength:76,organization:59,supply:75,fuel:51,x:1000,y:390}
+];
 
-/* =========================
-   SPIELER
-========================= */
-
-let playerCountry = "Deutschland";
-let selectedCountry = null;
-let attackTarget = null;
-
-let resources = {
-    money:25000,
-    steel:8500,
-    oil:5200
-};
-
-let day = 1;
-let seconds = 0;
-
-
-/* =========================
-   LAND AUSWÄHLEN
-========================= */
-
-function selectCountry(name){
-
-    selectedCountry = name;
+function selectCountry(i){
+    game.selectedCountry=i;
 
     document.querySelectorAll(".country")
-        .forEach(c => c.classList.remove("selected"));
+        .forEach(x=>x.classList.remove("selected"));
 
-    const element =
-        document.querySelector(
-            `[data-country="${name}"]`
-        );
+    document.querySelectorAll(".country")[i]
+        .classList.add("selected");
 
-    if(element){
-        element.classList.add("selected");
-    }
+    const c=countries[i];
 
-    const data = countries[name];
+    document.getElementById("panelTitle").textContent=c.name;
 
-    document.getElementById("selectedName")
-        .textContent = name;
-
-    document.getElementById("selectedPopulation")
-        .textContent = data.population;
-
-    document.getElementById("selectedArmy")
-        .textContent =
-        data.army.toLocaleString("de-DE");
-
-    document.getElementById("selectedIndustry")
-        .textContent = data.industry;
-
-    if(name !== playerCountry){
-
-        attackTarget = name;
-
-    }
-
-    notify(
-        name === playerCountry
-        ? "Eigenes Land ausgewählt."
-        : name + " ausgewählt."
-    );
+    document.getElementById("panelContent").innerHTML=`
+        <div class="row"><span>Hauptstadt</span><b>${c.capital}</b></div>
+        <div class="row"><span>Bevölkerung</span><b>${(c.population/1e6).toFixed(1)} Mio.</b></div>
+        <div class="row"><span>Industrie</span><b>${c.industry}</b></div>
+        <div class="row"><span>Stabilität</span><b>${c.stability}%</b></div>
+        <div class="row"><span>Kriegsunterstützung</span><b>${c.war}%</b></div>
+        <div class="row"><span>Terrain</span><b>${c.terrain}</b></div>
+        <hr>
+        <button onclick="declareWar()">Krieg erklären</button>
+        <button onclick="openProvince()">Provinzen</button>
+    `;
 }
 
+function selectArmy(i){
+    game.selectedArmy=i;
+    const a=armies[i];
 
-/* =========================
-   MODI
-========================= */
+    document.getElementById("panelTitle").textContent=a.name;
 
-function mode(type){
+    document.getElementById("panelContent").innerHTML=`
+        <div class="row"><span>General</span><b>${a.general}</b></div>
+        <div class="row"><span>Divisionen</span><b>${a.divisions}</b></div>
 
-    document.querySelectorAll(".menu button")
-        .forEach(b => b.classList.remove("active"));
+        <div class="row"><span>Stärke</span><b>${a.strength}%</b></div>
+        <div class="bar"><div style="width:${a.strength}%"></div></div>
 
-    if(type === "select"){
+        <div class="row"><span>Organisation</span><b>${a.organization}%</b></div>
+        <div class="bar"><div style="width:${a.organization}%"></div></div>
 
-        document.getElementById("selectBtn")
-            .classList.add("active");
+        <div class="row"><span>Versorgung</span><b>${a.supply}%</b></div>
+        <div class="bar"><div style="width:${a.supply}%"></div></div>
 
-        notify("Auswahlmodus aktiviert.");
+        <div class="row"><span>Treibstoff</span><b>${a.fuel}%</b></div>
 
-    }
+        <hr>
 
-    if(type === "army"){
-
-        notify(
-            "Armee-Modus: Wähle ein Land aus."
-        );
-
-    }
-
-    if(type === "build"){
-
-        notify(
-            "Baumodus aktiviert."
-        );
-
-    }
-
-    if(type === "economy"){
-
-        notify(
-            "Wirtschaftsübersicht geöffnet."
-        );
-
-    }
-
-    if(type === "diplomacy"){
-
-        notify(
-            "Diplomatie-Modus aktiviert."
-        );
-    }
+        <button onclick="moveArmy()">Bewegen</button>
+        <button onclick="createFront()">Frontlinie</button>
+        <button onclick="startAttack()">Angriffsplan</button>
+    `;
 }
 
-
-/* =========================
-   ANGRIFF
-========================= */
-
-function openAttack(){
-
-    if(!selectedCountry){
-
-        notify(
-            "Wähle zuerst ein Zielland auf der Karte."
-        );
-
+function moveArmy(){
+    if(game.selectedArmy===null){
+        notify("Keine Armee ausgewählt.");
         return;
     }
 
-    if(selectedCountry === playerCountry){
+    const a=armies[game.selectedArmy];
 
-        notify(
-            "Du kannst dein eigenes Land nicht angreifen."
-        );
+    a.x+=70;
+    a.y+=20;
 
+    const el=document.querySelectorAll(".army")[game.selectedArmy];
+
+    el.style.left=a.x+"px";
+    el.style.top=a.y+"px";
+
+    notify(a.name+" bewegt sich.");
+}
+
+function createFront(){
+    notify("Neue Frontlinie erstellt.");
+}
+
+function startAttack(){
+    notify("Angriffsplan aktiviert.");
+    notify("Truppen beginnen mit der Vorbereitung.");
+
+    setTimeout(()=>{
+        notify("Gefecht an der Front begonnen.");
+    },1500);
+}
+
+function declareWar(){
+    const c=countries[game.selectedCountry];
+
+    if(game.politicalPower<50){
+        notify("Nicht genügend politische Macht.");
         return;
     }
 
-    attackTarget = selectedCountry;
+    game.politicalPower-=50;
 
-    const attacker = countries[playerCountry];
-    const defender = countries[attackTarget];
-
-    document.getElementById("attackerName")
-        .textContent = playerCountry;
-
-    document.getElementById("defenderName")
-        .textContent = attackTarget;
-
-    document.getElementById("attackerArmyText")
-        .textContent =
-        attacker.army.toLocaleString("de-DE")
-        + " Soldaten";
-
-    document.getElementById("defenderArmyText")
-        .textContent =
-        defender.army.toLocaleString("de-DE")
-        + " Soldaten";
-
-    const slider =
-        document.getElementById("troopSlider");
-
-    slider.max = attacker.army;
-
-    slider.value =
-        Math.min(10000, attacker.army);
-
-    updateAttackSlider();
-
-    document.getElementById("overlay")
-        .classList.add("show");
-
-    document.getElementById("attackBox")
-        .classList.add("open");
+    notify("Krieg gegen "+c.name+" erklärt.");
+    updateUI();
 }
 
+function openProvince(){
+    document.getElementById("panelTitle").textContent="Provinz";
 
-function closeAttack(){
-
-    document.getElementById("overlay")
-        .classList.remove("show");
-
-    document.getElementById("attackBox")
-        .classList.remove("open");
+    document.getElementById("panelContent").innerHTML=`
+        <div class="row"><span>Besitzer</span><b>Nordmark</b></div>
+        <div class="row"><span>Bevölkerung</span><b>3,8 Mio.</b></div>
+        <div class="row"><span>Industrie</span><b>24</b></div>
+        <div class="row"><span>Infrastruktur</span><b>5/5</b></div>
+        <div class="row"><span>Versorgung</span><b>97%</b></div>
+        <div class="row"><span>Terrain</span><b>Stadt</b></div>
+        <div class="row"><span>Siegpunkte</span><b>20</b></div>
+        <hr>
+        <b>Gebäude</b>
+        <div class="row"><span>Militärfabriken</span><b>8</b></div>
+        <div class="row"><span>Zivilfabriken</span><b>12</b></div>
+        <div class="row"><span>Flughafen</span><b>1</b></div>
+        <div class="row"><span>Radar</span><b>2</b></div>
+    `;
 }
 
+function showPolitics(){
+    document.getElementById("panelTitle").textContent="Politik";
 
-/* =========================
-   SLIDER
-========================= */
-
-function updateAttackSlider(){
-
-    const troops =
-        Number(
-            document.getElementById("troopSlider").value
-        );
-
-    document.getElementById("troopNumber")
-        .textContent =
-        troops.toLocaleString("de-DE");
-
-    document.getElementById("attackPower")
-        .textContent =
-        Math.round(troops * 1.0)
-            .toLocaleString("de-DE");
-
-    if(attackTarget){
-
-        const defender =
-            countries[attackTarget];
-
-        document.getElementById("defensePower")
-            .textContent =
-            defender.army.toLocaleString("de-DE");
-    }
+    document.getElementById("panelContent").innerHTML=`
+        <div class="row"><span>Ideologie</span><b>Republik</b></div>
+        <div class="row"><span>Stabilität</span><b>${game.stability}%</b></div>
+        <div class="row"><span>Kriegsunterstützung</span><b>${game.warSupport}%</b></div>
+        <hr>
+        <button onclick="politicalDecision()">Militärbudget erhöhen</button>
+        <button onclick="politicalDecision()">Industrieprogramm</button>
+        <button onclick="politicalDecision()">Handelsreform</button>
+    `;
 }
 
-
-/* =========================
-   ANGRIFF AUSFÜHREN
-========================= */
-
-function executeAttack(){
-
-    if(!attackTarget){
+function politicalDecision(){
+    if(game.politicalPower<25){
+        notify("Nicht genügend politische Macht.");
         return;
     }
 
-    const attacker =
-        countries[playerCountry];
+    game.politicalPower-=25;
+    game.stability+=1;
 
-    const defender =
-        countries[attackTarget];
-
-    const troops =
-        Number(
-            document.getElementById("troopSlider").value
-        );
-
-    if(troops > attacker.army){
-
-        notify(
-            "Nicht genügend Soldaten."
-        );
-
-        return;
-    }
-
-    /*
-       Einfache Kampfformel:
-       Angriff = Truppen * Industriebonus
-       Verteidigung = Armee * Verteidigungsbonus
-    */
-
-    const attackPower =
-        troops *
-        (1 + attacker.industry / 300);
-
-    const defensePower =
-        defender.army *
-        (1 + defender.industry / 400);
-
-    attacker.army -= troops;
-
-    let message;
-
-    if(attackPower > defensePower){
-
-        /*
-           Sieg:
-           Ein Teil der Verteidiger fällt aus,
-           das Land wird erobert.
-        */
-
-        const losses =
-            Math.floor(
-                defender.army *
-                (0.25 + Math.random() * 0.25)
-            );
-
-        defender.army =
-            Math.max(
-                0,
-                defender.army - losses
-            );
-
-        /*
-           Gebiet gehört jetzt dem Spieler.
-        */
-
-        defender.color =
-            attacker.color;
-
-        const element =
-            document.querySelector(
-                `[data-country="${attackTarget}"]`
-            );
-
-        if(element){
-
-            element.style.background =
-                attacker.color;
-
-            element.style.borderColor =
-                "#ffffff";
-
-        }
-
-        message =
-            playerCountry +
-            " hat " +
-            attackTarget +
-            " erfolgreich angegriffen.";
-
-        addEvent(
-            "⚔️ " + message
-        );
-
-        notify(
-            "Sieg! " + attackTarget +
-            " wurde erobert."
-        );
-
-    }else{
-
-        /*
-           Niederlage
-        */
-
-        const losses =
-            Math.floor(
-                troops *
-                (0.45 + Math.random() * 0.35)
-            );
-
-        message =
-            "Der Angriff auf " +
-            attackTarget +
-            " ist gescheitert.";
-
-        addEvent(
-            "🛡️ " + message
-        );
-
-        notify(
-            "Angriff gescheitert."
-        );
-    }
-
-    updateResources();
-    updateTerritories();
-
-    closeAttack();
-
-    selectCountry(attackTarget);
+    notify("Politische Entscheidung durchgeführt.");
+    updateUI();
 }
 
+function showResearch(){
+    document.getElementById("panelTitle").textContent="Forschung";
 
-/* =========================
-   TERRITORIEN
-========================= */
-
-function updateTerritories(){
-
-    /*
-       Für diese Demo wird gezählt,
-       welche Länder dieselbe Farbe
-       wie Deutschland haben.
-    */
-
-    const ownColor =
-        countries[playerCountry].color;
-
-    let count = 1;
-
-    for(const name in countries){
-
-        if(
-            name !== playerCountry &&
-            countries[name].color === ownColor
-        ){
-            count++;
-        }
-    }
-
-    document.getElementById("territories")
-        .textContent =
-        count + " / " +
-        Object.keys(countries).length;
+    document.getElementById("panelContent").innerHTML=`
+        <b>Aktuelle Forschung</b>
+        <p>Motorisierung</p>
+        <div class="bar"><div style="width:${game.research}%"></div></div>
+        <p>${game.research}% abgeschlossen</p>
+        <hr>
+        <button onclick="researchBoost()">Forschung beschleunigen</button>
+    `;
 }
 
-
-/* =========================
-   RESSOURCEN
-========================= */
-
-function updateResources(){
-
-    document.getElementById("money")
-        .textContent =
-        Math.floor(resources.money)
-            .toLocaleString("de-DE");
-
-    document.getElementById("steel")
-        .textContent =
-        Math.floor(resources.steel)
-            .toLocaleString("de-DE");
-
-    document.getElementById("oil")
-        .textContent =
-        Math.floor(resources.oil)
-            .toLocaleString("de-DE");
+function researchBoost(){
+    game.research+=5;
+    if(game.research>=100){
+        game.research=0;
+        notify("Technologie erforscht!");
+    }
+    updateUI();
 }
 
+function showProduction(){
+    document.getElementById("panelTitle").textContent="Produktion";
 
-/*
-   Jede Sekunde Einkommen.
-*/
-
-setInterval(() => {
-
-    resources.money += 12;
-    resources.steel += 5;
-    resources.oil += 3;
-
-    updateResources();
-
-},1000);
-
-
-/* =========================
-   SPIELZEIT
-========================= */
-
-setInterval(() => {
-
-    seconds++;
-
-    const minutes =
-        Math.floor(seconds / 60);
-
-    const secs =
-        seconds % 60;
-
-    document.getElementById("timer")
-        .textContent =
-        String(minutes).padStart(2,"0")
-        + ":" +
-        String(secs).padStart(2,"0");
-
-    if(seconds % 60 === 0){
-
-        day++;
-
-        document.getElementById("day")
-            .textContent = day;
-
-        addEvent(
-            "📅 Ein neuer Spieltag beginnt."
-        );
-    }
-
-},1000);
-
-
-/* =========================
-   EVENTS
-========================= */
-
-function addEvent(text){
-
-    const events =
-        document.getElementById("events");
-
-    const event =
-        document.createElement("div");
-
-    event.className = "event";
-
-    event.textContent = text;
-
-    events.prepend(event);
-
-    while(events.children.length > 12){
-        events.removeChild(
-            events.lastChild
-        );
-    }
+    document.getElementById("panelContent").innerHTML=`
+        <div class="row"><span>Zivilfabriken</span><b>42</b></div>
+        <div class="row"><span>Militärfabriken</span><b>36</b></div>
+        <div class="row"><span>Werften</span><b>8</b></div>
+        <hr>
+        <div class="row"><span>Gewehre</span><b>120/Tag</b></div>
+        <div class="row"><span>Artillerie</span><b>8/Tag</b></div>
+        <div class="row"><span>Panzer</span><b>4/Tag</b></div>
+    `;
 }
 
+function showArmy(){
+    document.getElementById("panelTitle").textContent="Armeen";
 
-/* =========================
-   TOAST
-========================= */
+    let html="";
+
+    armies.forEach((a,i)=>{
+        html+=`
+        <div class="panel">
+            <b>${a.name}</b>
+            <div class="row"><span>General</span><b>${a.general}</b></div>
+            <div class="row"><span>Divisionen</span><b>${a.divisions}</b></div>
+            <button onclick="selectArmy(${i})">Auswählen</button>
+        </div>`;
+    });
+
+    document.getElementById("panelContent").innerHTML=html;
+}
+
+function showDiplomacy(){
+    document.getElementById("panelTitle").textContent="Diplomatie";
+
+    document.getElementById("panelContent").innerHTML=`
+        <div class="row"><span>Valoria</span><b>+42</b></div>
+        <div class="row"><span>Estara</span><b>+18</b></div>
+        <div class="row"><span>Ruthenia</span><b>-31</b></div>
+        <div class="row"><span>Aurelia</span><b>+57</b></div>
+        <hr>
+        <button onclick="notify('Nichtangriffspakt angeboten.')">Nichtangriffspakt</button>
+        <button onclick="notify('Handelsabkommen angeboten.')">Handelsabkommen</button>
+        <button onclick="notify('Bündnis angeboten.')">Bündnis</button>
+    `;
+}
+
+function showIntel(){
+    document.getElementById("panelTitle").textContent="Geheimdienst";
+
+    document.getElementById("panelContent").innerHTML=`
+        <div class="row"><span>Agenten</span><b>6</b></div>
+        <div class="row"><span>Netzwerk</span><b>54%</b></div>
+        <hr>
+        <button onclick="notify('Spionagenetzwerk aufgebaut.')">Netzwerk aufbauen</button>
+        <button onclick="notify('Aufklärung durchgeführt.')">Aufklärung</button>
+        <button onclick="notify('Sabotage vorbereitet.')">Sabotage</button>
+    `;
+}
+
+function showTrade(){
+    document.getElementById("panelTitle").textContent="Handel";
+
+    document.getElementById("panelContent").innerHTML=`
+        <div class="row"><span>Stahlimporte</span><b>+20</b></div>
+        <div class="row"><span>Ölimporte</span><b>+10</b></div>
+        <div class="row"><span>Exporte</span><b>+15</b></div>
+        <hr>
+        <button onclick="notify('Handelsabkommen abgeschlossen.')">Handelsabkommen</button>
+        <button onclick="notify('Embargo verhängt.')">Embargo</button>
+    `;
+}
+
+function toggleSupply(){
+    game.mapMode =
+        game.mapMode==="supply" ? "political" : "supply";
+
+    notify("Kartenmodus: "+game.mapMode);
+}
+
+function toggleMapMode(){
+    const modes=["political","terrain","supply","resources","infrastructure","front"];
+    let i=modes.indexOf(game.mapMode);
+    game.mapMode=modes[(i+1)%modes.length];
+
+    notify("Kartenmodus: "+game.mapMode);
+}
 
 function notify(text){
+    const box=document.createElement("div");
+    box.className="notification";
+    box.textContent=text;
 
-    const container =
-        document.getElementById("toasts");
+    document.getElementById("notifications")
+        .appendChild(box);
 
-    const toast =
-        document.createElement("div");
-
-    toast.className = "toast";
-
-    toast.textContent = text;
-
-    container.appendChild(toast);
-
-    setTimeout(() => {
-
-        toast.remove();
-
-    },3000);
+    setTimeout(()=>box.remove(),5000);
 }
 
-
-/* =========================
-   MAP ZOOM
-========================= */
-
-let zoom = 1;
-
-function zoomMap(multiplier){
-
-    zoom *= multiplier;
-
-    zoom =
-        Math.max(
-            0.55,
-            Math.min(2.5,zoom)
-        );
-
-    updateMapTransform();
-}
-
-
-function resetMap(){
-
-    zoom = 1;
-
-    mapX = 0;
-    mapY = 0;
-
-    updateMapTransform();
-}
-
-
-function updateMapTransform(){
-
-    map.style.transform =
-        `translate(
-            calc(-50% + ${mapX}px),
-            calc(-50% + ${mapY}px)
-        )
-        scale(${zoom})`;
-}
-
-
-/* =========================
-   MAP DRAG
-========================= */
-
-const mapContainer =
-    document.getElementById("mapContainer");
-
-const map =
-    document.getElementById("map");
-
-let dragging = false;
-let startX = 0;
-let startY = 0;
-
-let mapX = 0;
-let mapY = 0;
-
-mapContainer.addEventListener(
-    "mousedown",
-    e => {
-
-        /*
-           Nicht ziehen, wenn direkt
-           ein Land angeklickt wird.
-        */
-
-        if(e.target.closest(".country")){
-            return;
-        }
-
-        dragging = true;
-
-        mapContainer.classList.add(
-            "dragging"
-        );
-
-        startX =
-            e.clientX - mapX;
-
-        startY =
-            e.clientY - mapY;
+function setSpeed(speed){
+    if(speed===0){
+        game.paused=true;
+        document.getElementById("speedText").textContent="PAUSE";
+    }else{
+        game.paused=false;
+        game.speed=speed;
+        document.getElementById("speedText").textContent=speed+"x";
     }
-);
+}
 
-window.addEventListener(
-    "mousemove",
-    e => {
+function nextDay(){
 
-        if(!dragging){
-            return;
+    if(game.paused)return;
+
+    game.day++;
+
+    if(game.day>30){
+        game.day=1;
+        game.month++;
+
+        if(game.month>12){
+            game.month=1;
+            game.year++;
         }
-
-        mapX =
-            e.clientX - startX;
-
-        mapY =
-            e.clientY - startY;
-
-        updateMapTransform();
     }
-);
 
-window.addEventListener(
-    "mouseup",
-    () => {
+    game.politicalPower+=0.35;
 
-        dragging = false;
+    game.steel+=2;
+    game.oil-=1;
 
-        mapContainer.classList.remove(
-            "dragging"
-        );
+    if(game.oil<0)game.oil=0;
+
+    game.research+=0.15;
+
+    if(game.research>=100){
+        game.research=0;
+        notify("Neue Technologie erforscht.");
     }
-);
 
+    armies.forEach(a=>{
+        if(a.organization<100)
+            a.organization+=0.1;
 
-/* =========================
-   MAUS-WHEEL ZOOM
-========================= */
+        if(a.supply>0)
+            a.supply-=0.02;
+    });
 
-mapContainer.addEventListener(
-    "wheel",
-    e => {
+    updateUI();
+}
 
-        e.preventDefault();
+function updateUI(){
 
-        if(e.deltaY < 0){
-            zoomMap(1.1);
-        }else{
-            zoomMap(.9);
-        }
+    document.getElementById("pp").textContent=
+        Math.floor(game.politicalPower);
 
-    },
-    {passive:false}
-);
+    document.getElementById("stability").textContent=
+        Math.floor(game.stability)+"%";
 
+    document.getElementById("warSupport").textContent=
+        Math.floor(game.warSupport)+"%";
 
-/* =========================
-   START
-========================= */
+    document.getElementById("steel").textContent=
+        Math.floor(game.steel);
 
-selectCountry("Deutschland");
+    document.getElementById("oil").textContent=
+        Math.floor(game.oil);
 
-updateResources();
+    document.getElementById("aluminium").textContent=
+        Math.floor(game.aluminium);
 
-updateTerritories();
+    document.getElementById("research").textContent=
+        Math.floor(game.research)+"%";
+
+    document.getElementById("researchBar").style.width=
+        game.research+"%";
+
+    document.getElementById("date").textContent=
+        game.day+". "+monthName(game.month)+" "+game.year;
+}
+
+function monthName(m){
+    return [
+        "",
+        "Januar","Februar","März","April","Mai","Juni",
+        "Juli","August","September","Oktober","November","Dezember"
+    ][m];
+}
+
+function saveGame(){
+    localStorage.setItem(
+        "ironNationsSave",
+        JSON.stringify({
+            game,
+            armies
+        })
+    );
+
+    notify("Spiel gespeichert.");
+}
+
+function loadGame(){
+
+    const data=localStorage.getItem("ironNationsSave");
+
+    if(!data){
+        notify("Kein Spielstand vorhanden.");
+        return;
+    }
+
+    const save=JSON.parse(data);
+
+    game=save.game;
+    armies=save.armies;
+
+    updateUI();
+
+    armies.forEach((a,i)=>{
+        const el=document.querySelectorAll(".army")[i];
+
+        el.style.left=a.x+"px";
+        el.style.top=a.y+"px";
+    });
+
+    notify("Spiel geladen.");
+}
+
+function centerMap(){
+    const world=document.getElementById("world");
+
+    world.style.transform=
+        "translate(0px,0px) scale(0.8)";
+}
+
+let zoom=1;
+let panX=0;
+let panY=0;
+
+const map=document.getElementById("map");
+const world=document.getElementById("world");
+
+map.addEventListener("wheel",e=>{
+    e.preventDefault();
+
+    zoom+=e.deltaY<0?.1:-.1;
+    zoom=Math.max(.45,Math.min(2,zoom));
+
+    world.style.transform=
+        `translate(${panX}px,${panY}px) scale(${zoom})`;
+});
+
+let dragging=false;
+let startX=0;
+let startY=0;
+
+map.addEventListener("mousedown",e=>{
+    if(e.target!==map)return;
+
+    dragging=true;
+    startX=e.clientX;
+    startY=e.clientY;
+});
+
+window.addEventListener("mouseup",()=>{
+    dragging=false;
+});
+
+window.addEventListener("mousemove",e=>{
+    if(!dragging)return;
+
+    panX+=e.clientX-startX;
+    panY+=e.clientY-startY;
+
+    startX=e.clientX;
+    startY=e.clientY;
+
+    world.style.transform=
+        `translate(${panX}px,${panY}px) scale(${zoom})`;
+});
+
+setInterval(()=>{
+    const ticks=Math.max(1,game.speed);
+
+    for(let i=0;i<ticks;i++)
+        nextDay();
+
+},1000);
+
+selectCountry(0);
+updateUI();
+
+notify("Willkommen bei IRON NATIONS.");
+notify("Wähle ein Land oder eine Armee aus.");
 
 </script>
 

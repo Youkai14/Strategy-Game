@@ -1,858 +1,515 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<title>WW2 Eroberung</title>
-<style>
-  * { box-sizing: border-box; }
-  body {
-    margin: 0; min-height: 100vh;
-    background: radial-gradient(ellipse at 50% 30%, #14202e, #070b11 80%);
-    font-family: 'Segoe UI', system-ui, sans-serif;
-    color: #e0e6ed;
-    display: flex; align-items: center; justify-content: center;
-    padding: 20px;
-  }
-  #game {
-    position: relative; width: 1000px; height: 650px;
-    border-radius: 12px; overflow: hidden;
-    box-shadow: 0 25px 70px rgba(0,0,0,.8), 0 0 0 1px #1e2a38;
-    flex-shrink: 0;
-  }
-  canvas { display: block; width: 100%; height: 100%; cursor: pointer; }
-
-  #hud {
-    position: absolute; top: 14px; left: 14px;
-    background: rgba(8, 14, 22, .92);
-    border: 1px solid #24344a; border-radius: 10px;
-    padding: 12px 16px; font-size: 13px; min-width: 210px;
-    backdrop-filter: blur(8px);
-    box-shadow: 0 4px 16px rgba(0,0,0,.5);
-  }
-  #hud h2 {
-    margin: 0 0 10px; font-size: 11px;
-    text-transform: uppercase; letter-spacing: 2px;
-    color: #5a8fc7; font-weight: 700;
-  }
-  #hud .row {
-    display: flex; justify-content: space-between;
-    gap: 20px; padding: 2px 0; color: #8fa0b3;
-  }
-  #hud .row b { color: #e0e6ed; font-variant-numeric: tabular-nums; font-weight: 600; }
-  #hud .row b.blue { color: #5fa8ff; }
-  #hud .row b.gold { color: #ffc857; }
-
-  #selInfo {
-    position: absolute; bottom: 14px; left: 14px;
-    background: rgba(8, 14, 22, .92);
-    border: 1px solid #24344a; border-radius: 10px;
-    padding: 12px 16px; font-size: 13px; min-width: 210px;
-    backdrop-filter: blur(8px);
-    box-shadow: 0 4px 16px rgba(0,0,0,.5);
-    display: none;
-  }
-  #selInfo.show { display: block; }
-  #selInfo h3 { margin: 0 0 8px; font-size: 15px; color: #9fd0ff; letter-spacing: .5px; }
-  #selInfo .row {
-    display: flex; justify-content: space-between;
-    gap: 20px; padding: 2px 0; color: #8fa0b3;
-  }
-  #selInfo .row b { color: #e0e6ed; font-variant-numeric: tabular-nums; }
-
-  #hint {
-    position: absolute; bottom: 14px; right: 14px;
-    background: rgba(8, 14, 22, .85);
-    border: 1px solid #1e2a38; border-radius: 8px;
-    padding: 8px 14px; font-size: 12px; color: #6e8095;
-    max-width: 340px; line-height: 1.5;
-  }
-
-  .overlay {
-    position: absolute; inset: 0;
-    display: flex; align-items: center; justify-content: center;
-    background: rgba(4, 8, 14, .72);
-    backdrop-filter: blur(3px);
-    z-index: 10;
-  }
-  .overlay.hidden { display: none; }
-
-  #dialog > div {
-    width: 380px; background: #0f1822;
-    border: 1px solid #2c4054; border-radius: 12px;
-    padding: 22px; box-shadow: 0 20px 60px rgba(0,0,0,.7);
-  }
-  #dialog h3 {
-    margin: 0 0 16px; font-size: 15px; color: #9fd0ff;
-    text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700;
-  }
-  #dialog h3 span { color: #ff8888; }
-
-  .dlg-row {
-    display: flex; justify-content: space-between;
-    padding: 6px 0; font-size: 13px; color: #8fa0b3;
-    border-bottom: 1px solid #1a2430;
-  }
-  .dlg-row b { color: #e0e6ed; font-variant-numeric: tabular-nums; }
-  .dlg-row.big b { color: #ffc857; font-size: 17px; }
-  .dlg-row.small { font-size: 12px; border-bottom: none; padding-top: 10px; }
-  .dlg-row .win { color: #6ee7a0; }
-  .dlg-row .lose { color: #ff7b7b; }
-
-  input[type=range] {
-    width: 100%; margin: 16px 0 8px;
-    -webkit-appearance: none; height: 8px;
-    background: #1a2836; border-radius: 4px; outline: none;
-  }
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none; width: 20px; height: 20px;
-    border-radius: 50%;
-    background: linear-gradient(#5fa8ff, #3d7fd4);
-    cursor: pointer;
-    box-shadow: 0 0 10px rgba(95,168,255,.6);
-    border: 2px solid #0f1822;
-  }
-  input[type=range]::-moz-range-thumb {
-    width: 18px; height: 18px; border-radius: 50%;
-    background: #5fa8ff; cursor: pointer; border: 2px solid #0f1822;
-  }
-
-  .dlg-buttons { display: flex; gap: 10px; margin-top: 18px; }
-  .dlg-buttons button {
-    flex: 1; padding: 12px; border-radius: 8px;
-    border: 1px solid #2c4054; background: #16212d;
-    color: #b8c8d8; font-weight: 600; font-size: 13px;
-    text-transform: uppercase; letter-spacing: 1px;
-    cursor: pointer; transition: .15s;
-  }
-  .dlg-buttons button:hover { background: #1e2c3c; }
-  .dlg-buttons button.primary {
-    background: linear-gradient(#d94c4c, #b22c2c);
-    border-color: #e05a5a; color: #fff;
-  }
-  .dlg-buttons button.primary:hover { background: linear-gradient(#e05a5a, #c03434); }
-
-  #battle .box {
-    width: 560px; background: #0f1822;
-    border: 1px solid #2c4054; border-radius: 12px;
-    padding: 28px; box-shadow: 0 20px 60px rgba(0,0,0,.8);
-    text-align: center;
-  }
-  #battle h3 {
-    margin: 0 0 22px; font-size: 16px;
-    text-transform: uppercase; letter-spacing: 3px;
-    color: #9fd0ff; font-weight: 700;
-  }
-  .btl-names {
-    display: flex; justify-content: space-between;
-    align-items: center; margin-bottom: 10px; font-size: 14px;
-  }
-  .btl-side { flex: 1; }
-  .btl-side.att { text-align: left; }
-  .btl-side.def { text-align: right; }
-  .btl-side .nm { color: #8fa0b3; font-size: 12px; margin-bottom: 4px; }
-  .btl-side .tr { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
-  .btl-side.att .tr { color: #5fa8ff; }
-  .btl-side.def .tr { color: #ff6b6b; }
-  .btl-arrow { color: #556; font-size: 20px; padding: 0 14px; }
-
-  .btl-track {
-    position: relative; height: 24px;
-    background: #0a1018; border-radius: 12px;
-    overflow: hidden; margin: 18px 0;
-    border: 1px solid #1e2a38;
-  }
-  .btl-fill-att {
-    position: absolute; left: 0; top: 0; bottom: 0;
-    background: linear-gradient(90deg, #2f6fd0, #5fa8ff);
-  }
-  .btl-fill-def {
-    position: absolute; top: 0; bottom: 0;
-    background: linear-gradient(90deg, #ff6b6b, #b22c2c);
-  }
-  .btl-front {
-    position: absolute; top: 0; bottom: 0; width: 4px;
-    background: #fff; transform: translateX(-2px);
-    box-shadow: 0 0 8px #ffd54f, 0 0 18px #ffd54f;
-    z-index: 2;
-  }
-
-  .btl-result {
-    margin-top: 14px; font-size: 15px; font-weight: 700;
-    letter-spacing: 1px; text-transform: uppercase;
-    min-height: 22px; opacity: 0; transition: opacity .3s;
-  }
-  .btl-result.show { opacity: 1; }
-  .btl-result.win { color: #6ee7a0; }
-  .btl-result.lose { color: #ff7b7b; }
-
-  #gameover .box {
-    background: #0f1822; border: 1px solid #2c4054;
-    border-radius: 12px; padding: 40px 60px;
-    text-align: center;
-    box-shadow: 0 20px 60px rgba(0,0,0,.8);
-  }
-  #gameover h2 {
-    font-size: 32px; margin: 0 0 14px; letter-spacing: 4px;
-  }
-  #gameover p { color: #8fa0b3; margin: 0 0 26px; font-size: 14px; }
-  #gameover button {
-    padding: 14px 32px; border-radius: 8px;
-    border: 1px solid #2f6fd0;
-    background: linear-gradient(#2f6fd0, #2357a8);
-    color: #fff; font-weight: 700; font-size: 14px;
-    text-transform: uppercase; letter-spacing: 2px;
-    cursor: pointer;
-  }
-  #gameover button:hover { filter: brightness(1.15); }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WW2 Global Strategy</title>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 { color: #ff4444; text-transform: uppercase; letter-spacing: 3px; }
+        #game-container {
+            display: flex;
+            gap: 20px;
+            max-width: 1200px;
+            width: 100%;
+        }
+        canvas {
+            background-color: #2c3e50;
+            border: 4px solid #444;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            cursor: crosshair;
+        }
+        #ui-panel {
+            background-color: #222;
+            border: 2px solid #555;
+            padding: 20px;
+            width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+        .stat-box {
+            background-color: #333;
+            padding: 10px;
+            border-left: 5px solid #fff;
+        }
+        .slider-container {
+            background-color: #333;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        input[type=range] { width: 100%; cursor: pointer; }
+        button {
+            background-color: #8b0000;
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: background 0.2s;
+        }
+        button:hover { background-color: #ff0000; }
+        button:disabled { background-color: #444; cursor: not-allowed; color: #888; }
+        #log {
+            height: 150px;
+            overflow-y: auto;
+            background-color: #111;
+            padding: 10px;
+            font-size: 12px;
+            border: 1px solid #333;
+        }
+        .p-entry { margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px solid #333; }
+        .instructions { font-size: 12px; color: #aaa; line-height: 1.4; }
+    </style>
 </head>
 <body>
-<div id="game">
-  <canvas id="cv"></canvas>
 
-  <div id="hud">
-    <h2>WW2 Eroberung</h2>
-    <div class="row"><span>Gebiete</span><b class="blue" id="hudTerritory">1 / 16</b></div>
-    <div class="row"><span>Produktion</span><b class="gold" id="hudProd">+4.5k/s</b></div>
-    <div class="row"><span>Truppen</span><b id="hudTroops">45.0k</b></div>
-  </div>
+<h1>World War II: Global Front</h1>
 
-  <div id="selInfo">
-    <h3 id="selName">—</h3>
-    <div class="row"><span>Truppen</span><b id="selTroops">—</b></div>
-    <div class="row"><span>Produktion</span><b id="selProd">—</b></div>
-    <div class="row"><span>Größe</span><b id="selSize">—</b></div>
-  </div>
-
-  <div id="hint">
-    Klicke ein blaues Gebiet, dann ein rot umrandetes Nachbargebiet, um anzugreifen.
-  </div>
-
-  <div id="dialog" class="overlay hidden">
-    <div>
-      <h3>Angriff auf <span id="dTargetName">—</span></h3>
-      <div class="dlg-row"><span>Verteidiger</span><b id="dDefTroops">—</b></div>
-      <div class="dlg-row"><span>Eigene Truppen</span><b id="dOwnTroops">—</b></div>
-      <input type="range" id="dSlider" min="1" max="100" value="100">
-      <div class="dlg-row big"><span>Entsenden</span><b id="dSendAmount">—</b></div>
-      <div class="dlg-row small"><span id="dOutcome">—</span></div>
-      <div class="dlg-buttons">
-        <button id="dCancel">Abbrechen</button>
-        <button id="dConfirm" class="primary">Angriff!</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="battle" class="overlay hidden">
-    <div class="box">
-      <h3>Schlacht um <span id="bTarget">—</span></h3>
-      <div class="btl-names">
-        <div class="btl-side att">
-          <div class="nm" id="bAttName">—</div>
-          <div class="tr" id="bAttTroops">—</div>
+<div id="game-container">
+    <canvas id="mapCanvas" width="800" height="450"></canvas>
+    
+    <div id="ui-panel">
+        <div class="instructions">
+            <strong>Anleitung:</strong><br>
+            1. Klicke auf deine Nation (blau) oder ein Nachbarland.<br>
+            2. Wähle mit dem Regler, wie viel % deiner Truppen angreifen.<br>
+            3. Klicke auf "ANGREIFEN!".<br>
+            4. Die Front bewegt sich je nach Truppenübermacht Pixel für Pixel!
         </div>
-        <div class="btl-arrow">⚔</div>
-        <div class="btl-side def">
-          <div class="nm" id="bDefName">—</div>
-          <div class="tr" id="bDefTroops">—</div>
-        </div>
-      </div>
-      <div class="btl-track">
-        <div class="btl-fill-att" id="bAttFill"></div>
-        <div class="btl-fill-def" id="bDefFill"></div>
-        <div class="btl-front" id="bFront"></div>
-      </div>
-      <div class="btl-result" id="bResult"></div>
-    </div>
-  </div>
 
-  <div id="gameover" class="overlay hidden">
-    <div class="box">
-      <h2 id="goTitle">SIEG</h2>
-      <p id="goText">—</p>
-      <button id="goRestart">Neues Spiel</button>
+        <div class="stat-box" id="player-stats" style="border-color: #3498db;">
+            <strong>Deine Nation:</strong> <span id="p-name">Alliierte (USA)</span><br>
+            <strong>Truppen:</strong> <span id="p-troops">0</span><br>
+            <strong>Produktion:</strong> +<span id="p-prod">0</span>/Sek
+        </div>
+
+        <div class="stat-box" id="target-stats" style="border-color: #e74c3c;">
+            <strong>Ziel:</strong> <span id="t-name">Bitte Land wählen</span><br>
+            <strong>Feind-Truppen:</strong> <span id="t-troops">0</span><br>
+            <strong>Besitzer:</strong> <span id="t-owner">-</span>
+        </div>
+
+        <div class="slider-container">
+            <label for="commit-slider"><strong>Truppen-Einsatz:</strong> <span id="commit-val">50</span>%</label>
+            <input type="range" id="commit-slider" min="1" max="100" value="50">
+            <div style="font-size: 11px; color: #aaa; margin-top: 5px;">
+                Einsatzbereite Truppen: <span id="commit-num">0</span>
+            </div>
+        </div>
+
+        <button id="attack-btn" disabled>⚔️ ANGRIFF STARTEN ⚔️</button>
+
+        <div>
+            <strong>Kriegsbericht:</strong>
+            <div id="log"></div>
+        </div>
     </div>
-  </div>
 </div>
 
 <script>
-// ============================================================
-// KARTENDATEN — stilisierte Europakarte
-// ============================================================
-const MAP_DATA = [
-  { id:'ireland', name:'Irland', size:1,
-    points:[[55,175],[95,158],[110,190],[95,225],[62,230],[45,200]],
-    neighbors:['uk'] },
-  { id:'uk', name:'Britannien', size:7,
-    points:[[115,135],[170,112],[192,152],[180,195],[155,230],[125,218],[105,175]],
-    neighbors:['ireland','france','norway'] },
-  { id:'portugal', name:'Portugal', size:2,
-    points:[[52,385],[100,372],[108,455],[75,472],[42,435]],
-    neighbors:['spain'] },
-  { id:'spain', name:'Spanien', size:6,
-    points:[[102,372],[252,355],[258,445],[215,490],[132,492],[108,455]],
-    neighbors:['portugal','france','northafrica'] },
-  { id:'france', name:'Frankreich', size:8,
-    points:[[180,248],[288,240],[300,308],[280,352],[240,355],[185,338],[168,298]],
-    neighbors:['spain','uk','germany','italy'] },
-  { id:'norway', name:'Norwegen', size:3,
-    points:[[285,50],[335,38],[358,68],[342,135],[315,165],[292,140],[272,95]],
-    neighbors:['sweden','finland','uk'] },
-  { id:'sweden', name:'Schweden', size:4,
-    points:[[338,62],[370,52],[395,98],[388,182],[362,205],[338,178],[328,118]],
-    neighbors:['norway','finland','germany'] },
-  { id:'finland', name:'Finnland', size:3,
-    points:[[400,62],[445,58],[468,98],[462,160],[435,188],[405,162],[392,108]],
-    neighbors:['norway','sweden','ussr'] },
-  { id:'ussr', name:'Sowjetunion', size:16,
-    points:[[478,52],[958,72],[968,340],[705,362],[560,340],[510,290],[480,200],[468,135]],
-    neighbors:['finland','poland','balkans','turkey'] },
-  { id:'poland', name:'Polen', size:6,
-    points:[[415,195],[478,188],[495,258],[475,295],[418,290],[395,245]],
-    neighbors:['germany','ussr','balkans'] },
-  { id:'germany', name:'Deutschland', size:9,
-    points:[[308,202],[405,195],[415,268],[375,300],[318,295],[292,255]],
-    neighbors:['france','poland','italy','balkans','sweden'] },
-  { id:'italy', name:'Italien', size:6,
-    points:[[340,298],[372,290],[392,328],[405,375],[420,410],[400,435],[382,408],[368,372],[348,340]],
-    neighbors:['france','germany','balkans','northafrica'] },
-  { id:'balkans', name:'Balkan', size:5,
-    points:[[430,285],[500,278],[518,335],[492,392],[445,388],[422,335]],
-    neighbors:['germany','poland','ussr','italy','greece','turkey'] },
-  { id:'greece', name:'Griechenland', size:2,
-    points:[[495,402],[538,395],[555,428],[528,455],[498,442]],
-    neighbors:['balkans','turkey','northafrica'] },
-  { id:'turkey', name:'Türkei', size:5,
-    points:[[562,358],[700,352],[710,408],[640,428],[562,415]],
-    neighbors:['balkans','greece','ussr'] },
-  { id:'northafrica', name:'Nordafrika', size:3,
-    points:[[92,512],[700,512],[700,605],[92,605]],
-    neighbors:['spain','italy','greece'] }
-];
+const canvas = document.getElementById('mapCanvas');
+const ctx = canvas.getContext('2d');
 
-const W = 1000, H = 650;
-const PROD_RATE = 500;    // Truppen pro Sekunde pro Größenpunkt
-const START_MULT = 5000;  // Starttruppen = size * START_MULT
-
-// ============================================================
-// STATE
-// ============================================================
-const state = {
-  countries: [],
-  selected: null,
-  hovered: null,
-  busy: false,
-  gameOver: false,
-  aiTimer: 0
+// Farben
+const COLORS = {
+    water: '#2c3e50',
+    grid: '#34495e',
+    player: '#3498db',
+    axis1: '#e74c3c', // Deutschland
+    axis2: '#8e44ad', // Japan
+    neutral: '#7f8c8d'
 };
 
-// ============================================================
-// CANVAS
-// ============================================================
-const canvas = document.getElementById('cv');
-const ctx = canvas.getContext('2d');
-const DPR = Math.min(window.devicePixelRatio || 1, 2);
-canvas.width = W * DPR;
-canvas.height = H * DPR;
-canvas.style.width = W + 'px';
-canvas.style.height = H + 'px';
-ctx.scale(DPR, DPR);
+// Nationen & Gebiete (vereinfachte Polygone für die Weltkarte)
+const territories = [
+    { id: 'usa', name: 'USA (Spieler)', owner: 'player', troops: 150000, prod: 5000, color: COLORS.player, 
+      poly: [[50,100], [250,100], [250,250], [150,300], [50,250]] },
+    { id: 'uk', name: 'Großbritannien', owner: 'player', troops: 80000, prod: 2000, color: COLORS.player, 
+      poly: [[360,80], [390,80], [390,140], [360,140]] },
+    { id: 'germany', name: 'Deutsches Reich', owner: 'axis1', troops: 200000, prod: 4500, color: COLORS.axis1, 
+      poly: [[400,100], [480,100], [480,180], [400,180]] },
+    { id: 'ussr', name: 'Sowjetunion', owner: 'axis1', troops: 300000, prod: 6000, color: COLORS.axis1, 
+      poly: [[480,50], [750,50], [750,200], [480,200]] },
+    { id: 'japan', name: 'Japanisches Kaiserreich', owner: 'axis2', troops: 180000, prod: 3500, color: COLORS.axis2, 
+      poly: [[720,150], [760,150], [760,250], [720,250]] },
+    { id: 'africa', name: 'Nordafrika', owner: 'neutral', troops: 50000, prod: 500, color: COLORS.neutral, 
+      poly: [[350,200], [550,200], [550,350], [350,350]] },
+    { id: 'south_am', name: 'Südamerika', owner: 'neutral', troops: 40000, prod: 400, color: COLORS.neutral, 
+      poly: [[150,300], [280,300], [250,430], [180,430]] }
+];
 
-// ============================================================
-// HELPERS
-// ============================================================
-const getCountry = id => state.countries.find(c => c.id === id);
+// Nachbarschaften (Wer kann wen angreifen?)
+const borders = {
+    'usa': ['uk', 'south_am'],
+    'uk': ['usa', 'germany', 'africa'],
+    'germany': ['uk', 'ussr', 'africa'],
+    'ussr': ['germany', 'japan'],
+    'japan': ['ussr'],
+    'africa': ['uk', 'germany', 'south_am'],
+    'south_am': ['usa', 'africa']
+};
 
-function centroid(pts) {
-  let a = 0, cx = 0, cy = 0;
-  for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
-    const f = pts[j][0] * pts[i][1] - pts[i][0] * pts[j][1];
-    a += f;
-    cx += (pts[j][0] + pts[i][0]) * f;
-    cy += (pts[j][1] + pts[i][1]) * f;
-  }
-  a /= 2;
-  if (Math.abs(a) < 1e-6) return [pts[0][0], pts[0][1]];
-  return [cx / (6 * a), cy / (6 * a)];
+let selectedSource = null;
+let selectedTarget = null;
+let activeBattles = []; // Laufende Animationen
+
+// UI Elemente
+const slider = document.getElementById('commit-slider');
+const commitVal = document.getElementById('commit-val');
+const commitNum = document.getElementById('commit-num');
+const attackBtn = document.getElementById('attack-btn');
+const logDiv = document.getElementById('log');
+
+function log(msg, color = '#fff') {
+    const p = document.createElement('div');
+    p.className = 'p-entry';
+    p.style.color = color;
+    p.innerHTML = `[${new Date().toLocaleTimeString()}] ${msg}`;
+    logDiv.prepend(p);
 }
 
-function pointInPoly(x, y, pts) {
-  let inside = false;
-  for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
-    const [xi, yi] = pts[i], [xj, yj] = pts[j];
-    if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) {
-      inside = !inside;
+// Punkt im Polygon prüfen (für Klick-Erkennung)
+function isPointInPoly(x, y, poly) {
+    let inside = false;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+        let xi = poly[i][0], yi = poly[i][1];
+        let xj = poly[j][0], yj = poly[j][1];
+        let intersect = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
     }
-  }
-  return inside;
+    return inside;
 }
 
-function fmt(n) {
-  n = Math.floor(n);
-  if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
-  if (n >= 1e3) return (n / 1e3).toFixed(1) + 'k';
-  return n.toString();
+function getTerritoryAt(x, y) {
+    return territories.find(t => isPointInPoly(x, y, t.poly));
 }
 
-function polyPath(pts) {
-  const p = new Path2D();
-  p.moveTo(pts[0][0], pts[0][1]);
-  for (let i = 1; i < pts.length; i++) p.lineTo(pts[i][0], pts[i][1]);
-  p.closePath();
-  return p;
-}
+// Zeichnen
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Raster für WW2-Karten-Look
+    ctx.strokeStyle = COLORS.grid;
+    ctx.lineWidth = 0.5;
+    for(let i=0; i<canvas.width; i+=40) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,canvas.height); ctx.stroke(); }
+    for(let i=0; i<canvas.height; i+=40) { ctx.beginPath(); ctx.moveTo(0,i); ctx.lineTo(canvas.width,i); ctx.stroke(); }
 
-// ============================================================
-// INIT
-// ============================================================
-function initGame() {
-  state.countries = MAP_DATA.map(d => ({
-    ...d,
-    owner: d.id === 'germany' ? 'player' : 'enemy',
-    troops: d.size * START_MULT,
-    path: polyPath(d.points)
-  }));
-  state.selected = null;
-  state.hovered = null;
-  state.busy = false;
-  state.gameOver = false;
-  state.aiTimer = 0;
+    // Gebiete zeichnen
+    territories.forEach(t => {
+        ctx.beginPath();
+        ctx.moveTo(t.poly[0][0], t.poly[0][1]);
+        for(let i=1; i<t.poly.length; i++) ctx.lineTo(t.poly[i][0], t.poly[i][1]);
+        ctx.closePath();
+        
+        ctx.fillStyle = t.color;
+        ctx.fill();
+        ctx.strokeStyle = '#111';
+        ctx.lineWidth = 2;
+        ctx.stroke();
 
-  document.getElementById('gameover').classList.add('hidden');
-  document.getElementById('battle').classList.add('hidden');
-  document.getElementById('dialog').classList.add('hidden');
+        // Text (Name & Truppen)
+        let cx = t.poly.reduce((s,p)=>s+p[0],0)/t.poly.length;
+        let cy = t.poly.reduce((s,p)=>s+p[1],0)/t.poly.length;
+        
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 14px Courier New';
+        ctx.textAlign = 'center';
+        ctx.fillText(t.name.split(' ')[0], cx, cy - 10);
+        ctx.font = '12px Courier New';
+        ctx.fillText(formatNumber(t.troops) + ' Truppen', cx, cy + 10);
+    });
 
-  updateHUD();
-}
-
-// ============================================================
-// LOOP
-// ============================================================
-let lastTime = performance.now();
-
-function loop(now) {
-  const dt = Math.min(0.1, (now - lastTime) / 1000);
-  lastTime = now;
-
-  if (!state.gameOver) {
-    // Truppenproduktion
-    for (const c of state.countries) {
-      c.troops += c.size * PROD_RATE * dt;
+    // Auswahl hervorheben
+    if (selectedSource) {
+        drawHighlight(selectedSource, '#0f0', 4);
     }
-    // KI
-    if (!state.busy) {
-      state.aiTimer += dt;
-      if (state.aiTimer >= 3.0) {
-        state.aiTimer = 0;
-        aiTick();
-      }
+    if (selectedTarget) {
+        drawHighlight(selectedTarget, '#ff0', 4);
     }
-  }
 
-  draw(now);
-  updateHUD();
-  requestAnimationFrame(loop);
+    // Aktive Schlachten (Frontlinien) zeichnen
+    activeBattles.forEach(b => drawBattle(b));
 }
 
-// ============================================================
-// KI
-// ============================================================
-function aiTick() {
-  if (state.gameOver || state.busy) return;
-
-  const candidates = [];
-  for (const c of state.countries) {
-    if (c.owner !== 'enemy') continue;
-    if (c.troops < 18000) continue;
-
-    const targets = c.neighbors
-      .map(getCountry)
-      .filter(n => n && n.owner === 'player');
-    if (!targets.length) continue;
-
-    targets.sort((a, b) => a.troops - b.troops);
-    const t = targets[0];
-
-    if (c.troops > t.troops * 1.4) candidates.push({ c, t });
-  }
-
-  if (!candidates.length) return;
-
-  const { c, t } = candidates[Math.floor(Math.random() * candidates.length)];
-  performAttack(c, t, Math.floor(c.troops * 0.85));
-}
-
-// ============================================================
-// ANGRIFF
-// ============================================================
-function performAttack(from, to, amount) {
-  if (state.busy) return;
-  state.busy = true;
-
-  amount = Math.min(Math.max(1, Math.floor(amount)), Math.floor(from.troops));
-  from.troops -= amount;
-  const defTroops = to.troops;
-  const attackerWins = amount > defTroops;
-
-  showBattleOverlay(from, to, amount, defTroops, attackerWins, () => {
-    if (attackerWins) {
-      to.owner = from.owner;
-      to.troops = amount - defTroops;
-    } else {
-      to.troops -= amount;
-    }
-    state.busy = false;
-    updateHUD();
-    checkGameOver();
-  });
-}
-
-// ============================================================
-// SCHLACHT-VISUALISIERUNG
-// ============================================================
-function showBattleOverlay(from, to, amount, defTroops, attackerWins, onDone) {
-  const overlay = document.getElementById('battle');
-  const attFill = document.getElementById('bAttFill');
-  const defFill = document.getElementById('bDefFill');
-  const front = document.getElementById('bFront');
-  const result = document.getElementById('bResult');
-
-  document.getElementById('bTarget').textContent = to.name;
-  document.getElementById('bAttName').textContent = from.name;
-  document.getElementById('bAttTroops').textContent = fmt(amount);
-  document.getElementById('bDefName').textContent = to.name;
-  document.getElementById('bDefTroops').textContent = fmt(defTroops);
-
-  result.textContent = '';
-  result.className = 'btl-result';
-
-  overlay.classList.remove('hidden');
-
-  const startPos = 0.5;
-  const endPos = attackerWins ? 1.0 : 0.0;
-  const duration = 1400;
-  const t0 = performance.now();
-
-  function animate(now) {
-    const t = Math.min(1, (now - t0) / duration);
-    const ease = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-    const pos = startPos + (endPos - startPos) * ease;
-
-    attFill.style.width = (pos * 100) + '%';
-    defFill.style.left = (pos * 100) + '%';
-    defFill.style.width = ((1 - pos) * 100) + '%';
-    front.style.left = (pos * 100) + '%';
-
-    if (t < 1) {
-      requestAnimationFrame(animate);
-    } else {
-      result.textContent = attackerWins
-        ? `✓ ${from.name} erobert ${to.name}!`
-        : `✗ ${to.name} hält stand!`;
-      result.className = 'btl-result show ' + (attackerWins ? 'win' : 'lose');
-
-      setTimeout(() => {
-        overlay.classList.add('hidden');
-        onDone();
-      }, 1000);
-    }
-  }
-  requestAnimationFrame(animate);
-}
-
-// ============================================================
-// DRAW
-// ============================================================
-function draw(now) {
-  // Ozean
-  const g = ctx.createRadialGradient(W/2, H/2, 100, W/2, H/2, 900);
-  g.addColorStop(0, '#0e1c2a');
-  g.addColorStop(1, '#060b12');
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, W, H);
-
-  // Wellen
-  ctx.strokeStyle = 'rgba(60, 110, 160, 0.05)';
-  ctx.lineWidth = 1;
-  for (let i = 0; i < 8; i++) {
+function drawHighlight(t, color, width) {
     ctx.beginPath();
-    const yy = 80 + i * 70;
-    ctx.moveTo(0, yy);
-    for (let x = 0; x <= W; x += 50) {
-      ctx.lineTo(x, yy + Math.sin((x + now * 0.02 + i * 100) / 120) * 4);
-    }
+    ctx.moveTo(t.poly[0][0], t.poly[0][1]);
+    for(let i=1; i<t.poly.length; i++) ctx.lineTo(t.poly[i][0], t.poly[i][1]);
+    ctx.closePath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
     ctx.stroke();
-  }
+}
 
-  // Länder
-  for (const c of state.countries) drawCountry(c);
+function formatNumber(num) {
+    if (num >= 1000000) return (num/1000000).toFixed(1) + 'M';
+    if (num >= 1000) return (num/1000).toFixed(1) + 'k';
+    return Math.floor(num).toString();
+}
 
-  // Angreifbare Nachbarn pulsieren
-  if (state.selected && !state.busy && !state.gameOver) {
-    const sel = getCountry(state.selected);
-    if (sel && sel.owner === 'player') {
-      const pulse = 0.5 + 0.5 * Math.sin(now / 250);
-      for (const nid of sel.neighbors) {
-        const n = getCountry(nid);
-        if (n && n.owner !== 'player') {
-          ctx.save();
-          ctx.strokeStyle = `rgba(255, 80, 80, ${0.4 + pulse * 0.6})`;
-          ctx.lineWidth = 3;
-          ctx.setLineDash([8, 6]);
-          ctx.lineDashOffset = -now / 40;
-          ctx.stroke(n.path);
-          ctx.restore();
-        }
-      }
+// Kampf-Mechanik & Animation
+class Battle {
+    constructor(source, target, attackingTroops) {
+        this.source = source;
+        this.target = target;
+        this.attackingTroops = attackingTroops;
+        this.defendingTroops = target.troops;
+        
+        this.startAtt = attackingTroops;
+        this.startDef = this.defendingTroops;
+        
+        // Berechne Zentrum für Frontlinie
+        this.srcCenter = this.getCenter(source);
+        this.tgtCenter = this.getCenter(target);
+        
+        // Fortschritt 0 = am Start, 1 = Ziel erreicht
+        this.progress = 0; 
+        this.finished = false;
+        this.winner = null;
+
+        // Truppen sofort vom Ursprung abziehen
+        this.source.troops -= attackingTroops;
     }
-  }
+
+    getCenter(t) {
+        return {
+            x: t.poly.reduce((s,p)=>s+p[0],0)/t.poly.length,
+            y: t.poly.reduce((s,p)=>s+p[1],0)/t.poly.length
+        };
+    }
+
+    update() {
+        if (this.finished) return;
+
+        // Kampfberechnung: Je mehr Truppen, desto schneller bewegt sich die Front
+        // und desto mehr Verluste macht der Gegner.
+        let attPower = this.attackingTroops * 0.05;
+        let defPower = this.defendingTroops * 0.05;
+
+        // Verluste berechnen
+        let attLosses = defPower * (Math.random() * 0.5 + 0.5);
+        let defLosses = attPower * (Math.random() * 0.5 + 0.5);
+
+        this.attackingTroops -= attLosses;
+        this.defendingTroops -= defLosses;
+
+        if (this.attackingTroops <= 0) this.attackingTroops = 0;
+        if (this.defendingTroops <= 0) this.defendingTroops = 0;
+
+        // Front-Bewegung: Verhältnis der aktuellen Truppen bestimmt Geschwindigkeit
+        let ratio = 0;
+        if (this.attackingTroops + this.defendingTroops > 0) {
+            ratio = (this.attackingTroops - this.defendingTroops) / (this.attackingTroops + this.defendingTroops);
+        }
+        
+        // Wenn Angreifer mehr hat, bewegt sich Front zum Ziel (positiv), sonst zurück
+        this.progress += ratio * 0.02; 
+
+        // Sieg/Niederlage Bedingungen
+        if (this.progress >= 1 || this.defendingTroops === 0) {
+            this.finished = true;
+            this.winner = 'attacker';
+            this.target.owner = this.source.owner;
+            this.target.color = this.source.color;
+            this.target.troops = Math.max(100, Math.floor(this.attackingTroops));
+            log(`SIEG! ${this.source.name} hat ${this.target.name} erobert!`, '#2ecc71');
+        } else if (this.progress <= 0 || this.attackingTroops === 0) {
+            this.finished = true;
+            this.winner = 'defender';
+            this.target.troops = Math.floor(this.defendingTroops);
+            log(`NIEDERLAGE! Angriff auf ${this.target.name} wurde abgewehrt.`, '#e74c3c');
+        }
+
+        // Ziel-Truppen live aktualisieren für UI
+        if (!this.finished) {
+            this.target.troops = Math.floor(this.defendingTroops);
+        }
+    }
 }
 
-function drawCountry(c) {
-  const isPlayer = c.owner === 'player';
-  const isSelected = state.selected === c.id;
-  const isHovered = state.hovered === c.id;
+function drawBattle(b) {
+    if (b.finished) return;
 
-  let r, g, b;
-  if (isPlayer) { r = 45; g = 110; b = 200; }
-  else { r = 185; g = 55; b = 55; }
+    // Linie zwischen Zentren
+    let dx = b.tgtCenter.x - b.srcCenter.x;
+    let dy = b.tgtCenter.y - b.srcCenter.y;
+    
+    // Aktuelle Frontposition
+    let frontX = b.srcCenter.x + dx * b.progress;
+    let frontY = b.srcCenter.y + dy * b.progress;
 
-  const lighten = isHovered ? 40 : 0;
-  const alpha = isSelected ? 0.95 : (isHovered ? 0.9 : 0.78);
+    // Frontlinie zeichnen (senkrecht zur Angriffsrichtung)
+    let angle = Math.atan2(dy, dx) + Math.PI/2;
+    let len = 30; // Länge der Frontlinie
+    
+    ctx.beginPath();
+    ctx.moveTo(frontX - Math.cos(angle)*len, frontY - Math.sin(angle)*len);
+    ctx.lineTo(frontX + Math.cos(angle)*len, frontY + Math.sin(angle)*len);
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 4;
+    ctx.setLineDash([5, 5]);
+    ctx.stroke();
+    ctx.setLineDash([]);
 
-  const xs = c.points.map(p => p[0]), ys = c.points.map(p => p[1]);
-  const minX = Math.min(...xs), maxX = Math.max(...xs);
-  const minY = Math.min(...ys), maxY = Math.max(...ys);
+    // Explosions-Effekt an der Front
+    ctx.beginPath();
+    ctx.arc(frontX, frontY, 5 + Math.random()*5, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(255, ${Math.random()*100}, 0, 0.8)`;
+    ctx.fill();
 
-  const grad = ctx.createLinearGradient(minX, minY, maxX, maxY);
-  grad.addColorStop(0, `rgba(${r+lighten+30}, ${g+lighten+30}, ${b+lighten+30}, ${alpha})`);
-  grad.addColorStop(1, `rgba(${r+lighten}, ${g+lighten}, ${b+lighten}, ${alpha})`);
-
-  ctx.fillStyle = grad;
-  ctx.fill(c.path);
-
-  ctx.strokeStyle = isSelected ? '#ffd54f' : 'rgba(0, 0, 0, 0.6)';
-  ctx.lineWidth = isSelected ? 3 : 1.5;
-  ctx.stroke(c.path);
-
-  if (isSelected) {
-    ctx.save();
-    ctx.shadowColor = '#ffd54f';
-    ctx.shadowBlur = 15;
-    ctx.strokeStyle = 'rgba(255, 213, 79, 0.6)';
-    ctx.lineWidth = 2;
-    ctx.stroke(c.path);
-    ctx.restore();
-  }
-
-  // Beschriftung
-  const [cx, cy] = centroid(c.points);
-  const w = maxX - minX, h = maxY - minY;
-  const fs = Math.max(9, Math.min(14, Math.sqrt(w * h) / 8));
-
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-
-  ctx.font = `700 ${fs}px 'Segoe UI', sans-serif`;
-  ctx.fillStyle = 'rgba(0,0,0,0.6)';
-  ctx.fillText(c.name, cx + 1, cy - fs * 0.9 + 1);
-  ctx.fillStyle = '#ffffff';
-  ctx.fillText(c.name, cx, cy - fs * 0.9);
-
-  ctx.font = `700 ${fs * 1.15}px 'Consolas', monospace`;
-  ctx.fillStyle = 'rgba(0,0,0,0.6)';
-  ctx.fillText(fmt(c.troops), cx + 1, cy + fs * 0.5 + 1);
-  ctx.fillStyle = '#ffe082';
-  ctx.fillText(fmt(c.troops), cx, cy + fs * 0.5);
-
-  if (fs >= 11) {
-    ctx.font = `500 ${fs * 0.75}px 'Segoe UI', sans-serif`;
-    ctx.fillStyle = 'rgba(255,255,255,0.55)';
-    ctx.fillText('+' + fmt(c.size * PROD_RATE) + '/s', cx, cy + fs * 1.7);
-  }
+    // Truppenzahlen an der Front anzeigen
+    ctx.fillStyle = '#fff';
+    ctx.font = '10px Courier New';
+    ctx.fillText(`ATT: ${formatNumber(b.attackingTroops)}`, frontX - 40, frontY - 15);
+    ctx.fillText(`DEF: ${formatNumber(b.defendingTroops)}`, frontX + 10, frontY + 20);
 }
 
-// ============================================================
-// HUD
-// ============================================================
-function updateHUD() {
-  if (state.selected) {
-    const sel = getCountry(state.selected);
-    if (!sel || sel.owner !== 'player') state.selected = null;
-  }
+// Input Handling
+canvas.addEventListener('click', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const clicked = getTerritoryAt(x, y);
 
-  const owned = state.countries.filter(c => c.owner === 'player');
-  const totalProd = owned.reduce((s, c) => s + c.size * PROD_RATE, 0);
-  const totalTroops = owned.reduce((s, c) => s + c.troops, 0);
+    if (!clicked) return;
 
-  document.getElementById('hudTerritory').textContent = `${owned.length} / ${state.countries.length}`;
-  document.getElementById('hudProd').textContent = '+' + fmt(totalProd) + '/s';
-  document.getElementById('hudTroops').textContent = fmt(totalTroops);
-
-  const info = document.getElementById('selInfo');
-  if (state.selected) {
-    const c = getCountry(state.selected);
-    info.classList.add('show');
-    document.getElementById('selName').textContent = c.name;
-    document.getElementById('selTroops').textContent = fmt(c.troops);
-    document.getElementById('selProd').textContent = '+' + fmt(c.size * PROD_RATE) + '/s';
-    document.getElementById('selSize').textContent = c.size;
-  } else {
-    info.classList.remove('show');
-  }
-}
-
-// ============================================================
-// MAUS
-// ============================================================
-function getMousePos(e) {
-  const rect = canvas.getBoundingClientRect();
-  return {
-    x: (e.clientX - rect.left) / rect.width * W,
-    y: (e.clientY - rect.top) / rect.height * H
-  };
-}
-
-function countryAt(x, y) {
-  for (let i = state.countries.length - 1; i >= 0; i--) {
-    if (pointInPoly(x, y, state.countries[i].points)) return state.countries[i];
-  }
-  return null;
-}
-
-canvas.addEventListener('mousemove', e => {
-  const { x, y } = getMousePos(e);
-  const c = countryAt(x, y);
-  state.hovered = c ? c.id : null;
-  canvas.style.cursor = c ? 'pointer' : 'default';
+    // Logik: Erst eigenes Land wählen, dann Nachbarland
+    if (!selectedSource) {
+        if (clicked.owner === 'player') {
+            selectedSource = clicked;
+            selectedTarget = null;
+            updateUI();
+        } else {
+            log("Wähle zuerst eines deiner eigenen Gebiete!", "#f1c40f");
+        }
+    } else {
+        if (clicked === selectedSource) {
+            selectedSource = null; // Abwählen
+        } else if (clicked.owner === 'player') {
+            selectedSource = clicked; // Anderes eigenes Land wählen
+        } else {
+            // Prüfen ob Nachbar
+            if (borders[selectedSource.id].includes(clicked.id)) {
+                selectedTarget = clicked;
+            } else {
+                log(`${clicked.name} grenzt nicht an ${selectedSource.name}.`, "#e74c3c");
+            }
+        }
+        updateUI();
+    }
 });
 
-canvas.addEventListener('click', e => {
-  if (state.busy || state.gameOver) return;
+slider.addEventListener('input', updateUI);
 
-  const { x, y } = getMousePos(e);
-  const c = countryAt(x, y);
-  if (!c) return;
+attackBtn.addEventListener('click', () => {
+    if (!selectedSource || !selectedTarget) return;
+    
+    let percent = parseInt(slider.value) / 100;
+    let troopsToSend = Math.floor(selectedSource.troops * percent);
 
-  // Nichts ausgewählt
-  if (!state.selected) {
-    if (c.owner === 'player') state.selected = c.id;
-    return;
-  }
+    if (troopsToSend < 1000) {
+        log("Zu wenige Truppen für einen Angriff! (Min. 1k)", "#e74c3c");
+        return;
+    }
 
-  const sel = getCountry(state.selected);
-  if (!sel) { state.selected = null; return; }
+    // Prüfen ob schon eine Schlacht auf dieses Ziel läuft
+    if (activeBattles.some(b => b.target === selectedTarget && !b.finished)) {
+        log("Dort wird bereits gekämpft!", "#f1c40f");
+        return;
+    }
 
-  // Gleiches Land -> abwählen
-  if (c.id === state.selected) {
-    state.selected = null;
-    return;
-  }
-
-  // Anderes eigenes Land -> umwählen
-  if (c.owner === 'player') {
-    state.selected = c.id;
-    return;
-  }
-
-  // Feindlicher Nachbar -> Angriff
-  if (sel.neighbors.includes(c.id)) {
-    openAttackDialog(sel, c);
-  }
+    log(`Angriff gestartet! ${formatNumber(troopsToSend)} Truppen marschieren nach ${selectedTarget.name}.`, '#3498db');
+    activeBattles.push(new Battle(selectedSource, selectedTarget, troopsToSend));
+    
+    selectedTarget = null;
+    updateUI();
 });
 
-// ============================================================
-// DIALOG
-// ============================================================
-let currentAttack = null;
+function updateUI() {
+    // Player Stats
+    let playerTotalTroops = territories.filter(t=>t.owner==='player').reduce((s,t)=>s+t.troops,0);
+    let playerTotalProd = territories.filter(t=>t.owner==='player').reduce((s,t)=>s+t.prod,0);
+    document.getElementById('p-troops').innerText = formatNumber(playerTotalTroops);
+    document.getElementById('p-prod').innerText = formatNumber(playerTotalProd);
 
-function openAttackDialog(from, to) {
-  currentAttack = { from, to };
+    // Target Stats
+    if (selectedTarget) {
+        document.getElementById('t-name').innerText = selectedTarget.name;
+        document.getElementById('t-troops').innerText = formatNumber(selectedTarget.troops);
+        document.getElementById('t-owner').innerText = selectedTarget.owner === 'player' ? 'EIGEN' : selectedTarget.owner.toUpperCase();
+        document.getElementById('target-stats').style.borderColor = selectedTarget.color;
+    } else {
+        document.getElementById('t-name').innerText = "Bitte Nachbarland wählen";
+        document.getElementById('t-troops').innerText = "0";
+        document.getElementById('t-owner').innerText = "-";
+    }
 
-  document.getElementById('dTargetName').textContent = to.name;
-  document.getElementById('dDefTroops').textContent = fmt(to.troops);
-  document.getElementById('dOwnTroops').textContent = fmt(from.troops);
-
-  const slider = document.getElementById('dSlider');
-  slider.value = 100;
-
-  updateDialogSend();
-  document.getElementById('dialog').classList.remove('hidden');
+    // Slider
+    let val = slider.value;
+    commitVal.innerText = val;
+    if (selectedSource) {
+        let num = Math.floor(selectedSource.troops * (val/100));
+        commitNum.innerText = formatNumber(num);
+        attackBtn.disabled = !(selectedTarget && num >= 1000);
+    } else {
+        commitNum.innerText = "0";
+        attackBtn.disabled = true;
+    }
 }
 
-function updateDialogSend() {
-  if (!currentAttack) return;
-  const { from, to } = currentAttack;
-  const pct = parseInt(document.getElementById('dSlider').value);
-  const send = Math.max(1, Math.floor(from.troops * pct / 100));
-  const remaining = Math.floor(from.troops) - send;
+// Game Loop
+setInterval(() => {
+    // Produktion (jede Sekunde)
+    territories.forEach(t => {
+        t.troops += t.prod;
+    });
 
-  document.getElementById('dSendAmount').textContent = fmt(send);
+    // Einfache KI für Feinde (greifen zufällig an)
+    territories.forEach(t => {
+        if (t.owner !== 'player' && t.owner !== 'neutral' && Math.random() < 0.05) {
+            let neighbors = borders[t.id].map(id => territories.find(x => x.id === id)).filter(x => x.owner !== t.owner);
+            if (neighbors.length > 0 && !activeBattles.some(b => b.source === t && !b.finished)) {
+                let target = neighbors[Math.floor(Math.random() * neighbors.length)];
+                let troops = Math.floor(t.troops * 0.3);
+                if (troops > 5000) {
+                    activeBattles.push(new Battle(t, target, troops));
+                    log(`WARNUNG: ${t.name} greift ${target.name} an!`, '#e74c3c');
+                }
+            }
+        }
+    });
 
-  const outcome = document.getElementById('dOutcome');
-  if (send > to.troops) {
-    outcome.textContent = `✓ Überlegen — Verbleibend: ${fmt(remaining)}`;
-    outcome.className = 'win';
-  } else {
-    outcome.textContent = `✗ Unterlegen — Verbleibend: ${fmt(remaining)}`;
-    outcome.className = 'lose';
-  }
+    updateUI();
+}, 1000);
+
+function gameLoop() {
+    // Schlachten updaten
+    activeBattles.forEach(b => b.update());
+    // Alte beendete Schlachten aufräumen
+    activeBattles = activeBattles.filter(b => !b.finished || b.progress > 0); // Behalte kurz für visuelles Feedback, aber hier direkt löschen ist sauberer
+    activeBattles = activeBattles.filter(b => !b.finished);
+
+    draw();
+    requestAnimationFrame(gameLoop);
 }
 
-document.getElementById('dSlider').addEventListener('input', updateDialogSend);
+log("Spiel gestartet. Wähle dein Land (blau) und klicke auf ein Nachbarland.", "#2ecc71");
+updateUI();
+gameLoop();
 
-document.getElementById('dCancel').addEventListener('click', () => {
-  document.getElementById('dialog').classList.add('hidden');
-  currentAttack = null;
-});
-
-document.getElementById('dConfirm').addEventListener('click', () => {
-  if (!currentAttack) return;
-  const { from, to } = currentAttack;
-  const pct = parseInt(document.getElementById('dSlider').value);
-  const send = Math.max(1, Math.floor(from.troops * pct / 100));
-
-  document.getElementById('dialog').classList.add('hidden');
-  currentAttack = null;
-
-  if (from.troops < 1) return;
-  performAttack(from, to, send);
-});
-
-// ============================================================
-// GAME OVER
-// ============================================================
-function checkGameOver() {
-  const playerCount = state.countries.filter(c => c.owner === 'player').length;
-  const enemyCount = state.countries.filter(c => c.owner === 'enemy').length;
-
-  if (playerCount === 0) {
-    state.gameOver = true;
-    showGameOver(false);
-  } else if (enemyCount === 0) {
-    state.gameOver = true;
-    showGameOver(true);
-  }
-}
-
-function showGameOver(win) {
-  document.getElementById('goTitle').textContent = win ? '🏆 SIEG' : '💀 NIEDERLAGE';
-  document.getElementById('goTitle').style.color = win ? '#6ee7a0' : '#ff6b6b';
-  document.getElementById('goText').textContent = win
-    ? 'Du hast ganz Europa erobert!'
-    : 'Dein Reich wurde ausgelöscht.';
-  document.getElementById('gameover').classList.remove('hidden');
-  state.selected = null;
-  updateHUD();
-}
-
-document.getElementById('goRestart').addEventListener('click', initGame);
-
-// ============================================================
-// START
-// ============================================================
-initGame();
-requestAnimationFrame(loop);
 </script>
 </body>
 </html>

@@ -1,411 +1,754 @@
-from pathlib import Path
-
-html = r'''<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>IRON NATIONS — World Strategy Map</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WW2 Taktik</title>
 <style>
-*{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#2e6d85;color:#eaf0f3;font-family:Arial,Helvetica,sans-serif}
-body{user-select:none}
-#map{position:fixed;inset:0;background:
- radial-gradient(circle at 50% 35%,#4b8399 0,#39748b 45%,#2b6278 100%)}
-svg{position:absolute;inset:0;width:100%;height:100%;cursor:grab}
-svg.drag{cursor:grabbing}
-.country{stroke:#263f4a;stroke-width:.55;vector-effect:non-scaling-stroke;transition:filter .1s}
-.country:hover{stroke:#fff;stroke-width:1.4;filter:brightness(1.18)}
-.country.selected{stroke:#ffe89a;stroke-width:2}
-.border{fill:none;stroke:#eaf1f333;stroke-width:.35;vector-effect:non-scaling-stroke;pointer-events:none}
-#top{position:absolute;top:0;left:50%;transform:translateX(-50%);display:flex;height:63px;background:#07141de8;border:1px solid #304955;border-top:0;border-radius:0 0 11px 11px;z-index:10;box-shadow:0 8px 30px #09141b88}
-.res{min-width:104px;padding:8px 13px;text-align:center;border-right:1px solid #ffffff0c}
-.res span{font-size:9px;color:#9dafb8}.res b{display:block;font-size:14px;margin-top:5px}
-#date{min-width:135px;padding:14px 16px;text-align:center;font-weight:bold}
-#date small{display:block;color:#92a5ae;margin-top:4px;font-size:9px}
-#leader{position:absolute;top:80px;left:10px;width:190px;background:#07141de8;border:1px solid #dce7eb;border-radius:2px;padding:10px;z-index:8;box-shadow:0 8px 28px #07101888}
-#leader h3{font-size:10px;color:#aebcc4;margin:0 0 8px}
-.rank{height:20px;display:flex;align-items:center;gap:5px;font-size:10px}
-.rank .n{width:16px;color:#aab8bf}.rank .dot{width:9px;height:9px;border-radius:2px}.rank .name{flex:1}.rank .power{font-weight:bold;color:#c2cdd2}
-#side{position:absolute;right:10px;top:80px;width:325px;max-height:calc(100% - 135px);overflow:auto;background:#07141df2;border:1px solid #304955;border-radius:7px;z-index:9;box-shadow:0 12px 35px #061018aa;display:none}
-#side.open{display:block}
-.head{padding:12px 13px;border-bottom:1px solid #ffffff12;display:flex;justify-content:space-between}
-.head h2{font-size:16px;margin:0}.close{background:#172a33;padding:2px 8px}
-.sec{padding:11px 13px;border-bottom:1px solid #ffffff0c}
-.sec h4{font-size:9px;color:#9eb0b8;letter-spacing:.7px;margin:0 0 8px;text-transform:uppercase}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.card{background:#ffffff06;border:1px solid #ffffff0b;border-radius:4px;padding:7px}
-.card small{color:#94a7b0}.card b{display:block;font-size:14px;margin-top:3px}
-.row{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid #ffffff08}
-.row:last-child{border:0}
-button{background:#10232d;border:1px solid #3a5260;color:#e8eef1;border-radius:4px;padding:6px 9px;cursor:pointer}
-button:hover{background:#1a3744}.buttons{display:flex;gap:5px;flex-wrap:wrap}
-#bottomLeft{position:absolute;left:0;bottom:0;width:330px;height:48px;background:#07141de8;border:1px solid #304955;border-bottom:0;border-left:0;border-radius:0 12px 0 0;z-index:8;display:flex;align-items:center;padding:7px;gap:5px}
-#bottomLeft button{width:35px;height:33px;padding:0;font-size:15px}
-#mode{font-size:9px;color:#9dafb7;margin-left:5px}
-#speed{position:absolute;right:0;bottom:0;width:330px;height:48px;background:#07141de8;border:1px solid #304955;border-bottom:0;border-right:0;border-radius:12px 0 0 0;z-index:8;padding:8px 12px}
-#speedbar{height:4px;background:#314750;border-radius:4px;margin:3px 0 7px}.fill{height:100%;background:#647885;width:20%}
-.speedbuttons{display:flex;justify-content:flex-end;gap:3px}.speedbuttons button{font-size:10px;padding:2px 7px}
-#toast{position:absolute;top:75px;left:50%;transform:translateX(-50%);background:#07141df5;border:1px solid #607782;border-radius:5px;padding:8px 14px;opacity:0;z-index:20;transition:.2s;pointer-events:none}
-#toast.show{opacity:1}
-#hint{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);background:#07141daa;border-radius:4px;padding:4px 8px;color:#c3d0d5;font-size:9px;z-index:5}
-#loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#2e6d85;z-index:50;font-size:18px}
-.hidden{display:none}
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh;
+    background: radial-gradient(circle at 50% 0%, #2a3138, #14181c 70%);
+    color: #e6e6e6;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  #game {
+    display: flex; gap: 18px;
+    background: #23282e;
+    padding: 18px;
+    border-radius: 14px;
+    box-shadow: 0 18px 50px rgba(0,0,0,.7);
+    border: 1px solid #333a42;
+  }
+  canvas { border-radius: 8px; display: block; cursor: crosshair; }
+
+  #sidebar { width: 250px; display: flex; flex-direction: column; gap: 10px; }
+
+  h1 {
+    font-size: 15px; margin: 0; letter-spacing: 2px;
+    text-transform: uppercase; color: #8fb8e8;
+  }
+
+  .turn {
+    padding: 9px 12px; border-radius: 8px; font-weight: 700;
+    font-size: 13px; letter-spacing: 1px; text-align: center;
+    text-transform: uppercase; transition: .2s;
+  }
+  .turn.player { background: #1c3d66; color: #7fb6ff; border: 1px solid #2f6fd0; }
+  .turn.enemy  { background: #5a1c1c; color: #ff9b9b; border: 1px solid #c0392b; }
+
+  .panel {
+    background: #1a1f24; border: 1px solid #2e363e;
+    border-radius: 8px; padding: 12px; font-size: 13px;
+    min-height: 140px;
+  }
+  .panel .unit-name {
+    font-weight: 700; font-size: 15px; margin-bottom: 8px;
+    color: #9fd0ff; letter-spacing: .5px;
+  }
+  .panel .unit-name.enemy { color: #ff9b9b; }
+  .stat { display: flex; justify-content: space-between; padding: 3px 0; color: #a8b4bf; }
+  .stat b { color: #e6e6e6; font-variant-numeric: tabular-nums; }
+  .hint { color: #6e7a86; line-height: 1.5; font-size: 12px; }
+
+  button {
+    padding: 11px; border-radius: 8px; border: 1px solid #2f6fd0;
+    background: linear-gradient(#2f6fd0, #2357a8); color: #fff;
+    font-weight: 700; font-size: 13px; letter-spacing: 1px;
+    text-transform: uppercase; cursor: pointer; transition: .15s;
+  }
+  button:hover:not(:disabled) { filter: brightness(1.2); }
+  button:active:not(:disabled) { transform: translateY(1px); }
+  button:disabled { opacity: .4; cursor: not-allowed; }
+
+  .log {
+    background: #16191d; border: 1px solid #262d34; border-radius: 8px;
+    padding: 8px 10px; font-size: 11px; line-height: 1.5;
+    height: 130px; overflow-y: auto; color: #8b98a5;
+    font-family: 'Consolas', monospace;
+  }
+  .log div { padding: 1px 0; }
+  .log .hl { color: #ffd27f; }
+  .log .kill { color: #ff7b7b; }
 </style>
 </head>
 <body>
-<div id="map">
-  <svg id="world" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet">
-    <rect width="1600" height="900" fill="transparent"/>
-    <g id="countries"></g>
-    <g id="borders"></g>
-    <g id="labels"></g>
-  </svg>
-</div>
-
-<div id="loading">WELTKARTE WIRD GELADEN…</div>
-
-<div id="top">
-  <div class="res"><span>💰 POLITISCHE MACHT</span><b id="pp">120</b></div>
-  <div class="res"><span>⚙ STABILITÄT</span><b id="stab">72%</b></div>
-  <div class="res"><span>⚔ KRIEGSWILLE</span><b id="war">61%</b></div>
-  <div class="res"><span>⛓ STAHL</span><b id="steel">80</b></div>
-  <div class="res"><span>🛢 ÖL</span><b id="oil">40</b></div>
-  <div class="res"><span>🏭 FABRIKEN</span><b id="fact">42 / 36</b></div>
-  <div id="date">1. Januar 1940<small>PAUSIERT</small></div>
-</div>
-
-<div id="leader">
-  <h3>LEADERBOARD</h3>
-  <div id="ranks"></div>
-</div>
-
-<div id="side"></div>
-<div id="toast"></div>
-<div id="hint">Länder anklicken • Karte ziehen • Mausrad zoomen • Leertaste pausiert</div>
-
-<div id="bottomLeft">
-  <button onclick="openPanel('politics')">⚒</button>
-  <button onclick="openPanel('map')">🌐</button>
-  <button onclick="openPanel('army')">⚔</button>
-  <button onclick="openPanel('diplomacy')">♟</button>
-  <button onclick="openPanel('research')">⚗</button>
-  <button onclick="openPanel('production')">🏭</button>
-  <span id="mode">POLITISCHE KARTE</span>
-</div>
-
-<div id="speed">
-  <div id="speedbar"><div class="fill" id="fill"></div></div>
-  <div class="speedbuttons">
-    <button onclick="setSpeed(0)">Ⅱ</button>
-    <button onclick="setSpeed(1)">▶</button>
-    <button onclick="setSpeed(2)">▶▶</button>
-    <button onclick="setSpeed(4)">▶▶▶</button>
+<div id="game">
+  <canvas id="cv" width="600" height="500"></canvas>
+  <div id="sidebar">
+    <h1>⚔ WW2 Taktik</h1>
+    <div id="turn" class="turn player">Dein Zug</div>
+    <div id="info" class="panel"></div>
+    <button id="endTurn">Zug beenden</button>
+    <div id="log" class="log"></div>
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-<script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
 <script>
-/*
-  IRON NATIONS — komplette Weltkarte
-  Die Karte verwendet Natural Earth World Atlas Daten über world-atlas.
-  Dadurch werden die Ländergrenzen der Welt automatisch geladen.
-  Das Spiel selbst bleibt vollständig in dieser HTML-Datei.
-*/
+/* ============================================================
+   KONSTANTEN
+   ============================================================ */
+const COLS = 12, ROWS = 10, TILE = 50;
 
-const state={
-  speed:0,day:1,month:1,year:1940,selected:null,mode:"political",
-  pp:120,stab:72,war:61,steel:80,oil:40,civ:42,mil:36,
-  countries:{},wars:[],log:["Weltkampagne gestartet."]
+const TERRAIN = {
+  plain:  { name: 'Ebene',    cost: 1,        def: 0.00, color: '#7ea85f' },
+  forest: { name: 'Wald',     cost: 2,        def: 0.25, color: '#3f6b3a' },
+  hills:  { name: 'Hügel',    cost: 2,        def: 0.30, color: '#a8925f' },
+  water:  { name: 'Wasser',   cost: Infinity, def: 0.00, color: '#3d6fa5' },
+  city:   { name: 'Stadt',    cost: 1,        def: 0.40, color: '#9c9c9c' }
 };
 
-const palette=[
- "#6d6f72","#4f78b7","#b74c4c","#3c8b5b","#d2aa3d","#7546a6",
- "#4c9a8d","#d77e31","#6880a9","#a54e77","#8b673f","#5d9b45"
-];
+const UNIT_TYPES = {
+  infantry:  { name: 'Infanterie', hp: 100, move: 3, range: 1, dmg: 35, symbol: 'I' },
+  tank:      { name: 'Panzer',     hp: 160, move: 4, range: 1, dmg: 55, symbol: 'P' },
+  artillery: { name: 'Artillerie', hp: 80,  move: 2, range: 3, dmg: 60, symbol: 'A' }
+};
 
-const svg=d3.select("#world");
-const countriesLayer=d3.select("#countries");
-const bordersLayer=d3.select("#borders");
-const labelsLayer=d3.select("#labels");
+const PLAYER_COLOR = '#2f6fd0';
+const ENEMY_COLOR  = '#c0392b';
 
-let projection=d3.geoNaturalEarth1().scale(255).translate([800,450]);
-let path=d3.geoPath(projection);
-let worldData=null;
+/* ============================================================
+   STATE
+   ============================================================ */
+const state = {
+  map: [],
+  units: [],
+  turn: 'player',
+  selected: null,
+  moveTiles: new Set(),
+  attackTiles: new Set(),
+  busy: false,
+  gameOver: false,
+  logs: []
+};
 
-function initCountry(id,name){
-  if(!state.countries[id]){
-    state.countries[id]={
-      name,ind:Math.max(2,Math.round(5+Math.random()*35)),
-      army:Math.max(1,Math.round(2+Math.random()*45)),
-      pop:Math.max(1,Math.round(2+Math.random()*150)),
-      relations:0,color:palette[Object.keys(state.countries).length%palette.length]
-    };
+let unitIdCounter = 0;
+
+/* ============================================================
+   HILFSFUNKTIONEN
+   ============================================================ */
+const key = (x, y) => x + ',' + y;
+const unkey = k => k.split(',').map(Number);
+const manhattan = (a, b) => Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+function unitAt(x, y) {
+  return state.units.find(u => u.x === x && u.y === y && u.hp > 0);
+}
+
+/* ============================================================
+   KARTEN-GENERIERUNG
+   ============================================================ */
+function generateMap() {
+  let m;
+  let attempts = 0;
+  do {
+    m = [];
+    for (let y = 0; y < ROWS; y++) m.push(new Array(COLS).fill('plain'));
+
+    // Symmetrische Zufallskarte (linke Hälfte wird gespiegelt)
+    for (let y = 0; y < ROWS; y++) {
+      for (let x = 0; x < COLS / 2; x++) {
+        let t = 'plain';
+        const r = Math.random();
+        if (r < 0.20) t = 'forest';
+        else if (r < 0.32) t = 'hills';
+        else if (r < 0.38) t = 'water';
+        m[y][x] = t;
+        m[y][COLS - 1 - x] = t;
+      }
+    }
+
+    // Aufstellungszonen freiräumen
+    for (let y = 0; y < ROWS; y++) {
+      for (const x of [0, 1, COLS - 2, COLS - 1]) {
+        if (m[y][x] === 'water') m[y][x] = 'plain';
+      }
+    }
+
+    // Städte (symmetrisch, in der Nähe der Mitte)
+    for (const [cx, cy] of [[4, 2], [4, 7]]) {
+      m[cy][cx] = 'city';
+      m[cy][COLS - 1 - cx] = 'city';
+    }
+
+    attempts++;
+  } while (!mapIsConnected(m) && attempts < 30);
+
+  return m;
+}
+
+function mapIsConnected(m) {
+  const seen = new Set();
+  const start = [1, Math.floor(ROWS / 2)];
+  const stack = [start];
+  while (stack.length) {
+    const [x, y] = stack.pop();
+    const k = key(x, y);
+    if (seen.has(k)) continue;
+    if (x < 0 || y < 0 || x >= COLS || y >= ROWS) continue;
+    if (TERRAIN[m[y][x]].cost === Infinity) continue;
+    seen.add(k);
+    stack.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
+  }
+  return seen.has(key(COLS - 2, Math.floor(ROWS / 2)));
+}
+
+/* ============================================================
+   EINHEITEN ERZEUGEN
+   ============================================================ */
+function createUnit(side, typeKey, x, y) {
+  const t = UNIT_TYPES[typeKey];
+  return {
+    id: ++unitIdCounter,
+    side, type: typeKey,
+    name: t.name,
+    x, y,
+    hp: t.hp, maxHp: t.hp,
+    move: t.move, range: t.range, dmg: t.dmg,
+    symbol: t.symbol,
+    hasMoved: false,
+    acted: false
+  };
+}
+
+function setupUnits() {
+  state.units = [];
+  const layout = [
+    ['infantry',  1],
+    ['tank',      3],
+    ['infantry',  5],
+    ['artillery', 6],
+    ['tank',      8]
+  ];
+  for (const [type, y] of layout) {
+    state.units.push(createUnit('player', type, 1, y));
+    state.units.push(createUnit('enemy',  type, COLS - 2, y));
   }
 }
 
-async function loadWorld(){
-  try{
-    const topo=await fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json").then(r=>r.json());
-    worldData=topojson.feature(topo,topo.objects.countries);
-    const mesh=topojson.mesh(topo,topo.objects.countries,(a,b)=>a!==b);
+/* ============================================================
+   BEWEGUNGSBERECHNUNG (Dijkstra auf Grid)
+   ============================================================ */
+function computeReachable(unit) {
+  const dist = {};
+  dist[key(unit.x, unit.y)] = 0;
 
-    countriesLayer.selectAll("path")
-      .data(worldData.features)
-      .join("path")
-      .attr("class","country")
-      .attr("d",path)
-      .attr("fill",(d,i)=>{
-        const id=String(d.id);
-        initCountry(id,d.properties?.name||"Unbekannt");
-        return state.countries[id].color;
-      })
-      .on("click",(event,d)=>{
-        event.stopPropagation();
-        state.selected=String(d.id);
-        showCountry(d);
-      });
+  const occupied = new Set(
+    state.units
+      .filter(u => u.hp > 0 && u !== unit)
+      .map(u => key(u.x, u.y))
+  );
 
-    bordersLayer.append("path").datum(mesh).attr("class","border").attr("d",path);
+  const frontier = [[0, unit.x, unit.y]];
 
-    labelsLayer.selectAll("text")
-      .data(worldData.features.filter(d=>{
-        const a=d3.geoArea(d);
-        return a>.0007;
-      }))
-      .join("text")
-      .attr("x",d=>path.centroid(d)[0])
-      .attr("y",d=>path.centroid(d)[1])
-      .attr("fill","#ffffff")
-      .attr("font-size",d=>Math.max(7,Math.min(12,8+Math.sqrt(d3.geoArea(d))*30)))
-      .attr("text-anchor","middle")
-      .attr("opacity",".55")
-      .attr("pointer-events","none")
-      .text(d=>d.properties?.name||"");
+  while (frontier.length) {
+    frontier.sort((a, b) => a[0] - b[0]);
+    const [cost, x, y] = frontier.shift();
+    if (cost > dist[key(x, y)]) continue;
 
-    loading.classList.add("hidden");
-    renderAll();
-  }catch(err){
-    loading.textContent="Karte konnte nicht geladen werden. Internetverbindung prüfen.";
-    console.error(err);
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const nx = x + dx, ny = y + dy;
+      if (nx < 0 || ny < 0 || nx >= COLS || ny >= ROWS) continue;
+
+      const terr = TERRAIN[state.map[ny][nx]];
+      if (terr.cost === Infinity) continue;
+
+      const k = key(nx, ny);
+      if (occupied.has(k)) continue;
+
+      const nc = cost + terr.cost;
+      if (nc <= unit.move && (dist[k] === undefined || nc < dist[k])) {
+        dist[k] = nc;
+        frontier.push([nc, nx, ny]);
+      }
+    }
+  }
+  return dist;
+}
+
+function attackTargets(unit) {
+  return state.units.filter(o =>
+    o.side !== unit.side && o.hp > 0 && manhattan(unit, o) <= unit.range
+  );
+}
+
+/* ============================================================
+   RENDERING
+   ============================================================ */
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+
+function draw() {
+  // --- Gelände ---
+  for (let y = 0; y < ROWS; y++) {
+    for (let x = 0; x < COLS; x++) {
+      const t = TERRAIN[state.map[y][x]];
+      ctx.fillStyle = t.color;
+      ctx.fillRect(x * TILE, y * TILE, TILE, TILE);
+
+      // leichte Textur
+      if (t === TERRAIN.forest) {
+        ctx.fillStyle = 'rgba(0,0,0,0.15)';
+        for (let i = 0; i < 3; i++) {
+          const px = x * TILE + 10 + i * 14;
+          const py = y * TILE + 18 + (i % 2) * 12;
+          ctx.beginPath();
+          ctx.arc(px, py, 6, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      } else if (t === TERRAIN.hills) {
+        ctx.strokeStyle = 'rgba(0,0,0,0.18)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x * TILE + 8,  y * TILE + 34);
+        ctx.quadraticCurveTo(x * TILE + 25, y * TILE + 12, x * TILE + 42, y * TILE + 34);
+        ctx.stroke();
+      } else if (t === TERRAIN.water) {
+        ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+        ctx.lineWidth = 2;
+        for (let i = 0; i < 2; i++) {
+          const wy = y * TILE + 18 + i * 16;
+          ctx.beginPath();
+          ctx.moveTo(x * TILE + 10, wy);
+          ctx.quadraticCurveTo(x * TILE + 25, wy - 5, x * TILE + 40, wy);
+          ctx.stroke();
+        }
+      } else if (t === TERRAIN.city) {
+        ctx.fillStyle = 'rgba(0,0,0,0.22)';
+        ctx.fillRect(x * TILE + 12, y * TILE + 14, 12, 22);
+        ctx.fillRect(x * TILE + 26, y * TILE + 20, 12, 16);
+      }
+    }
+  }
+
+  // --- Raster ---
+  ctx.strokeStyle = 'rgba(0,0,0,0.18)';
+  ctx.lineWidth = 1;
+  for (let x = 0; x <= COLS; x++) {
+    ctx.beginPath(); ctx.moveTo(x * TILE, 0); ctx.lineTo(x * TILE, ROWS * TILE); ctx.stroke();
+  }
+  for (let y = 0; y <= ROWS; y++) {
+    ctx.beginPath(); ctx.moveTo(0, y * TILE); ctx.lineTo(COLS * TILE, y * TILE); ctx.stroke();
+  }
+
+  // --- Bewegungsfelder ---
+  ctx.fillStyle = 'rgba(80,160,255,0.30)';
+  for (const k of state.moveTiles) {
+    const [x, y] = unkey(k);
+    ctx.fillRect(x * TILE + 2, y * TILE + 2, TILE - 4, TILE - 4);
+  }
+
+  // --- Angriffsfelder ---
+  ctx.fillStyle = 'rgba(255,70,70,0.35)';
+  for (const k of state.attackTiles) {
+    const [x, y] = unkey(k);
+    ctx.fillRect(x * TILE + 2, y * TILE + 2, TILE - 4, TILE - 4);
+  }
+
+  // --- Einheiten ---
+  for (const u of state.units) if (u.hp > 0) drawUnit(u);
+
+  // --- Auswahlring ---
+  if (state.selected) {
+    const u = state.selected;
+    ctx.strokeStyle = '#ffd54f';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(u.x * TILE + TILE / 2, u.y * TILE + TILE / 2, TILE * 0.42, 0, Math.PI * 2);
+    ctx.stroke();
   }
 }
 
-function renderRanks(){
-  const list=Object.entries(state.countries)
-    .map(([id,c])=>({id,c,p:c.ind+c.army*.6+c.pop*.08}))
-    .sort((a,b)=>b.p-a.p).slice(0,9);
-  ranks.innerHTML=list.map((x,i)=>`
-    <div class="rank">
-      <span class="n">${i+1}</span>
-      <span class="dot" style="background:${x.c.color}"></span>
-      <span class="name">${x.c.name}</span>
-      <span class="power">${Math.round(x.p)}K</span>
-    </div>`).join("");
+function drawUnit(u) {
+  const cx = u.x * TILE + TILE / 2;
+  const cy = u.y * TILE + TILE / 2;
+  const r = TILE * 0.34;
+  const col = u.side === 'player' ? PLAYER_COLOR : ENEMY_COLOR;
+
+  // Schatten
+  ctx.beginPath();
+  ctx.arc(cx, cy + 3, r, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(0,0,0,0.35)';
+  ctx.fill();
+
+  // Körper
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fillStyle = col;
+  ctx.fill();
+  ctx.lineWidth = 2.5;
+  ctx.strokeStyle = 'rgba(0,0,0,0.55)';
+  ctx.stroke();
+
+  // Symbol
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 17px Segoe UI, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(u.symbol, cx, cy + 1);
+
+  // HP-Balken
+  const bw = TILE * 0.72, bh = 5;
+  const bx = cx - bw / 2;
+  const by = u.y * TILE + TILE - 9;
+  ctx.fillStyle = 'rgba(0,0,0,0.65)';
+  ctx.fillRect(bx, by, bw, bh);
+  const pct = Math.max(0, u.hp / u.maxHp);
+  ctx.fillStyle = pct > 0.5 ? '#4caf50' : pct > 0.25 ? '#ffb300' : '#e53935';
+  ctx.fillRect(bx, by, bw * pct, bh);
+
+  // "Bereits gehandelt"-Verdunkelung
+  if (u.acted && u.side === 'player' && !state.busy) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0,0,0,0.45)';
+    ctx.fill();
+  }
 }
 
-function showCountry(feature){
-  const id=String(feature.id), c=state.countries[id];
-  countriesLayer.selectAll(".country").classed("selected",d=>String(d.id)===id);
-  side.classList.add("open");
-  side.innerHTML=`
-    <div class="head"><h2>${c.name}</h2><button class="close" onclick="closePanel()">×</button></div>
-    <div class="sec">
-      <div class="grid">
-        <div class="card"><small>Bevölkerung</small><b>${c.pop} Mio.</b></div>
-        <div class="card"><small>Industrie</small><b>${c.ind}</b></div>
-        <div class="card"><small>Armee</small><b>${c.army} Div.</b></div>
-        <div class="card"><small>Beziehungen</small><b>${c.relations>0?"+":""}${c.relations}</b></div>
-      </div>
-    </div>
-    <div class="sec">
-      <h4>Diplomatie</h4>
-      <div class="row"><span>Handelsvertrag</span><button onclick="trade('${id}')">Handeln</button></div>
-      <div class="row"><span>Beziehungen</span><button onclick="relations('${id}')">+ Beziehung</button></div>
-      <div class="row"><span>Militär</span><button onclick="war('${id}')">Krieg erklären</button></div>
-    </div>
-    <div class="sec">
-      <h4>Staat</h4>
-      <div class="row"><span>Land-ID</span><span>${id}</span></div>
-      <div class="row"><span>Industriepotential</span><span>${c.ind}</span></div>
-      <div class="row"><span>Militärpotential</span><span>${c.army}</span></div>
+/* ============================================================
+   UI
+   ============================================================ */
+const turnEl = document.getElementById('turn');
+const infoEl = document.getElementById('info');
+const logEl  = document.getElementById('log');
+const btnEnd = document.getElementById('endTurn');
+
+function log(msg, cls = '') {
+  state.logs.push({ msg, cls });
+  if (state.logs.length > 40) state.logs.shift();
+  logEl.innerHTML = state.logs
+    .slice(-14)
+    .map(l => `<div class="${l.cls}">${l.msg}</div>`)
+    .join('');
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+function updateUI() {
+  // Zug-Anzeige
+  if (state.gameOver) {
+    turnEl.className = 'turn ' + (state.winner === 'player' ? 'player' : 'enemy');
+    turnEl.textContent = state.winner === 'player' ? '🏆 Sieg!' : '💀 Niederlage';
+  } else {
+    turnEl.className = 'turn ' + state.turn;
+    turnEl.textContent = state.turn === 'player'
+      ? (state.busy ? 'Feindzug...' : 'Dein Zug')
+      : 'Feindzug...';
+  }
+
+  // Info-Panel
+  const u = state.selected;
+  if (u) {
+    const terr = TERRAIN[state.map[u.y][u.x]];
+    infoEl.innerHTML = `
+      <div class="unit-name ${u.side === 'enemy' ? 'enemy' : ''}">${u.name}</div>
+      <div class="stat"><span>Trefferpunkte</span><b>${u.hp} / ${u.maxHp}</b></div>
+      <div class="stat"><span>Bewegung</span><b>${u.move}</b></div>
+      <div class="stat"><span>Reichweite</span><b>${u.range}</b></div>
+      <div class="stat"><span>Schaden</span><b>${u.dmg}</b></div>
+      <div class="stat"><span>Gelände</span><b>${terr.name} (${Math.round(terr.def * 100)}%)</b></div>
+    `;
+  } else {
+    infoEl.innerHTML = `<div class="hint">
+      Klicke eine <b style="color:#7fb6ff">blaue Einheit</b>, um sie auszuwählen.<br><br>
+      ▸ <b>Blaue Felder</b> = Bewegungsreichweite<br>
+      ▸ <b>Rote Felder</b> = Angriffsziele<br>
+      ▸ Einheiten können sich bewegen <i>und</i> angreifen.<br><br>
+      Gelände gibt Verteidigungsboni: Wald +25%, Hügel +30%, Stadt +40%.<br>
+      Wasser ist unpassierbar.
     </div>`;
+  }
+
+  btnEnd.disabled = state.turn !== 'player' || state.busy || state.gameOver;
 }
 
-function openPanel(type){
-  side.classList.add("open");
-  if(type==="politics")politicsPanel();
-  if(type==="map")mapPanel();
-  if(type==="army")armyPanel();
-  if(type==="diplomacy")diplomacyPanel();
-  if(type==="research")researchPanel();
-  if(type==="production")productionPanel();
-}
-function closePanel(){side.classList.remove("open")}
-function politicsPanel(){
- side.innerHTML=`<div class="head"><h2>Politik</h2><button class="close" onclick="closePanel()">×</button></div>
- <div class="sec"><div class="grid">
- <div class="card"><small>Politische Macht</small><b>${Math.floor(state.pp)}</b></div>
- <div class="card"><small>Stabilität</small><b>${state.stab}%</b></div>
- <div class="card"><small>Kriegswille</small><b>${state.war}%</b></div>
- <div class="card"><small>Weltspannung</small><b>${Math.min(100,state.wars.length*12)}%</b></div>
- </div></div>
- <div class="sec"><h4>Entscheidungen</h4>
- <div class="row"><span>Industrieprogramm</span><button onclick="decision('industry')">50 PP</button></div>
- <div class="row"><span>Propaganda</span><button onclick="decision('war')">35 PP</button></div>
- <div class="row"><span>Militärreform</span><button onclick="decision('army')">45 PP</button></div></div>`;
-}
-function mapPanel(){
- side.innerHTML=`<div class="head"><h2>Kartenmodus</h2><button class="close" onclick="closePanel()">×</button></div>
- <div class="sec"><h4>Darstellung</h4><div class="buttons">
- <button onclick="setMode('political')">Politisch</button>
- <button onclick="setMode('industry')">Industrie</button>
- <button onclick="setMode('army')">Armee</button>
- <button onclick="setMode('resources')">Ressourcen</button>
- </div></div>`;
-}
-function armyPanel(){
- side.innerHTML=`<div class="head"><h2>Armee</h2><button class="close" onclick="closePanel()">×</button></div>
- <div class="sec"><div class="grid">
- <div class="card"><small>Divisionen</small><b>${Math.round(state.countries["276"]?.army||31)}</b></div>
- <div class="card"><small>Personal</small><b>2.4 M</b></div>
- </div></div>
- <div class="sec"><h4>Armeeoperationen</h4>
- <div class="row"><span>Heeresgruppe Nord</span><button onclick="toast('Operationsplan erstellt')">Planen</button></div>
- <div class="row"><span>Heeresgruppe West</span><button onclick="toast('Verteidigungslinie erstellt')">Verteidigen</button></div>
- <div class="row"><span>Reserve</span><button onclick="toast('Reserve mobilisiert')">Mobilisieren</button></div></div>`;
-}
-function diplomacyPanel(){
- side.innerHTML=`<div class="head"><h2>Diplomatie</h2><button class="close" onclick="closePanel()">×</button></div>
- <div class="sec"><h4>Weltstaaten</h4>${Object.entries(state.countries).slice(0,35).map(([id,c])=>
- `<div class="row"><span>${c.name}</span><button onclick="openCountry('${id}')">Öffnen</button></div>`).join("")}</div>`;
-}
-function researchPanel(){
- side.innerHTML=`<div class="head"><h2>Forschung</h2><button class="close" onclick="closePanel()">×</button></div>
- <div class="sec"><div class="card"><small>Aktive Forschung</small><b>Motorisierung</b><div class="small">42 / 85 Tage</div></div></div>
- <div class="sec"><h4>Technologien</h4>
- ${["Motorisierung","Verbesserte Artillerie","Mittlere Panzer","Industrieautomation","Funktechnik","Jagdflugzeuge II","Konvoischutz","Radar","Raketentechnik"].map((x,i)=>
- `<div class="row"><span>${x}</span><button onclick="toast('${x} ausgewählt')">${i===0?"aktiv":"wählen"}</button></div>`).join("")}</div>`;
-}
-function productionPanel(){
- side.innerHTML=`<div class="head"><h2>Produktion</h2><button class="close" onclick="closePanel()">×</button></div>
- <div class="sec"><div class="grid">
- <div class="card"><small>Zivil</small><b>${state.civ}</b></div>
- <div class="card"><small>Militär</small><b>${state.mil}</b></div>
- </div></div>
- <div class="sec"><h4>Produktionslinien</h4>
- ${["Infanterieausrüstung","Artillerie","Jäger","Panzer","LKW","Schiffe"].map((x,i)=>
- `<div class="card" style="margin-bottom:6px"><b>${x}</b><div class="row"><span>${5+i} Fabriken</span><span>${(1+i*.35).toFixed(2)}/Tag</span></div></div>`).join("")}</div>`;
+/* ============================================================
+   SPIELER-AKTIONEN
+   ============================================================ */
+function selectUnit(u) {
+  state.selected = u;
+  state.moveTiles = new Set(u.hasMoved ? [] : Object.keys(computeReachable(u)));
+  state.attackTiles = new Set(attackTargets(u).map(t => key(t.x, t.y)));
+  updateUI();
+  draw();
 }
 
-function openCountry(id){
-  const feature=worldData.features.find(d=>String(d.id)===String(id));
-  if(feature)showCountry(feature);
-}
-function relations(id){
-  if(state.pp<15)return toast("Nicht genug politische Macht");
-  state.pp-=15;state.countries[id].relations+=10;
-  toast("Beziehungen verbessert");renderTop();
-}
-function trade(id){
-  if(state.civ<1)return toast("Keine zivile Fabrik");
-  state.civ--;state.oil+=5;state.steel+=8;
-  toast("Handelsabkommen abgeschlossen");renderTop();
-}
-function war(id){
-  if(state.pp<40)return toast("Mindestens 40 PP nötig");
-  if(!state.wars.some(w=>w===id)){state.pp-=40;state.wars.push(id)}
-  toast("Krieg erklärt");renderTop();
-}
-function decision(type){
-  const costs={industry:50,war:35,army:45};
-  if(state.pp<costs[type])return toast("Nicht genug PP");
-  state.pp-=costs[type];
-  if(type==="industry")state.civ+=3;
-  if(type==="war")state.war=Math.min(100,state.war+9);
-  if(type==="army")state.stab=Math.max(0,state.stab-1);
-  renderTop();politicsPanel();
-}
-function setMode(m){
-  state.mode=m;
-  mode.textContent={political:"POLITISCHE KARTE",industry:"INDUSTRIE",army:"MILITÄR",resources:"RESSOURCEN"}[m];
-  countriesLayer.selectAll(".country").attr("fill",d=>{
-    const c=state.countries[String(d.id)];
-    if(m==="political")return c.color;
-    if(m==="industry")return d3.interpolateYlOrRd(Math.min(1,c.ind/45));
-    if(m==="army")return d3.interpolateBlues(Math.min(1,c.army/60));
-    return d3.interpolateGreens(Math.min(1,(c.ind+c.army)/100));
-  });
-  closePanel();
-}
-function renderTop(){
-  pp.textContent=Math.floor(state.pp);stab.textContent=Math.floor(state.stab)+"%";war.textContent=Math.floor(state.war)+"%";
-  steel.textContent=Math.floor(state.steel);oil.textContent=Math.floor(state.oil);
-  fact.textContent=`${Math.floor(state.civ)} / ${Math.floor(state.mil)}`;
-  const months=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
-  date.innerHTML=`${state.day}. ${months[state.month-1]} ${state.year}<small>${state.speed?"SIMULATION LÄUFT":"PAUSIERT"}</small>`;
-  fill.style.width=Math.min(100,state.day/30*100)+"%";
-}
-function setSpeed(v){state.speed=v;renderTop()}
-function toast(msg){
- const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");
- clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.classList.remove("show"),1600);
+function deselect() {
+  state.selected = null;
+  state.moveTiles.clear();
+  state.attackTiles.clear();
+  updateUI();
+  draw();
 }
 
-/* Weltweite Simulation */
-function simulate(){
- if(!state.speed)return;
- for(let i=0;i<state.speed;i++){
-   state.day++;
-   if(state.day>30){state.day=1;state.month++;if(state.month>12){state.month=1;state.year++}}
-   state.pp+=.7;state.steel+=.18;state.oil+=.06;
-   for(const c of Object.values(state.countries)){
-     c.ind=Math.max(1,c.ind+(Math.random()-.49)*.03);
-     c.army=Math.max(1,c.army+(Math.random()-.48)*.05);
-   }
- }
- renderTop();renderRanks();
-}
-setInterval(simulate,1000);
+function onTileClick(x, y) {
+  if (state.turn !== 'player' || state.busy || state.gameOver) return;
 
-/* Kamera */
-let zoom=1,tx=0,ty=0,dragging=false,sx=0,sy=0,stx=0,sty=0;
-function applyTransform(){
- svg.style.transform=`translate(${tx}px,${ty}px) scale(${zoom})`;
+  const clicked = unitAt(x, y);
+  const k = key(x, y);
+
+  // 1) Angriff ausführen
+  if (state.selected && state.attackTiles.has(k) && clicked && clicked.side === 'enemy') {
+    doAttack(state.selected, clicked);
+    return;
+  }
+
+  // 2) Eigene Einheit auswählen
+  if (clicked && clicked.side === 'player') {
+    if (clicked.acted) return; // schon gehandelt
+    if (state.selected && state.selected !== clicked && state.selected.hasMoved) {
+      state.selected.acted = true;
+    }
+    selectUnit(clicked);
+    return;
+  }
+
+  // 3) Bewegung
+  if (state.selected && !state.selected.hasMoved && state.moveTiles.has(k)) {
+    moveUnit(state.selected, x, y);
+    return;
+  }
+
+  // 4) Auswahl aufheben
+  if (state.selected) {
+    if (state.selected.hasMoved) state.selected.acted = true;
+    deselect();
+  }
 }
-world.addEventListener("wheel",e=>{
- e.preventDefault();
- zoom=Math.max(.7,Math.min(2.5,zoom*(e.deltaY<0?1.1:.91)));
- applyTransform();
-},{passive:false});
-world.addEventListener("pointerdown",e=>{
- if(e.target.classList.contains("country"))return;
- dragging=true;world.classList.add("drag");
- sx=e.clientX;sy=e.clientY;stx=tx;sty=ty;
+
+function moveUnit(u, x, y) {
+  u.x = x;
+  u.y = y;
+  u.hasMoved = true;
+
+  state.moveTiles.clear();
+  state.attackTiles = new Set(attackTargets(u).map(t => key(t.x, t.y)));
+
+  if (state.attackTiles.size === 0) {
+    // Keine Ziele in Reichweite → Einheit ist fertig
+    u.acted = true;
+    deselect();
+  } else {
+    updateUI();
+    draw();
+  }
+}
+
+function doAttack(attacker, defender) {
+  resolveAttack(attacker, defender);
+  cleanupDead();
+
+  attacker.acted = true;
+  deselect();
+
+  if (checkGameOver()) return;
+  updateUI();
+  draw();
+}
+
+function resolveAttack(a, d) {
+  const dTerr = TERRAIN[state.map[d.y][d.x]];
+  let dmg = Math.round(a.dmg * (0.85 + Math.random() * 0.3) * (1 - dTerr.def));
+  dmg = Math.max(1, dmg);
+  d.hp -= dmg;
+  log(`${a.name} → ${d.name}: ${dmg} Schaden`, 'hl');
+
+  // Gegenangriff
+  if (d.hp > 0 && d.range >= manhattan(a, d)) {
+    const aTerr = TERRAIN[state.map[a.y][a.x]];
+    let ctr = Math.round(d.dmg * 0.5 * (0.85 + Math.random() * 0.3) * (1 - aTerr.def));
+    ctr = Math.max(1, ctr);
+    a.hp -= ctr;
+    log(`${d.name} kontert: ${ctr} Schaden`, '');
+  }
+}
+
+function cleanupDead() {
+  const dead = state.units.filter(u => u.hp <= 0);
+  for (const u of dead) {
+    log(`☠ ${u.name} (${u.side === 'player' ? 'Blau' : 'Rot'}) zerstört!`, 'kill');
+  }
+  state.units = state.units.filter(u => u.hp > 0);
+}
+
+function checkGameOver() {
+  const hasPlayer = state.units.some(u => u.side === 'player');
+  const hasEnemy  = state.units.some(u => u.side === 'enemy');
+  if (hasPlayer && hasEnemy) return false;
+
+  state.gameOver = true;
+  state.winner = hasPlayer ? 'player' : 'enemy';
+  state.selected = null;
+  state.moveTiles.clear();
+  state.attackTiles.clear();
+  log(state.winner === 'player'
+    ? '🏆 SIEG! Alle feindlichen Einheiten vernichtet.'
+    : '💀 NIEDERLAGE. Deine Armee wurde aufgerieben.', 'hl');
+  updateUI();
+  draw();
+  return true;
+}
+
+/* ============================================================
+   ZUGWECHSEL & KI
+   ============================================================ */
+function endTurn() {
+  if (state.gameOver || state.busy) return;
+
+  if (state.turn === 'player') {
+    // Auswahl aufräumen
+    if (state.selected && state.selected.hasMoved) state.selected.acted = true;
+    deselect();
+
+    state.turn = 'enemy';
+    state.units.filter(u => u.side === 'enemy').forEach(u => {
+      u.acted = false; u.hasMoved = false;
+    });
+    updateUI();
+    draw();
+    aiTurn();
+  } else {
+    state.turn = 'player';
+    state.units.filter(u => u.side === 'player').forEach(u => {
+      u.acted = false; u.hasMoved = false;
+    });
+    log('— Dein Zug —', '');
+    updateUI();
+    draw();
+  }
+}
+
+async function aiTurn() {
+  state.busy = true;
+  updateUI();
+
+  const enemies = state.units.filter(u => u.side === 'enemy');
+
+  for (const unit of enemies) {
+    if (unit.hp <= 0 || state.gameOver) continue;
+    await aiActUnit(unit);
+    await sleep(220);
+    if (checkGameOver()) { state.busy = false; return; }
+  }
+
+  state.busy = false;
+  endTurn();
+}
+
+async function aiActUnit(unit) {
+  const targets = state.units.filter(u => u.side === 'player' && u.hp > 0);
+  if (!targets.length) return;
+
+  // --- Ziel wählen: nah, verwundbar, hoher Wert ---
+  let target = null, bestScore = Infinity;
+  for (const t of targets) {
+    const d = manhattan(unit, t);
+    let score = d;
+    if (t.hp <= unit.dmg) score -= 25;              // kann wahrscheinlich töten
+    if (t.type === 'artillery') score -= 8;         // wertvolles Ziel
+    if (score < bestScore) { bestScore = score; target = t; }
+  }
+
+  // --- Direkt angreifen, wenn bereits in Reichweite? ---
+  if (manhattan(unit, target) <= unit.range) {
+    await sleep(120);
+    resolveAttack(unit, target);
+    cleanupDead();
+    unit.acted = true;
+    draw();
+    return;
+  }
+
+  // --- Beste Position finden ---
+  const reach = computeReachable(unit);
+  let best = null, bestPosScore = Infinity;
+
+  for (const k in reach) {
+    const [x, y] = unkey(k);
+    const d = Math.abs(x - target.x) + Math.abs(y - target.y);
+
+    // In Reichweite = stark bevorzugt; sonst näher heranrücken
+    let score = d <= unit.range ? (unit.range - d) : 100 + d;
+    score -= TERRAIN[state.map[y][x]].def * 8; // Deckung bevorzugen
+
+    if (score < bestPosScore) { bestPosScore = score; best = { x, y }; }
+  }
+
+  if (best && (best.x !== unit.x || best.y !== unit.y)) {
+    unit.x = best.x;
+    unit.y = best.y;
+    unit.hasMoved = true;
+    draw();
+    await sleep(220);
+  }
+
+  // --- Angriff nach Bewegung ---
+  const newTargets = attackTargets(unit);
+  if (newTargets.length) {
+    // Bevorzugt das Ziel, das getötet werden kann
+    newTargets.sort((a, b) => (a.hp - b.hp));
+    await sleep(120);
+    resolveAttack(unit, newTargets[0]);
+    cleanupDead();
+    draw();
+  }
+
+  unit.acted = true;
+}
+
+/* ============================================================
+   INITIALISIERUNG
+   ============================================================ */
+function newGame() {
+  state.map = generateMap();
+  state.turn = 'player';
+  state.selected = null;
+  state.moveTiles.clear();
+  state.attackTiles.clear();
+  state.busy = false;
+  state.gameOver = false;
+  state.winner = null;
+  state.logs = [];
+  logEl.innerHTML = '';
+
+  setupUnits();
+
+  log('— Dein Zug —', '');
+  log('Wähle eine Einheit und rücke vor.', '');
+  updateUI();
+  draw();
+}
+
+/* ============================================================
+   EVENTS
+   ============================================================ */
+cv.addEventListener('click', e => {
+  const rect = cv.getBoundingClientRect();
+  const x = Math.floor((e.clientX - rect.left) * (cv.width / rect.width) / TILE);
+  const y = Math.floor((e.clientY - rect.top) * (cv.height / rect.height) / TILE);
+  if (x < 0 || y < 0 || x >= COLS || y >= ROWS) return;
+  onTileClick(x, y);
 });
-window.addEventListener("pointermove",e=>{
- if(!dragging)return;
- tx=stx+e.clientX-sx;ty=sty+e.clientY-sy;applyTransform();
-});
-window.addEventListener("pointerup",()=>{dragging=false;world.classList.remove("drag")});
-window.addEventListener("keydown",e=>{
- if(e.code==="Space"){e.preventDefault();setSpeed(state.speed?0:1)}
- if(e.key==="Escape")closePanel();
- if(e.key==="1")openPanel("politics");
- if(e.key==="2")openPanel("research");
- if(e.key==="3")openPanel("production");
- if(e.key==="4")openPanel("army");
-});
-document.getElementById("map").addEventListener("click",()=>countriesLayer.selectAll(".country").classed("selected",false));
 
-renderTop();
-loadWorld();
+btnEnd.addEventListener('click', endTurn);
+
+document.addEventListener('keydown', e => {
+  if (e.code === 'Space') {
+    e.preventDefault();
+    endTurn();
+  }
+  if (e.code === 'Escape') {
+    if (state.selected) {
+      if (state.selected.hasMoved) state.selected.acted = true;
+      deselect();
+    }
+  }
+});
+
+newGame();
 </script>
 </body>
-</html>'''
-
-out=Path("/mnt/data/iron_nations_world.html")
-out.write_text(html,encoding="utf-8")
-print(f"Erstellt: {out}")
-print(f"{len(html):,} Zeichen HTML/JS/CSS")
+</html>

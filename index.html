@@ -2,792 +2,529 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Iron Nations</title>
 
 <style>
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
 }
 
-:root {
-    --bg: #10141b;
-    --panel: rgba(18, 23, 31, .94);
-    --panel2: rgba(27, 34, 44, .96);
-    --border: rgba(255,255,255,.12);
-    --text: #f4f4f5;
-    --muted: #9ca3af;
-    --accent: #d89b3d;
+body{
+    font-family:Arial,Helvetica,sans-serif;
+    background:#071018;
+    color:#e9eef3;
+    overflow:hidden;
 }
 
-html,
-body {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: var(--bg);
-    color: var(--text);
-    font-family: Arial, Helvetica, sans-serif;
+/* TOPBAR */
+.topbar{
+    height:64px;
+    background:#101a24;
+    border-bottom:1px solid #263442;
+    display:flex;
+    align-items:center;
+    padding:0 18px;
+    gap:28px;
+    position:relative;
+    z-index:20;
 }
 
-/* =========================
-   GAME
-========================= */
+.logo{
+    font-size:22px;
+    font-weight:900;
+    letter-spacing:3px;
+}
 
-#game {
-    position: fixed;
-    inset: 0;
-    overflow: hidden;
+.logo span{
+    color:#e34b4b;
+}
+
+.resources{
+    display:flex;
+    gap:10px;
+    flex:1;
+}
+
+.resource{
+    background:#17232f;
+    border:1px solid #293846;
+    border-radius:7px;
+    padding:7px 13px;
+    min-width:105px;
+}
+
+.resource small{
+    display:block;
+    color:#8293a3;
+    font-size:10px;
+    text-transform:uppercase;
+}
+
+.resource b{
+    font-size:15px;
+}
+
+/* GAME */
+.game{
+    position:absolute;
+    top:64px;
+    bottom:0;
+    left:0;
+    right:0;
+}
+
+/* MAP */
+.map-container{
+    position:absolute;
+    inset:0;
+    overflow:hidden;
     background:
-        radial-gradient(circle at center, #354331 0%, #202a22 45%, #11161a 100%);
+        radial-gradient(circle at 50% 40%,#173449 0%,#0b1d2b 45%,#061018 100%);
+    cursor:grab;
 }
 
-/* =========================
-   TOP BAR
-========================= */
-
-.topbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 64px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    padding: 0 18px;
-
-    background: rgba(12,16,21,.94);
-    border-bottom: 1px solid var(--border);
-
-    z-index: 1000;
-    backdrop-filter: blur(10px);
+.map-container.dragging{
+    cursor:grabbing;
 }
 
-.logo {
-    font-size: 23px;
-    font-weight: 900;
-    letter-spacing: 2px;
-    white-space: nowrap;
+.map{
+    position:absolute;
+    width:1500px;
+    height:850px;
+    left:50%;
+    top:50%;
+    transform-origin:center;
+    transform:translate(-50%,-50%) scale(1);
 }
 
-.logo span {
-    color: var(--accent);
-}
-
-.resources {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.resource {
-    min-width: 105px;
-    padding: 8px 12px;
-
-    background: var(--panel2);
-    border: 1px solid var(--border);
-    border-radius: 7px;
-
-    font-size: 13px;
-}
-
-.resource strong {
-    display: block;
-    margin-top: 2px;
-    font-size: 15px;
-}
-
-/* =========================
-   MAP
-========================= */
-
-#map-container {
-    position: absolute;
-    inset: 64px 0 0 0;
-    overflow: hidden;
-
-    cursor: grab;
-}
-
-#map-container.dragging {
-    cursor: grabbing;
-}
-
-#world {
-    position: absolute;
-
-    width: 2400px;
-    height: 1400px;
-
-    transform-origin: 0 0;
-
-    background:
-        radial-gradient(
-            ellipse at center,
-            rgba(255,255,255,.04),
-            rgba(0,0,0,.18)
-        );
-
-    border: 2px solid rgba(255,255,255,.12);
-    border-radius: 40px;
-
-    box-shadow:
-        inset 0 0 100px rgba(0,0,0,.25),
-        0 0 100px rgba(0,0,0,.35);
-}
-
-/* grid */
-#world::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-
+/* decorative ocean */
+.ocean-grid{
+    position:absolute;
+    inset:0;
+    opacity:.13;
     background-image:
-        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
-
-    background-size: 100px 100px;
-
-    pointer-events: none;
+        linear-gradient(#80a8bd 1px,transparent 1px),
+        linear-gradient(90deg,#80a8bd 1px,transparent 1px);
+    background-size:75px 75px;
 }
 
-/* =========================
-   TERRITORIES
-========================= */
-
-.country {
-    position: absolute;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    color: white;
-    font-weight: 800;
-    font-size: 18px;
-
-    text-shadow:
-        0 2px 4px rgba(0,0,0,.8);
-
-    border: 2px solid rgba(255,255,255,.38);
-
-    cursor: pointer;
-
-    transition:
-        filter .15s,
-        transform .15s,
-        border-color .15s;
-
-    user-select: none;
+/* LAND */
+.country{
+    position:absolute;
+    border:2px solid rgba(255,255,255,.35);
+    transition:.15s;
+    cursor:pointer;
+    filter:drop-shadow(0 4px 5px #0008);
 }
 
-.country:hover {
-    filter: brightness(1.2);
-    border-color: white;
-    z-index: 20;
+.country:hover{
+    filter:brightness(1.25) drop-shadow(0 4px 8px #000);
+    z-index:10;
 }
 
-.country.selected {
-    border: 4px solid #fff;
-    box-shadow:
-        0 0 0 3px rgba(216,155,61,.75),
-        0 0 30px rgba(216,155,61,.5);
-    z-index: 30;
+.country.selected{
+    outline:3px solid #fff;
+    outline-offset:3px;
+    filter:brightness(1.35) drop-shadow(0 0 10px #fff6);
+    z-index:15;
 }
 
-/* shapes */
+.country-name{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    font-weight:bold;
+    font-size:13px;
+    color:white;
+    text-shadow:0 2px 5px #000;
+    pointer-events:none;
+    white-space:nowrap;
+}
 
-.country-1 {
-    left: 190px;
-    top: 230px;
-    width: 480px;
-    height: 310px;
-    background: #315c8a;
-    clip-path: polygon(
-        4% 20%, 23% 4%, 50% 8%,
-        78% 2%, 98% 25%,
-        92% 60%, 75% 92%,
-        40% 85%, 12% 98%,
-        0 62%
+/* Shapes */
+.germany{
+    left:690px;
+    top:330px;
+    width:130px;
+    height:115px;
+    background:#526f82;
+    clip-path:polygon(
+        28% 0,62% 5%,83% 20%,94% 44%,78% 60%,
+        88% 81%,65% 100%,39% 87%,22% 94%,8% 65%,
+        17% 43%,4% 20%
     );
 }
 
-.country-2 {
-    left: 650px;
-    top: 180px;
-    width: 520px;
-    height: 350px;
-    background: #7a3c3c;
-    clip-path: polygon(
-        10% 5%, 38% 0, 72% 12%,
-        100% 35%, 90% 75%,
-        68% 95%, 35% 84%,
-        5% 92%, 0 50%
+.france{
+    left:565px;
+    top:390px;
+    width:145px;
+    height:145px;
+    background:#596f88;
+    clip-path:polygon(
+        25% 0,60% 7%,85% 24%,100% 52%,81% 69%,
+        87% 94%,53% 100%,28% 82%,4% 73%,0 45%,13% 23%
     );
 }
 
-.country-3 {
-    left: 1160px;
-    top: 250px;
-    width: 470px;
-    height: 330px;
-    background: #756126;
-    clip-path: polygon(
-        5% 20%, 28% 4%, 70% 10%,
-        96% 28%, 88% 64%,
-        100% 88%, 55% 96%,
-        25% 78%, 0 60%
+.spain{
+    left:500px;
+    top:505px;
+    width:150px;
+    height:90px;
+    background:#735e4b;
+    clip-path:polygon(8% 17%,38% 0,84% 12%,100% 52%,84% 91%,39% 100%,8% 73%,0 39%);
+}
+
+.italy{
+    left:720px;
+    top:475px;
+    width:80px;
+    height:160px;
+    background:#62764f;
+    clip-path:polygon(30% 0,65% 11%,48% 32%,74% 45%,55% 59%,70% 76%,48% 100%,27% 83%,39% 60%,15% 44%,29% 25%);
+}
+
+.poland{
+    left:805px;
+    top:315px;
+    width:135px;
+    height:105px;
+    background:#715d78;
+    clip-path:polygon(8% 22%,36% 4%,80% 10%,100% 40%,84% 83%,49% 100%,13% 76%);
+}
+
+.uk{
+    left:460px;
+    top:275px;
+    width:75px;
+    height:125px;
+    background:#4d6f68;
+    clip-path:polygon(45% 0,73% 19%,61% 38%,82% 56%,65% 77%,74% 100%,42% 88%,27% 66%,3% 53%,18% 29%,8% 10%);
+}
+
+.norway{
+    left:630px;
+    top:120px;
+    width:90px;
+    height:200px;
+    background:#59697b;
+    clip-path:polygon(48% 0,77% 18%,62% 34%,91% 48%,68% 65%,83% 82%,52% 100%,32% 80%,8% 66%,24% 45%,4% 28%,26% 12%);
+}
+
+.sweden{
+    left:720px;
+    top:110px;
+    width:90px;
+    height:210px;
+    background:#6e6548;
+    clip-path:polygon(41% 0,74% 14%,58% 31%,89% 50%,64% 66%,81% 84%,48% 100%,27% 81%,9% 62%,23% 43%,7% 24%,28% 9%);
+}
+
+.russia{
+    left:850px;
+    top:120px;
+    width:480px;
+    height:210px;
+    background:#554e70;
+    clip-path:polygon(
+        0 25%,8% 9%,19% 15%,29% 2%,41% 13%,52% 3%,
+        65% 11%,75% 2%,89% 14%,100% 24%,95% 45%,
+        100% 61%,88% 73%,78% 66%,66% 83%,53% 73%,
+        39% 90%,24% 77%,13% 91%,4% 71%,10% 51%,0 44%
     );
 }
 
-.country-4 {
-    left: 410px;
-    top: 520px;
-    width: 510px;
-    height: 390px;
-    background: #356847;
-    clip-path: polygon(
-        8% 4%, 45% 0, 83% 12%,
-        98% 45%, 90% 78%,
-        65% 100%, 28% 88%,
-        0 70%, 4% 30%
-    );
+.ukraine{
+    left:880px;
+    top:335px;
+    width:190px;
+    height:125px;
+    background:#5f744e;
+    clip-path:polygon(9% 28%,31% 8%,63% 0,89% 19%,100% 52%,78% 75%,57% 100%,29% 83%,4% 75%,0 48%);
 }
 
-.country-5 {
-    left: 910px;
-    top: 530px;
-    width: 500px;
-    height: 380px;
-    background: #65407b;
-    clip-path: polygon(
-        20% 0, 70% 5%, 98% 25%,
-        88% 60%, 100% 86%,
-        55% 100%, 18% 86%, 0 55%,
-        8% 20%
-    );
+.turkey{
+    left:850px;
+    top:470px;
+    width:220px;
+    height:70px;
+    background:#704f4e;
+    clip-path:polygon(0 40%,17% 18%,41% 25%,58% 8%,79% 27%,100% 32%,92% 64%,65% 74%,45% 59%,20% 79%,4% 63%);
 }
 
-.country-6 {
-    left: 1400px;
-    top: 570px;
-    width: 460px;
-    height: 350px;
-    background: #386b70;
-    clip-path: polygon(
-        8% 12%, 40% 0, 78% 10%,
-        100% 38%, 88% 72%,
-        65% 96%, 25% 88%, 0 58%
-    );
+/* SIDE PANELS */
+.panel{
+    position:absolute;
+    top:15px;
+    bottom:15px;
+    width:285px;
+    background:#101a24ed;
+    border:1px solid #2b3a47;
+    backdrop-filter:blur(8px);
+    border-radius:10px;
+    z-index:12;
+    overflow:hidden;
 }
 
-.country-7 {
-    left: 700px;
-    top: 900px;
-    width: 510px;
-    height: 300px;
-    background: #815d35;
-    clip-path: polygon(
-        0 25%, 25% 5%, 58% 0,
-        92% 18%, 100% 55%,
-        82% 90%, 45% 100%,
-        12% 82%
-    );
+.left-panel{
+    left:15px;
 }
 
-.country-8 {
-    left: 1210px;
-    top: 900px;
-    width: 530px;
-    height: 300px;
-    background: #563d70;
-    clip-path: polygon(
-        10% 15%, 40% 0, 78% 8%,
-        100% 40%, 90% 80%,
-        60% 100%, 20% 90%, 0 55%
-    );
+.right-panel{
+    right:15px;
 }
 
-/* =========================
-   LEFT SIDEBAR
-========================= */
-
-.left-sidebar {
-    position: fixed;
-
-    top: 76px;
-    left: 12px;
-
-    width: 230px;
-    max-height: calc(100vh - 88px);
-
-    padding: 12px;
-
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-
-    z-index: 500;
-
-    backdrop-filter: blur(12px);
-    box-shadow: 0 10px 30px rgba(0,0,0,.25);
-
-    overflow-y: auto;
+.panel-header{
+    padding:17px;
+    border-bottom:1px solid #293845;
+    font-size:15px;
+    font-weight:bold;
 }
 
-.panel-title {
-    font-size: 12px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-
-    margin-bottom: 10px;
+.menu{
+    padding:10px;
 }
 
-.menu-button {
-    width: 100%;
-
-    padding: 11px 12px;
-    margin-bottom: 7px;
-
-    border: 1px solid var(--border);
-    border-radius: 7px;
-
-    background: #252d38;
-    color: white;
-
-    text-align: left;
-
-    cursor: pointer;
-    transition: .15s;
+.menu button{
+    width:100%;
+    padding:12px;
+    margin-bottom:7px;
+    text-align:left;
+    border:1px solid #293947;
+    background:#16232f;
+    color:#dbe4ea;
+    border-radius:7px;
+    cursor:pointer;
 }
 
-.menu-button:hover {
-    background: #343e4c;
+.menu button:hover{
+    background:#213343;
 }
 
-.menu-button.active {
-    background: #5d4729;
-    border-color: #9f783e;
+.menu button.active{
+    background:#713737;
+    border-color:#aa5050;
 }
 
-.menu-button.danger {
-    background: #662f2f;
+.info{
+    margin:12px;
+    padding:13px;
+    border:1px solid #2c3b47;
+    border-radius:8px;
+    background:#0b151e;
 }
 
-.menu-button.danger:hover {
-    background: #853b3b;
+.info h3{
+    margin-bottom:10px;
 }
 
-/* =========================
-   RIGHT SIDEBAR
-========================= */
-
-.right-sidebar {
-    position: fixed;
-
-    top: 76px;
-    right: 12px;
-
-    width: 250px;
-
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-
-    z-index: 500;
-
-    overflow: hidden;
-    backdrop-filter: blur(12px);
+.stat{
+    display:flex;
+    justify-content:space-between;
+    padding:6px 0;
+    color:#9baab6;
 }
 
-.timer {
-    padding: 13px;
-
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    border-bottom: 1px solid var(--border);
+.stat b{
+    color:#fff;
 }
 
-.timer-value {
-    font-family: monospace;
-    font-size: 18px;
+/* ATTACK BOX */
+.attack-box{
+    position:absolute;
+    width:420px;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    background:#101a24;
+    border:1px solid #40505d;
+    border-radius:12px;
+    box-shadow:0 20px 70px #000b;
+    z-index:50;
+    display:none;
 }
 
-.icon-buttons {
-    display: flex;
-    gap: 5px;
+.attack-box.open{
+    display:block;
 }
 
-.icon-button {
-    width: 32px;
-    height: 32px;
-
-    border: 1px solid var(--border);
-    border-radius: 6px;
-
-    background: #252d38;
-    color: white;
-
-    cursor: pointer;
+.attack-header{
+    padding:18px;
+    border-bottom:1px solid #2c3b48;
+    display:flex;
+    justify-content:space-between;
 }
 
-.icon-button:hover {
-    background: #3a4655;
+.close{
+    border:0;
+    background:none;
+    color:#9ba9b5;
+    font-size:22px;
+    cursor:pointer;
 }
 
-.leaderboard {
-    padding: 12px;
+.attack-content{
+    padding:20px;
 }
 
-.leaderboard-row {
-    display: flex;
-    justify-content: space-between;
-
-    padding: 8px;
-
-    border-radius: 5px;
-
-    font-size: 13px;
+.war-preview{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:20px;
 }
 
-.leaderboard-row:hover {
-    background: rgba(255,255,255,.06);
+.war-country{
+    text-align:center;
+    width:130px;
 }
 
-.rank {
-    width: 25px;
-    color: var(--muted);
+.flag{
+    width:65px;
+    height:45px;
+    margin:auto auto 8px;
+    border:1px solid #555;
 }
 
-.player-name {
-    flex: 1;
+.vs{
+    font-size:20px;
+    font-weight:bold;
+    color:#e25a5a;
 }
 
-.score {
-    font-weight: bold;
+.slider{
+    width:100%;
+    margin:14px 0;
 }
 
-/* =========================
-   COUNTRY INFO
-========================= */
-
-#country-panel {
-    position: fixed;
-
-    left: 50%;
-    bottom: 20px;
-
-    transform: translateX(-50%) translateY(130%);
-
-    width: 440px;
-
-    padding: 16px;
-
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-
-    z-index: 800;
-
-    transition: transform .25s ease;
-
-    backdrop-filter: blur(12px);
-    box-shadow: 0 15px 50px rgba(0,0,0,.4);
+.attack-number{
+    text-align:center;
+    font-size:25px;
+    font-weight:bold;
+    margin:10px;
 }
 
-#country-panel.open {
-    transform: translateX(-50%) translateY(0);
+.attack-btn{
+    width:100%;
+    border:0;
+    padding:14px;
+    border-radius:7px;
+    background:#a43f3f;
+    color:#fff;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
 }
 
-.country-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    margin-bottom: 12px;
+.attack-btn:hover{
+    background:#c24c4c;
 }
 
-.country-name {
-    font-size: 20px;
-    font-weight: 800;
+/* EVENT LOG */
+.events{
+    max-height:250px;
+    overflow:auto;
 }
 
-.close-button {
-    border: none;
-    background: transparent;
-    color: #aaa;
-
-    font-size: 20px;
-    cursor: pointer;
+.event{
+    padding:9px 0;
+    border-bottom:1px solid #263440;
+    font-size:12px;
+    color:#aebbc4;
 }
 
-.country-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 7px;
-
-    margin-bottom: 12px;
+/* MAP CONTROLS */
+.map-controls{
+    position:absolute;
+    right:315px;
+    bottom:20px;
+    z-index:20;
+    display:flex;
+    gap:6px;
 }
 
-.stat {
-    padding: 9px;
-
-    background: rgba(255,255,255,.05);
-    border: 1px solid var(--border);
-    border-radius: 7px;
+.map-controls button{
+    width:42px;
+    height:42px;
+    background:#14222e;
+    color:white;
+    border:1px solid #344653;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:20px;
 }
 
-.stat small {
-    display: block;
-    color: var(--muted);
-    margin-bottom: 3px;
+/* TOAST */
+.toast-container{
+    position:absolute;
+    right:315px;
+    top:20px;
+    z-index:100;
 }
 
-.stat strong {
-    font-size: 15px;
+.toast{
+    background:#172530;
+    border:1px solid #405361;
+    padding:12px 16px;
+    margin-bottom:8px;
+    border-radius:7px;
+    box-shadow:0 8px 25px #0008;
+    animation:toast .25s ease;
 }
 
-.action-row {
-    display: flex;
-    gap: 7px;
+@keyframes toast{
+    from{transform:translateX(30px);opacity:0}
+    to{transform:translateX(0);opacity:1}
 }
 
-.action {
-    flex: 1;
-
-    padding: 10px;
-
-    border: 1px solid var(--border);
-    border-radius: 7px;
-
-    color: white;
-    background: #303b48;
-
-    cursor: pointer;
+.overlay{
+    position:absolute;
+    inset:0;
+    background:#0008;
+    z-index:40;
+    display:none;
 }
 
-.action:hover {
-    background: #425061;
+.overlay.show{
+    display:block;
 }
 
-.action.attack {
-    background: #713434;
-}
-
-.action.attack:hover {
-    background: #8c4040;
-}
-
-/* =========================
-   CHAT
-========================= */
-
-#chat {
-    position: fixed;
-
-    left: 12px;
-    bottom: 12px;
-
-    width: 300px;
-    height: 190px;
-
-    display: flex;
-    flex-direction: column;
-
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-
-    z-index: 500;
-
-    backdrop-filter: blur(12px);
-}
-
-.chat-title {
-    padding: 9px 12px;
-
-    font-size: 13px;
-    font-weight: bold;
-
-    border-bottom: 1px solid var(--border);
-}
-
-#messages {
-    flex: 1;
-
-    overflow-y: auto;
-
-    padding: 8px;
-
-    font-size: 12px;
-}
-
-.message {
-    margin-bottom: 6px;
-}
-
-.message b {
-    color: var(--accent);
-}
-
-.chat-input {
-    display: flex;
-
-    border-top: 1px solid var(--border);
-}
-
-.chat-input input {
-    flex: 1;
-
-    min-width: 0;
-
-    padding: 9px;
-
-    border: none;
-    outline: none;
-
-    background: #161c24;
-    color: white;
-}
-
-.chat-input button {
-    width: 55px;
-
-    border: none;
-
-    background: #6c512e;
-    color: white;
-
-    cursor: pointer;
-}
-
-/* =========================
-   ZOOM
-========================= */
-
-.zoom-controls {
-    position: fixed;
-
-    right: 12px;
-    bottom: 15px;
-
-    display: flex;
-    flex-direction: column;
-
-    z-index: 600;
-}
-
-.zoom-button {
-    width: 40px;
-    height: 40px;
-
-    border: 1px solid var(--border);
-
-    background: var(--panel);
-    color: white;
-
-    cursor: pointer;
-
-    font-size: 20px;
-}
-
-.zoom-button:first-child {
-    border-radius: 7px 7px 0 0;
-}
-
-.zoom-button:last-child {
-    border-radius: 0 0 7px 7px;
-}
-
-/* =========================
-   NOTIFICATION
-========================= */
-
-#notification {
-    position: fixed;
-
-    top: 80px;
-    left: 50%;
-
-    transform: translateX(-50%) translateY(-30px);
-
-    padding: 11px 18px;
-
-    background: rgba(20,25,31,.96);
-    border: 1px solid var(--border);
-    border-radius: 7px;
-
-    opacity: 0;
-    pointer-events: none;
-
-    transition: .25s;
-
-    z-index: 2000;
-}
-
-#notification.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-}
-
-/* =========================
-   MOBILE
-========================= */
-
-@media(max-width: 800px) {
-
-    .resources {
-        display: none;
+/* MOBILE */
+@media(max-width:900px){
+    .left-panel{
+        width:230px;
     }
 
-    .left-sidebar {
-        width: 190px;
+    .right-panel{
+        display:none;
     }
 
-    .right-sidebar {
-        width: 190px;
+    .resources{
+        display:none;
     }
 
-    #chat {
-        width: 230px;
-        height: 150px;
+    .map-controls{
+        right:15px;
     }
 
-    #country-panel {
-        width: calc(100vw - 24px);
+    .toast-container{
+        right:15px;
     }
 }
 
-@media(max-width: 500px) {
-
-    .left-sidebar {
-        top: 72px;
-        left: 7px;
-        width: 170px;
+@media(max-width:600px){
+    .left-panel{
+        width:190px;
+        left:7px;
     }
 
-    .right-sidebar {
-        right: 7px;
-        top: 72px;
-        width: 170px;
-    }
-
-    #chat {
-        left: 7px;
-        bottom: 7px;
-        width: 210px;
-    }
-
-    .logo {
-        font-size: 17px;
+    .attack-box{
+        width:calc(100% - 20px);
     }
 }
 </style>
@@ -795,995 +532,838 @@ body {
 
 <body>
 
-<div id="game">
+<header class="topbar">
+    <div class="logo">IRON <span>NATIONS</span></div>
 
-    <!-- TOP -->
-    <header class="topbar">
-
-        <div class="logo">
-            IRON <span>NATIONS</span>
+    <div class="resources">
+        <div class="resource">
+            <small>Geld</small>
+            <b id="money">25.000</b>
         </div>
 
-        <div class="resources">
-
-            <div class="resource">
-                💰 Geld
-                <strong id="money">1,000</strong>
-            </div>
-
-            <div class="resource">
-                ⚙ Stahl
-                <strong id="steel">500</strong>
-            </div>
-
-            <div class="resource">
-                🛢 Öl
-                <strong id="oil">250</strong>
-            </div>
-
-            <div class="resource">
-                👥 Bevölkerung
-                <strong id="population">10,000</strong>
-            </div>
-
+        <div class="resource">
+            <small>Stahl</small>
+            <b id="steel">8.500</b>
         </div>
 
-    </header>
-
-
-    <!-- MAP -->
-    <main id="map-container">
-
-        <div id="world">
-
-            <div
-                class="country country-1"
-                data-id="northland"
-                data-name="Nordland"
-            >
-                Nordland
-            </div>
-
-            <div
-                class="country country-2"
-                data-id="centralia"
-                data-name="Zentralien"
-            >
-                Zentralien
-            </div>
-
-            <div
-                class="country country-3"
-                data-id="eastmark"
-                data-name="Ostmark"
-            >
-                Ostmark
-            </div>
-
-            <div
-                class="country country-4"
-                data-id="southland"
-                data-name="Südland"
-            >
-                Südland
-            </div>
-
-            <div
-                class="country country-5"
-                data-id="westia"
-                data-name="Westia"
-            >
-                Westia
-            </div>
-
-            <div
-                class="country country-6"
-                data-id="maritime"
-                data-name="Maritima"
-            >
-                Maritima
-            </div>
-
-            <div
-                class="country country-7"
-                data-id="desertia"
-                data-name="Desertia"
-            >
-                Desertia
-            </div>
-
-            <div
-                class="country country-8"
-                data-id="highland"
-                data-name="Highland"
-            >
-                Highland
-            </div>
-
+        <div class="resource">
+            <small>Öl</small>
+            <b id="oil">5.200</b>
         </div>
 
-    </main>
-
-
-    <!-- LEFT -->
-    <aside class="left-sidebar">
-
-        <div class="panel-title">
-            Kommando
+        <div class="resource">
+            <small>Bevölkerung</small>
+            <b id="population">83 Mio.</b>
         </div>
-
-        <button class="menu-button active" onclick="selectMode('select')">
-            🖱 Auswahl
-        </button>
-
-        <button class="menu-button" onclick="selectMode('army')">
-            ⚔ Armee
-        </button>
-
-        <button class="menu-button" onclick="selectMode('build')">
-            🏭 Bauen
-        </button>
-
-        <button class="menu-button" onclick="selectMode('economy')">
-            💰 Wirtschaft
-        </button>
-
-        <button class="menu-button" onclick="selectMode('diplomacy')">
-            🤝 Diplomatie
-        </button>
-
-        <button class="menu-button" onclick="showNotification('Diplomatie wird vorbereitet.')">
-            📜 Verträge
-        </button>
-
-        <button class="menu-button" onclick="showNotification('Technologie wird vorbereitet.')">
-            🔬 Forschung
-        </button>
-
-        <button class="menu-button danger" onclick="attackSelected()">
-            ⚔ Angriff
-        </button>
-
-    </aside>
-
-
-    <!-- RIGHT -->
-    <aside class="right-sidebar">
-
-        <div class="timer">
-
-            <div>
-                <div style="font-size:11px;color:#9ca3af;">
-                    SPIELZEIT
-                </div>
-
-                <div class="timer-value" id="timer">
-                    00:00
-                </div>
-            </div>
-
-            <div class="icon-buttons">
-
-                <button
-                    class="icon-button"
-                    onclick="togglePause()"
-                    id="pauseButton"
-                >
-                    ⏸
-                </button>
-
-                <button
-                    class="icon-button"
-                    onclick="resetCamera()"
-                >
-                    ⌂
-                </button>
-
-            </div>
-
-        </div>
-
-        <div class="leaderboard">
-
-            <div class="panel-title">
-                Nationen
-            </div>
-
-            <div class="leaderboard-row">
-                <span class="rank">1</span>
-                <span class="player-name">Iron Empire</span>
-                <span class="score">12,430</span>
-            </div>
-
-            <div class="leaderboard-row">
-                <span class="rank">2</span>
-                <span class="player-name">Nordbund</span>
-                <span class="score">10,820</span>
-            </div>
-
-            <div class="leaderboard-row">
-                <span class="rank">3</span>
-                <span class="player-name">Westliche Union</span>
-                <span class="score">9,450</span>
-            </div>
-
-            <div class="leaderboard-row">
-                <span class="rank">4</span>
-                <span class="player-name">Ost-Allianz</span>
-                <span class="score">8,710</span>
-            </div>
-
-        </div>
-
-    </aside>
-
-
-    <!-- COUNTRY PANEL -->
-    <section id="country-panel">
-
-        <div class="country-header">
-
-            <div class="country-name" id="selected-name">
-                Kein Land ausgewählt
-            </div>
-
-            <button
-                class="close-button"
-                onclick="closeCountryPanel()"
-            >
-                ×
-            </button>
-
-        </div>
-
-        <div class="country-stats">
-
-            <div class="stat">
-                <small>Bevölkerung</small>
-                <strong id="selected-population">-</strong>
-            </div>
-
-            <div class="stat">
-                <small>Armee</small>
-                <strong id="selected-army">-</strong>
-            </div>
-
-            <div class="stat">
-                <small>Industrie</small>
-                <strong id="selected-industry">-</strong>
-            </div>
-
-        </div>
-
-        <div class="action-row">
-
-            <button
-                class="action"
-                onclick="recruit()"
-            >
-                + Rekrutieren
-            </button>
-
-            <button
-                class="action"
-                onclick="buildFactory()"
-            >
-                🏭 Fabrik
-            </button>
-
-            <button
-                class="action attack"
-                onclick="attackSelected()"
-            >
-                ⚔ Angriff
-            </button>
-
-        </div>
-
-    </section>
-
-
-    <!-- CHAT -->
-    <section id="chat">
-
-        <div class="chat-title">
-            💬 Weltchat
-        </div>
-
-        <div id="messages">
-
-            <div class="message">
-                <b>System:</b>
-                Willkommen bei Iron Nations.
-            </div>
-
-            <div class="message">
-                <b>Nordbund:</b>
-                Viel Glück!
-            </div>
-
-        </div>
-
-        <div class="chat-input">
-
-            <input
-                id="chatInput"
-                type="text"
-                placeholder="Nachricht..."
-                maxlength="200"
-                onkeydown="chatKey(event)"
-            >
-
-            <button onclick="sendMessage()">
-                Senden
-            </button>
-
-        </div>
-
-    </section>
-
-
-    <!-- ZOOM -->
-    <div class="zoom-controls">
-
-        <button
-            class="zoom-button"
-            onclick="zoomMap(1.2)"
-        >
-            +
-        </button>
-
-        <button
-            class="zoom-button"
-            onclick="zoomMap(.8)"
-        >
-            −
-        </button>
-
     </div>
 
+    <div>
+        Tag <b id="day">1</b>
+    </div>
+</header>
 
-    <!-- NOTIFICATION -->
-    <div id="notification"></div>
+<div class="game">
+
+    <div class="map-container" id="mapContainer">
+        <div class="map" id="map">
+
+            <div class="ocean-grid"></div>
+
+            <div class="country germany"
+                 data-country="Deutschland"
+                 onclick="selectCountry('Deutschland')">
+                <span class="country-name">Deutschland</span>
+            </div>
+
+            <div class="country france"
+                 data-country="Frankreich"
+                 onclick="selectCountry('Frankreich')">
+                <span class="country-name">Frankreich</span>
+            </div>
+
+            <div class="country spain"
+                 data-country="Spanien"
+                 onclick="selectCountry('Spanien')">
+                <span class="country-name">Spanien</span>
+            </div>
+
+            <div class="country italy"
+                 data-country="Italien"
+                 onclick="selectCountry('Italien')">
+                <span class="country-name">Italien</span>
+            </div>
+
+            <div class="country poland"
+                 data-country="Polen"
+                 onclick="selectCountry('Polen')">
+                <span class="country-name">Polen</span>
+            </div>
+
+            <div class="country uk"
+                 data-country="Großbritannien"
+                 onclick="selectCountry('Großbritannien')">
+                <span class="country-name">UK</span>
+            </div>
+
+            <div class="country norway"
+                 data-country="Norwegen"
+                 onclick="selectCountry('Norwegen')">
+                <span class="country-name">Norwegen</span>
+            </div>
+
+            <div class="country sweden"
+                 data-country="Schweden"
+                 onclick="selectCountry('Schweden')">
+                <span class="country-name">Schweden</span>
+            </div>
+
+            <div class="country russia"
+                 data-country="Russland"
+                 onclick="selectCountry('Russland')">
+                <span class="country-name">Russland</span>
+            </div>
+
+            <div class="country ukraine"
+                 data-country="Ukraine"
+                 onclick="selectCountry('Ukraine')">
+                <span class="country-name">Ukraine</span>
+            </div>
+
+            <div class="country turkey"
+                 data-country="Türkei"
+                 onclick="selectCountry('Türkei')">
+                <span class="country-name">Türkei</span>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- LEFT -->
+    <aside class="panel left-panel">
+
+        <div class="panel-header">
+            Kommandomenü
+        </div>
+
+        <div class="menu">
+
+            <button onclick="mode('select')" id="selectBtn">
+                🖱️ Auswahl
+            </button>
+
+            <button onclick="mode('army')">
+                🪖 Armee
+            </button>
+
+            <button onclick="mode('build')">
+                🏭 Gebäude
+            </button>
+
+            <button onclick="mode('economy')">
+                💰 Wirtschaft
+            </button>
+
+            <button onclick="mode('diplomacy')">
+                🤝 Diplomatie
+            </button>
+
+            <button onclick="openAttack()">
+                ⚔️ Angriff planen
+            </button>
+
+        </div>
+
+        <div class="info">
+
+            <h3 id="selectedName">
+                Kein Land ausgewählt
+            </h3>
+
+            <div class="stat">
+                <span>Bevölkerung</span>
+                <b id="selectedPopulation">—</b>
+            </div>
+
+            <div class="stat">
+                <span>Armee</span>
+                <b id="selectedArmy">—</b>
+            </div>
+
+            <div class="stat">
+                <span>Industrie</span>
+                <b id="selectedIndustry">—</b>
+            </div>
+
+            <button class="attack-btn"
+                    style="margin-top:10px"
+                    onclick="openAttack()">
+                Angriff planen
+            </button>
+
+        </div>
+
+    </aside>
+
+    <!-- RIGHT -->
+    <aside class="panel right-panel">
+
+        <div class="panel-header">
+            Weltübersicht
+        </div>
+
+        <div class="info">
+            <div class="stat">
+                <span>Spielzeit</span>
+                <b id="timer">00:00</b>
+            </div>
+
+            <div class="stat">
+                <span>Spieler</span>
+                <b>12.483</b>
+            </div>
+
+            <div class="stat">
+                <span>Gebiete</span>
+                <b id="territories">1 / 11</b>
+            </div>
+        </div>
+
+        <div class="panel-header">
+            Ereignisse
+        </div>
+
+        <div class="info events" id="events">
+
+            <div class="event">
+                Spiel gestartet.
+            </div>
+
+            <div class="event">
+                Europa wartet auf deine Befehle.
+            </div>
+
+        </div>
+
+    </aside>
+
+    <!-- MAP CONTROLS -->
+    <div class="map-controls">
+        <button onclick="zoomMap(1.15)">+</button>
+        <button onclick="zoomMap(.87)">−</button>
+        <button onclick="resetMap()">⌂</button>
+    </div>
+
+    <!-- OVERLAY -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- ATTACK WINDOW -->
+    <div class="attack-box" id="attackBox">
+
+        <div class="attack-header">
+
+            <b>⚔️ Angriff planen</b>
+
+            <button class="close"
+                    onclick="closeAttack()">×</button>
+
+        </div>
+
+        <div class="attack-content">
+
+            <div class="war-preview">
+
+                <div class="war-country">
+                    <div class="flag" id="attackerFlag"></div>
+                    <b id="attackerName">Deutschland</b>
+                    <small id="attackerArmyText">
+                        125.000 Soldaten
+                    </small>
+                </div>
+
+                <div class="vs">
+                    VS
+                </div>
+
+                <div class="war-country">
+                    <div class="flag" id="defenderFlag"></div>
+                    <b id="defenderName">—</b>
+                    <small id="defenderArmyText">
+                        — Soldaten
+                    </small>
+                </div>
+
+            </div>
+
+            <label>
+                Truppen für Angriff
+            </label>
+
+            <input
+                class="slider"
+                id="troopSlider"
+                type="range"
+                min="1000"
+                max="100000"
+                step="1000"
+                value="10000"
+                oninput="updateAttackSlider()"
+            >
+
+            <div class="attack-number">
+                <span id="troopNumber">10.000</span>
+                Soldaten
+            </div>
+
+            <div class="stat">
+                <span>Angriffsstärke</span>
+                <b id="attackPower">10.000</b>
+            </div>
+
+            <div class="stat">
+                <span>Verteidigungsstärke</span>
+                <b id="defensePower">—</b>
+            </div>
+
+            <button class="attack-btn"
+                    onclick="executeAttack()">
+                ANGRIFF STARTEN
+            </button>
+
+        </div>
+    </div>
+
+    <div class="toast-container" id="toasts"></div>
 
 </div>
 
-
 <script>
+/* =========================
+   SPIELDATEN
+========================= */
 
-/* ============================================================
-   GAME DATA
-============================================================ */
+const countries = {
 
-const Game = {
-
-    paused: false,
-
-    elapsed: 0,
-
-    mode: "select",
-
-    selectedCountry: null,
-
-    resources: {
-        money: 1000,
-        steel: 500,
-        oil: 250,
-        population: 10000
+    "Deutschland":{
+        population:"83 Mio.",
+        army:125000,
+        industry:92,
+        color:"#526f82"
     },
 
-    countries: {
-
-        northland: {
-            name: "Nordland",
-            population: 3200000,
-            army: 42000,
-            industry: 7
-        },
-
-        centralia: {
-            name: "Zentralien",
-            population: 5700000,
-            army: 73000,
-            industry: 12
-        },
-
-        eastmark: {
-            name: "Ostmark",
-            population: 4100000,
-            army: 51000,
-            industry: 9
-        },
-
-        southland: {
-            name: "Südland",
-            population: 2900000,
-            army: 28000,
-            industry: 6
-        },
-
-        westia: {
-            name: "Westia",
-            population: 3500000,
-            army: 39000,
-            industry: 8
-        },
-
-        maritime: {
-            name: "Maritima",
-            population: 2200000,
-            army: 21000,
-            industry: 5
-        },
-
-        desertia: {
-            name: "Desertia",
-            population: 1800000,
-            army: 17000,
-            industry: 4
-        },
-
-        highland: {
-            name: "Highland",
-            population: 2500000,
-            army: 24000,
-            industry: 5
-        }
-
-    }
-
-};
-
-
-/* ============================================================
-   DOM
-============================================================ */
-
-const mapContainer =
-    document.getElementById("map-container");
-
-const world =
-    document.getElementById("world");
-
-const countryPanel =
-    document.getElementById("country-panel");
-
-const notification =
-    document.getElementById("notification");
-
-
-/* ============================================================
-   MAP CAMERA
-============================================================ */
-
-let camera = {
-    x: -350,
-    y: -250,
-    zoom: .65
-};
-
-let dragging = false;
-let dragStart = {
-    x: 0,
-    y: 0
-};
-
-let cameraStart = {
-    x: 0,
-    y: 0
-};
-
-
-function renderCamera() {
-
-    world.style.transform =
-        `translate(${camera.x}px, ${camera.y}px)
-         scale(${camera.zoom})`;
-
-}
-
-
-function zoomMap(amount) {
-
-    const oldZoom = camera.zoom;
-
-    camera.zoom *= amount;
-
-    camera.zoom =
-        Math.max(
-            .35,
-            Math.min(2.5, camera.zoom)
-        );
-
-    const rect =
-        mapContainer.getBoundingClientRect();
-
-    const centerX =
-        rect.width / 2;
-
-    const centerY =
-        rect.height / 2;
-
-    camera.x =
-        centerX -
-        (centerX - camera.x) *
-        (camera.zoom / oldZoom);
-
-    camera.y =
-        centerY -
-        (centerY - camera.y) *
-        (camera.zoom / oldZoom);
-
-    renderCamera();
-
-}
-
-
-function resetCamera() {
-
-    camera = {
-        x: -350,
-        y: -250,
-        zoom: .65
-    };
-
-    renderCamera();
-
-}
-
-
-/* mouse movement */
-
-mapContainer.addEventListener(
-    "mousedown",
-    event => {
-
-        if (event.button !== 0)
-            return;
-
-        if (
-            event.target.classList.contains("country")
-        )
-            return;
-
-        dragging = true;
-
-        mapContainer.classList.add("dragging");
-
-        dragStart.x = event.clientX;
-        dragStart.y = event.clientY;
-
-        cameraStart.x = camera.x;
-        cameraStart.y = camera.y;
-
-    }
-);
-
-
-window.addEventListener(
-    "mousemove",
-    event => {
-
-        if (!dragging)
-            return;
-
-        camera.x =
-            cameraStart.x +
-            (event.clientX - dragStart.x);
-
-        camera.y =
-            cameraStart.y +
-            (event.clientY - dragStart.y);
-
-        renderCamera();
-
-    }
-);
-
-
-window.addEventListener(
-    "mouseup",
-    () => {
-
-        dragging = false;
-
-        mapContainer.classList.remove("dragging");
-
-    }
-);
-
-
-/* wheel zoom */
-
-mapContainer.addEventListener(
-    "wheel",
-    event => {
-
-        event.preventDefault();
-
-        if (event.deltaY < 0)
-            zoomMap(1.1);
-        else
-            zoomMap(.9);
-
+    "Frankreich":{
+        population:"68 Mio.",
+        army:110000,
+        industry:82,
+        color:"#596f88"
     },
-    { passive: false }
-);
+
+    "Spanien":{
+        population:"48 Mio.",
+        army:65000,
+        industry:65,
+        color:"#735e4b"
+    },
+
+    "Italien":{
+        population:"59 Mio.",
+        army:85000,
+        industry:72,
+        color:"#62764f"
+    },
+
+    "Polen":{
+        population:"37 Mio.",
+        army:90000,
+        industry:67,
+        color:"#715d78"
+    },
+
+    "Großbritannien":{
+        population:"68 Mio.",
+        army:115000,
+        industry:88,
+        color:"#4d6f68"
+    },
+
+    "Norwegen":{
+        population:"5,5 Mio.",
+        army:25000,
+        industry:55,
+        color:"#59697b"
+    },
+
+    "Schweden":{
+        population:"10,6 Mio.",
+        army:42000,
+        industry:70,
+        color:"#6e6548"
+    },
+
+    "Russland":{
+        population:"143 Mio.",
+        army:450000,
+        industry:95,
+        color:"#554e70"
+    },
+
+    "Ukraine":{
+        population:"37 Mio.",
+        army:190000,
+        industry:58,
+        color:"#5f744e"
+    },
+
+    "Türkei":{
+        population:"86 Mio.",
+        army:220000,
+        industry:78,
+        color:"#704f4e"
+    }
+};
 
 
-/* ============================================================
-   COUNTRY SELECTION
-============================================================ */
+/* =========================
+   SPIELER
+========================= */
 
-document
-    .querySelectorAll(".country")
-    .forEach(country => {
+let playerCountry = "Deutschland";
+let selectedCountry = null;
+let attackTarget = null;
 
-        country.addEventListener(
-            "click",
-            event => {
+let resources = {
+    money:25000,
+    steel:8500,
+    oil:5200
+};
 
-                event.stopPropagation();
-
-                selectCountry(
-                    country.dataset.id
-                );
-
-            }
-        );
-
-    });
+let day = 1;
+let seconds = 0;
 
 
-function selectCountry(id) {
+/* =========================
+   LAND AUSWÄHLEN
+========================= */
 
-    const country =
-        Game.countries[id];
+function selectCountry(name){
 
-    if (!country)
-        return;
+    selectedCountry = name;
 
-    Game.selectedCountry = id;
-
-    document
-        .querySelectorAll(".country")
-        .forEach(element => {
-
-            element.classList.remove("selected");
-
-        });
+    document.querySelectorAll(".country")
+        .forEach(c => c.classList.remove("selected"));
 
     const element =
         document.querySelector(
-            `.country[data-id="${id}"]`
+            `[data-country="${name}"]`
         );
 
-    if (element)
+    if(element){
         element.classList.add("selected");
+    }
 
+    const data = countries[name];
 
-    document.getElementById(
-        "selected-name"
-    ).textContent = country.name;
+    document.getElementById("selectedName")
+        .textContent = name;
 
+    document.getElementById("selectedPopulation")
+        .textContent = data.population;
 
-    document.getElementById(
-        "selected-population"
-    ).textContent =
-        country.population.toLocaleString("de-DE");
+    document.getElementById("selectedArmy")
+        .textContent =
+        data.army.toLocaleString("de-DE");
 
+    document.getElementById("selectedIndustry")
+        .textContent = data.industry;
 
-    document.getElementById(
-        "selected-army"
-    ).textContent =
-        country.army.toLocaleString("de-DE");
+    if(name !== playerCountry){
 
-
-    document.getElementById(
-        "selected-industry"
-    ).textContent =
-        country.industry;
-
-
-    countryPanel.classList.add("open");
-
-}
-
-
-function closeCountryPanel() {
-
-    countryPanel.classList.remove("open");
-
-    document
-        .querySelectorAll(".country")
-        .forEach(element => {
-
-            element.classList.remove("selected");
-
-        });
-
-    Game.selectedCountry = null;
-
-}
-
-
-/* ============================================================
-   GAME ACTIONS
-============================================================ */
-
-function recruit() {
-
-    if (!Game.selectedCountry) {
-
-        showNotification(
-            "Wähle zuerst ein Land."
-        );
-
-        return;
+        attackTarget = name;
 
     }
 
-    const country =
-        Game.countries[
-            Game.selectedCountry
-        ];
-
-
-    if (Game.resources.money < 100) {
-
-        showNotification(
-            "Nicht genug Geld."
-        );
-
-        return;
-
-    }
-
-
-    Game.resources.money -= 100;
-
-    country.army += 500;
-
-    updateResources();
-
-    selectCountry(Game.selectedCountry);
-
-    showNotification(
-        `500 Soldaten für ${country.name} rekrutiert.`
+    notify(
+        name === playerCountry
+        ? "Eigenes Land ausgewählt."
+        : name + " ausgewählt."
     );
-
 }
 
 
-function buildFactory() {
+/* =========================
+   MODI
+========================= */
 
-    if (!Game.selectedCountry) {
+function mode(type){
 
-        showNotification(
-            "Wähle zuerst ein Land."
+    document.querySelectorAll(".menu button")
+        .forEach(b => b.classList.remove("active"));
+
+    if(type === "select"){
+
+        document.getElementById("selectBtn")
+            .classList.add("active");
+
+        notify("Auswahlmodus aktiviert.");
+
+    }
+
+    if(type === "army"){
+
+        notify(
+            "Armee-Modus: Wähle ein Land aus."
+        );
+
+    }
+
+    if(type === "build"){
+
+        notify(
+            "Baumodus aktiviert."
+        );
+
+    }
+
+    if(type === "economy"){
+
+        notify(
+            "Wirtschaftsübersicht geöffnet."
+        );
+
+    }
+
+    if(type === "diplomacy"){
+
+        notify(
+            "Diplomatie-Modus aktiviert."
+        );
+    }
+}
+
+
+/* =========================
+   ANGRIFF
+========================= */
+
+function openAttack(){
+
+    if(!selectedCountry){
+
+        notify(
+            "Wähle zuerst ein Zielland auf der Karte."
         );
 
         return;
-
     }
 
+    if(selectedCountry === playerCountry){
 
-    const country =
-        Game.countries[
-            Game.selectedCountry
-        ];
-
-
-    if (Game.resources.steel < 150) {
-
-        showNotification(
-            "Nicht genug Stahl."
+        notify(
+            "Du kannst dein eigenes Land nicht angreifen."
         );
 
         return;
-
     }
 
+    attackTarget = selectedCountry;
 
-    Game.resources.steel -= 150;
+    const attacker = countries[playerCountry];
+    const defender = countries[attackTarget];
 
-    country.industry++;
+    document.getElementById("attackerName")
+        .textContent = playerCountry;
 
-    updateResources();
+    document.getElementById("defenderName")
+        .textContent = attackTarget;
 
-    selectCountry(Game.selectedCountry);
+    document.getElementById("attackerArmyText")
+        .textContent =
+        attacker.army.toLocaleString("de-DE")
+        + " Soldaten";
 
-    showNotification(
-        `Industrie in ${country.name} verbessert.`
-    );
+    document.getElementById("defenderArmyText")
+        .textContent =
+        defender.army.toLocaleString("de-DE")
+        + " Soldaten";
 
+    const slider =
+        document.getElementById("troopSlider");
+
+    slider.max = attacker.army;
+
+    slider.value =
+        Math.min(10000, attacker.army);
+
+    updateAttackSlider();
+
+    document.getElementById("overlay")
+        .classList.add("show");
+
+    document.getElementById("attackBox")
+        .classList.add("open");
 }
 
 
-function attackSelected() {
+function closeAttack(){
 
-    if (!Game.selectedCountry) {
+    document.getElementById("overlay")
+        .classList.remove("show");
 
-        showNotification(
-            "Wähle ein Ziel."
+    document.getElementById("attackBox")
+        .classList.remove("open");
+}
+
+
+/* =========================
+   SLIDER
+========================= */
+
+function updateAttackSlider(){
+
+    const troops =
+        Number(
+            document.getElementById("troopSlider").value
+        );
+
+    document.getElementById("troopNumber")
+        .textContent =
+        troops.toLocaleString("de-DE");
+
+    document.getElementById("attackPower")
+        .textContent =
+        Math.round(troops * 1.0)
+            .toLocaleString("de-DE");
+
+    if(attackTarget){
+
+        const defender =
+            countries[attackTarget];
+
+        document.getElementById("defensePower")
+            .textContent =
+            defender.army.toLocaleString("de-DE");
+    }
+}
+
+
+/* =========================
+   ANGRIFF AUSFÜHREN
+========================= */
+
+function executeAttack(){
+
+    if(!attackTarget){
+        return;
+    }
+
+    const attacker =
+        countries[playerCountry];
+
+    const defender =
+        countries[attackTarget];
+
+    const troops =
+        Number(
+            document.getElementById("troopSlider").value
+        );
+
+    if(troops > attacker.army){
+
+        notify(
+            "Nicht genügend Soldaten."
         );
 
         return;
-
     }
-
-
-    const country =
-        Game.countries[
-            Game.selectedCountry
-        ];
-
-
-    if (country.army <= 0) {
-
-        showNotification(
-            "Dieses Land hat keine Armee."
-        );
-
-        return;
-
-    }
-
-
-    if (Game.resources.oil < 50) {
-
-        showNotification(
-            "Nicht genug Öl für den Angriff."
-        );
-
-        return;
-
-    }
-
-
-    Game.resources.oil -= 50;
-
-
-    const attackForce =
-        Math.min(
-            10000,
-            country.army
-        );
-
-
-    country.army -= attackForce;
-
-
-    updateResources();
-
-    selectCountry(Game.selectedCountry);
-
-
-    showNotification(
-        `Angriff auf ${country.name} gestartet.`
-    );
-
-}
-
-
-/* ============================================================
-   MODES
-============================================================ */
-
-function selectMode(mode) {
-
-    Game.mode = mode;
-
-    document
-        .querySelectorAll(".menu-button")
-        .forEach(button => {
-
-            button.classList.remove("active");
-
-        });
-
-    event.currentTarget.classList.add("active");
-
-    showNotification(
-        `Modus: ${mode}`
-    );
-
-}
-
-
-/* ============================================================
-   RESOURCES
-============================================================ */
-
-function updateResources() {
-
-    document.getElementById(
-        "money"
-    ).textContent =
-        Game.resources.money.toLocaleString("de-DE");
-
-
-    document.getElementById(
-        "steel"
-    ).textContent =
-        Game.resources.steel.toLocaleString("de-DE");
-
-
-    document.getElementById(
-        "oil"
-    ).textContent =
-        Game.resources.oil.toLocaleString("de-DE");
-
-
-    document.getElementById(
-        "population"
-    ).textContent =
-        Game.resources.population.toLocaleString("de-DE");
-
-}
-
-
-/* ============================================================
-   TIMER
-============================================================ */
-
-let lastTime =
-    performance.now();
-
-
-function gameLoop(time) {
-
-    const delta =
-        time - lastTime;
-
-    lastTime = time;
-
-
-    if (!Game.paused) {
-
-        Game.elapsed += delta;
-
-        updateGame(delta);
-
-        updateTimer();
-
-    }
-
-
-    requestAnimationFrame(gameLoop);
-
-}
-
-
-function updateGame(delta) {
 
     /*
-       Hier kommt später die eigentliche
-       Wirtschaft, KI, Diplomatie,
-       Kämpfe usw. hinein.
+       Einfache Kampfformel:
+       Angriff = Truppen * Industriebonus
+       Verteidigung = Armee * Verteidigungsbonus
     */
 
-    if (Game.elapsed % 5000 < delta) {
+    const attackPower =
+        troops *
+        (1 + attacker.industry / 300);
 
-        Game.resources.money += 2;
+    const defensePower =
+        defender.army *
+        (1 + defender.industry / 400);
 
-        Game.resources.steel += 1;
+    attacker.army -= troops;
 
-        Game.resources.oil += 1;
+    let message;
 
-        updateResources();
+    if(attackPower > defensePower){
 
+        /*
+           Sieg:
+           Ein Teil der Verteidiger fällt aus,
+           das Land wird erobert.
+        */
+
+        const losses =
+            Math.floor(
+                defender.army *
+                (0.25 + Math.random() * 0.25)
+            );
+
+        defender.army =
+            Math.max(
+                0,
+                defender.army - losses
+            );
+
+        /*
+           Gebiet gehört jetzt dem Spieler.
+        */
+
+        defender.color =
+            attacker.color;
+
+        const element =
+            document.querySelector(
+                `[data-country="${attackTarget}"]`
+            );
+
+        if(element){
+
+            element.style.background =
+                attacker.color;
+
+            element.style.borderColor =
+                "#ffffff";
+
+        }
+
+        message =
+            playerCountry +
+            " hat " +
+            attackTarget +
+            " erfolgreich angegriffen.";
+
+        addEvent(
+            "⚔️ " + message
+        );
+
+        notify(
+            "Sieg! " + attackTarget +
+            " wurde erobert."
+        );
+
+    }else{
+
+        /*
+           Niederlage
+        */
+
+        const losses =
+            Math.floor(
+                troops *
+                (0.45 + Math.random() * 0.35)
+            );
+
+        message =
+            "Der Angriff auf " +
+            attackTarget +
+            " ist gescheitert.";
+
+        addEvent(
+            "🛡️ " + message
+        );
+
+        notify(
+            "Angriff gescheitert."
+        );
     }
 
+    updateResources();
+    updateTerritories();
+
+    closeAttack();
+
+    selectCountry(attackTarget);
 }
 
 
-function updateTimer() {
+/* =========================
+   TERRITORIEN
+========================= */
 
-    const seconds =
-        Math.floor(
-            Game.elapsed / 1000
-        );
+function updateTerritories(){
+
+    /*
+       Für diese Demo wird gezählt,
+       welche Länder dieselbe Farbe
+       wie Deutschland haben.
+    */
+
+    const ownColor =
+        countries[playerCountry].color;
+
+    let count = 1;
+
+    for(const name in countries){
+
+        if(
+            name !== playerCountry &&
+            countries[name].color === ownColor
+        ){
+            count++;
+        }
+    }
+
+    document.getElementById("territories")
+        .textContent =
+        count + " / " +
+        Object.keys(countries).length;
+}
+
+
+/* =========================
+   RESSOURCEN
+========================= */
+
+function updateResources(){
+
+    document.getElementById("money")
+        .textContent =
+        Math.floor(resources.money)
+            .toLocaleString("de-DE");
+
+    document.getElementById("steel")
+        .textContent =
+        Math.floor(resources.steel)
+            .toLocaleString("de-DE");
+
+    document.getElementById("oil")
+        .textContent =
+        Math.floor(resources.oil)
+            .toLocaleString("de-DE");
+}
+
+
+/*
+   Jede Sekunde Einkommen.
+*/
+
+setInterval(() => {
+
+    resources.money += 12;
+    resources.steel += 5;
+    resources.oil += 3;
+
+    updateResources();
+
+},1000);
+
+
+/* =========================
+   SPIELZEIT
+========================= */
+
+setInterval(() => {
+
+    seconds++;
 
     const minutes =
         Math.floor(seconds / 60);
@@ -1791,149 +1371,226 @@ function updateTimer() {
     const secs =
         seconds % 60;
 
-
-    document.getElementById(
-        "timer"
-    ).textContent =
-        String(minutes).padStart(2, "0")
+    document.getElementById("timer")
+        .textContent =
+        String(minutes).padStart(2,"0")
         + ":" +
-        String(secs).padStart(2, "0");
+        String(secs).padStart(2,"0");
 
-}
+    if(seconds % 60 === 0){
 
+        day++;
 
-function togglePause() {
+        document.getElementById("day")
+            .textContent = day;
 
-    Game.paused =
-        !Game.paused;
-
-
-    document.getElementById(
-        "pauseButton"
-    ).textContent =
-        Game.paused ? "▶" : "⏸";
-
-
-    showNotification(
-        Game.paused
-            ? "Spiel pausiert."
-            : "Spiel fortgesetzt."
-    );
-
-}
-
-
-/* ============================================================
-   CHAT
-============================================================ */
-
-function sendMessage() {
-
-    const input =
-        document.getElementById(
-            "chatInput"
+        addEvent(
+            "📅 Ein neuer Spieltag beginnt."
         );
+    }
 
-    const text =
-        input.value.trim();
-
-
-    if (!text)
-        return;
+},1000);
 
 
-    const messages =
-        document.getElementById(
-            "messages"
-        );
+/* =========================
+   EVENTS
+========================= */
 
+function addEvent(text){
 
-    const message =
+    const events =
+        document.getElementById("events");
+
+    const event =
         document.createElement("div");
 
-    message.className =
-        "message";
+    event.className = "event";
 
+    event.textContent = text;
 
-    message.innerHTML =
-        `<b>Du:</b> ${escapeHtml(text)}`;
+    events.prepend(event);
 
-
-    messages.appendChild(message);
-
-    messages.scrollTop =
-        messages.scrollHeight;
-
-
-    input.value = "";
-
+    while(events.children.length > 12){
+        events.removeChild(
+            events.lastChild
+        );
+    }
 }
 
 
-function chatKey(event) {
+/* =========================
+   TOAST
+========================= */
 
-    if (event.key === "Enter")
-        sendMessage();
+function notify(text){
 
-}
+    const container =
+        document.getElementById("toasts");
 
-
-function escapeHtml(text) {
-
-    const div =
+    const toast =
         document.createElement("div");
 
-    div.textContent = text;
+    toast.className = "toast";
 
-    return div.innerHTML;
+    toast.textContent = text;
 
+    container.appendChild(toast);
+
+    setTimeout(() => {
+
+        toast.remove();
+
+    },3000);
 }
 
 
-/* ============================================================
-   NOTIFICATIONS
-============================================================ */
+/* =========================
+   MAP ZOOM
+========================= */
 
-let notificationTimeout;
+let zoom = 1;
 
+function zoomMap(multiplier){
 
-function showNotification(text) {
+    zoom *= multiplier;
 
-    notification.textContent =
-        text;
-
-    notification.classList.add("show");
-
-
-    clearTimeout(
-        notificationTimeout
-    );
-
-
-    notificationTimeout =
-        setTimeout(
-            () => {
-
-                notification.classList.remove(
-                    "show"
-                );
-
-            },
-            2200
+    zoom =
+        Math.max(
+            0.55,
+            Math.min(2.5,zoom)
         );
 
+    updateMapTransform();
 }
 
 
-/* ============================================================
+function resetMap(){
+
+    zoom = 1;
+
+    mapX = 0;
+    mapY = 0;
+
+    updateMapTransform();
+}
+
+
+function updateMapTransform(){
+
+    map.style.transform =
+        `translate(
+            calc(-50% + ${mapX}px),
+            calc(-50% + ${mapY}px)
+        )
+        scale(${zoom})`;
+}
+
+
+/* =========================
+   MAP DRAG
+========================= */
+
+const mapContainer =
+    document.getElementById("mapContainer");
+
+const map =
+    document.getElementById("map");
+
+let dragging = false;
+let startX = 0;
+let startY = 0;
+
+let mapX = 0;
+let mapY = 0;
+
+mapContainer.addEventListener(
+    "mousedown",
+    e => {
+
+        /*
+           Nicht ziehen, wenn direkt
+           ein Land angeklickt wird.
+        */
+
+        if(e.target.closest(".country")){
+            return;
+        }
+
+        dragging = true;
+
+        mapContainer.classList.add(
+            "dragging"
+        );
+
+        startX =
+            e.clientX - mapX;
+
+        startY =
+            e.clientY - mapY;
+    }
+);
+
+window.addEventListener(
+    "mousemove",
+    e => {
+
+        if(!dragging){
+            return;
+        }
+
+        mapX =
+            e.clientX - startX;
+
+        mapY =
+            e.clientY - startY;
+
+        updateMapTransform();
+    }
+);
+
+window.addEventListener(
+    "mouseup",
+    () => {
+
+        dragging = false;
+
+        mapContainer.classList.remove(
+            "dragging"
+        );
+    }
+);
+
+
+/* =========================
+   MAUS-WHEEL ZOOM
+========================= */
+
+mapContainer.addEventListener(
+    "wheel",
+    e => {
+
+        e.preventDefault();
+
+        if(e.deltaY < 0){
+            zoomMap(1.1);
+        }else{
+            zoomMap(.9);
+        }
+
+    },
+    {passive:false}
+);
+
+
+/* =========================
    START
-============================================================ */
+========================= */
+
+selectCountry("Deutschland");
 
 updateResources();
 
-renderCamera();
-
-requestAnimationFrame(gameLoop);
+updateTerritories();
 
 </script>
 

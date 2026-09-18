@@ -8,55 +8,37 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#060b10;
-  --panel:#0b1620;
-  --panel2:#0f1e2a;
-  --border:#1e3140;
-  --border2:#2d4759;
-  --text:#e6eef3;
-  --muted:#6d8492;
-  --cyan:#22d3ee;
-  --green:#4ade80;
-  --red:#f87171;
-  --yellow:#fbbf24;
+  --bg:#060b10;--panel:#0b1620;--border:#1e3140;--border2:#2d4759;
+  --text:#e6eef3;--muted:#6d8492;--cyan:#22d3ee;--green:#4ade80;
+  --red:#f87171;--yellow:#fbbf24;
 }
-html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);
-  font-family:'Segoe UI',system-ui,Arial,sans-serif}
-
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
+  color:var(--text);font-family:'Segoe UI',system-ui,Arial,sans-serif}
 #game{height:100vh;display:grid;grid-template-columns:250px 1fr 340px}
 
-/* ============ LEFT PANEL ============ */
 #left{background:linear-gradient(180deg,#0a141d,#060d13);
   border-right:1px solid var(--border);padding:20px 16px;overflow-y:auto}
-
 .logo{font-size:20px;font-weight:800;letter-spacing:2px}
 .logo span{color:var(--cyan)}
 .subtitle{margin-top:5px;margin-bottom:22px;font-size:10px;letter-spacing:3px;color:var(--muted)}
-
-.section-title{color:#5a7080;font-size:10px;letter-spacing:2px;margin:18px 4px 8px;text-transform:uppercase}
-
+.section-title{color:#5a7080;font-size:10px;letter-spacing:2px;
+  margin:18px 4px 8px;text-transform:uppercase}
 .menu button,.action{width:100%;border:1px solid var(--border);
   background:linear-gradient(180deg,#12212d,#0d1a24);color:var(--text);
   border-radius:6px;padding:11px 12px;margin-bottom:6px;text-align:left;
   cursor:pointer;transition:.15s;font-size:13px;font-family:inherit}
 .menu button:hover,.action:hover{border-color:var(--cyan);background:#142a37;transform:translateX(2px)}
 .menu button.active{border-color:var(--cyan);box-shadow:0 0 12px rgba(34,211,238,.15)}
-
 .box{background:linear-gradient(180deg,#0f1b25,#0a141d);border:1px solid var(--border);
   border-radius:7px;padding:13px;margin-top:12px}
 .small{color:var(--muted);font-size:10px;letter-spacing:1px}
 .big{font-size:24px;font-weight:800;margin:5px 0 8px}
-.cyan{color:var(--cyan)}
-.green{color:var(--green)}
-.red{color:var(--red)}
-.yellow{color:var(--yellow)}
-
+.cyan{color:var(--cyan)}.green{color:var(--green)}.red{color:var(--red)}.yellow{color:var(--yellow)}
 .speed-row{display:flex;gap:5px}
 .speed-row button{flex:1;padding:8px 4px;background:#0a141c;border:1px solid var(--border);
   color:white;border-radius:4px;cursor:pointer;font-family:inherit;font-size:11px}
 .speed-row button:hover{border-color:var(--cyan)}
 
-/* ============ MAP ============ */
 #center{position:relative;overflow:hidden;background:#08161e}
 #map{width:100%;height:100%}
 .leaflet-container{background:#08161e;font-family:'Segoe UI',sans-serif}
@@ -64,29 +46,23 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 .leaflet-control-attribution{background:rgba(6,11,16,.8)!important;
   color:#5a7080!important;font-size:9px!important}
 .leaflet-control-attribution a{color:var(--cyan)!important}
-
 .country-label{background:transparent;border:none;box-shadow:none;
   color:#fff;font-weight:700;font-size:11px;
   text-shadow:0 1px 3px #000,0 0 6px #000;padding:0}
 .country-label::before{display:none}
 
-/* TOPBAR */
 .topbar{position:absolute;top:12px;left:14px;right:14px;
   display:flex;justify-content:space-between;align-items:flex-start;
   pointer-events:none;z-index:400}
-
 .brand{background:rgba(6,16,25,.95);border:1px solid var(--border2);
-  border-radius:7px;padding:11px 16px;font-weight:800;
-  letter-spacing:2px;font-size:13px}
+  border-radius:7px;padding:11px 16px;font-weight:800;letter-spacing:2px;font-size:13px}
 .brand span{color:var(--cyan)}
-
 .resources{display:flex;gap:8px}
 .resource{min-width:110px;background:rgba(6,16,25,.95);
   border:1px solid var(--border2);border-radius:6px;padding:8px 12px}
 .resource-label{color:var(--muted);font-size:9px;letter-spacing:1px}
 .resource-value{margin-top:3px;font-weight:700;font-size:13px}
 
-/* MAP CONTROLS */
 .map-controls{position:absolute;right:14px;bottom:20px;
   display:flex;flex-direction:column;gap:5px;z-index:400}
 .map-controls button{width:38px;height:38px;background:rgba(6,16,25,.9);
@@ -94,58 +70,115 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
   cursor:pointer;font-size:18px;font-family:inherit;transition:.15s}
 .map-controls button:hover{border-color:var(--cyan);background:#0e2230}
 
-/* DATE */
 .datebox{position:absolute;left:14px;bottom:20px;
   background:rgba(6,16,25,.95);border:1px solid var(--border2);
   border-radius:6px;padding:10px 15px;z-index:400}
 .date-year{font-size:18px;font-weight:800}
 .date-month{color:var(--muted);font-size:11px;letter-spacing:1px}
 
-/* MESSAGE */
 #message{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);
   background:rgba(6,16,25,.96);border:1px solid var(--border2);
   padding:10px 20px;border-radius:6px;font-size:12px;z-index:400;
   white-space:nowrap;transition:opacity .3s}
 
-/* ============ RIGHT PANEL ============ */
 #right{background:linear-gradient(180deg,#0a141d,#060d13);
   border-left:1px solid var(--border);padding:17px;overflow-y:auto}
-
 .panel-title{font-size:10px;color:var(--muted);letter-spacing:2px;
   margin-bottom:9px;text-transform:uppercase}
-
 .nation-name{font-size:24px;font-weight:800;margin-bottom:12px}
 .flag{width:48px;height:34px;border:1px solid var(--border2);border-radius:4px;
   display:flex;align-items:center;justify-content:center;font-size:22px;
   background:#0f1e2a;margin-bottom:10px}
-
 .stat{display:flex;justify-content:space-between;
   border-bottom:1px solid rgba(255,255,255,.04);padding:8px 0;font-size:12px}
 .stat:last-child{border-bottom:0}
 .value{font-weight:700}
-
 .action{text-align:center;margin-bottom:6px}
 .action.war{color:#ff8790;border-color:#5c2e34}
 .action.war:hover{border-color:var(--red);background:#2c1317}
 
-/* ============ MODAL ============ */
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);
   display:none;align-items:center;justify-content:center;z-index:1000;
   backdrop-filter:blur(4px)}
+.modal-bg.open{display:flex}
 .modal{width:760px;max-width:92vw;max-height:80vh;overflow:auto;
   background:#0a1620;border:1px solid var(--border2);border-radius:10px;
-  padding:22px;box-shadow:0 20px 80px rgba(0,0,0,.8)}
+  padding:22px;box-shadow:0 20px 80px rgba(0,0,0,.8);
+  animation:modalIn .2s ease}
+@keyframes modalIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
 .modal-header{display:flex;justify-content:space-between;align-items:center;
   border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:15px}
 .modal-header h2{margin:0;font-size:16px;letter-spacing:2px;color:var(--cyan)}
 .close{cursor:pointer;color:var(--muted);font-size:22px;line-height:1}
 .close:hover{color:#fff}
-
 .country{padding:13px;margin:7px 0;background:#0d1c27;
   border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:.15s}
 .country:hover{border-color:var(--cyan);background:#122838}
 .country-name{font-weight:700}
 .country-info{color:var(--muted);font-size:11px;margin-top:4px}
+
+/* ============ CONFIRM DIALOG ============ */
+.confirm-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);
+  display:none;align-items:center;justify-content:center;z-index:2000;
+  backdrop-filter:blur(6px)}
+.confirm-bg.open{display:flex}
+.confirm{width:440px;max-width:92vw;background:#0a1620;
+  border:1px solid var(--border2);border-radius:12px;padding:24px;
+  box-shadow:0 20px 80px rgba(0,0,0,.85);
+  animation:confirmIn .22s cubic-bezier(.34,1.4,.4,1)}
+@keyframes confirmIn{from{opacity:0;transform:scale(.9) translateY(10px)}
+  to{opacity:1;transform:scale(1) translateY(0)}}
+.confirm-icon{width:52px;height:52px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;margin:0 auto 14px;
+  background:linear-gradient(180deg,#2c1317,#1a0a0d);
+  border:1px solid #5c2e34}
+.confirm-icon.info{background:linear-gradient(180deg,#0f2838,#0a1620);
+  border-color:#2d4759}
+.confirm h3{margin:0 0 8px;font-size:16px;text-align:center;
+  letter-spacing:1px;color:#fff}
+.confirm p{margin:0 0 18px;font-size:13px;text-align:center;
+  color:#a8bcc8;line-height:1.55}
+.confirm-details{background:#0d1c27;border:1px solid var(--border);
+  border-radius:8px;padding:12px 14px;margin-bottom:18px;font-size:12px}
+.confirm-details .row{display:flex;justify-content:space-between;
+  padding:5px 0;color:#8fa4b0}
+.confirm-details .row b{color:#e6eef3;font-variant-numeric:tabular-nums}
+.confirm-details .row .win{color:var(--green);font-weight:700}
+.confirm-details .row .lose{color:var(--red);font-weight:700}
+.confirm-buttons{display:flex;gap:10px}
+.confirm-buttons button{flex:1;padding:12px;border-radius:8px;
+  font-family:inherit;font-weight:700;font-size:12px;
+  letter-spacing:1.2px;text-transform:uppercase;cursor:pointer;
+  transition:.15s;border:1px solid var(--border2)}
+.btn-cancel{background:#14232f;color:#a8bcc8}
+.btn-cancel:hover{background:#1a2c3a;border-color:var(--muted)}
+.btn-confirm{background:linear-gradient(180deg,#c73a3a,#9c2424);
+  color:#fff;border-color:#e05a5a!important}
+.btn-confirm:hover{filter:brightness(1.15);transform:translateY(-1px)}
+.btn-confirm.primary{background:linear-gradient(180deg,#1e8ea8,#156b82);
+  border-color:#22d3ee!important}
+.btn-confirm.primary:hover{filter:brightness(1.15)}
+
+/* ============ TOASTS ============ */
+#toasts{position:fixed;top:80px;right:20px;z-index:3000;
+  display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{background:rgba(10,22,32,.97);border:1px solid var(--border2);
+  border-left:3px solid var(--cyan);border-radius:8px;
+  padding:12px 16px;font-size:13px;color:#e6eef3;min-width:240px;
+  max-width:340px;box-shadow:0 8px 24px rgba(0,0,0,.6);
+  animation:toastIn .3s cubic-bezier(.34,1.4,.4,1);
+  pointer-events:auto}
+.toast.success{border-left-color:var(--green)}
+.toast.error{border-left-color:var(--red)}
+.toast.warning{border-left-color:var(--yellow)}
+.toast.fade-out{animation:toastOut .3s ease forwards}
+@keyframes toastIn{from{opacity:0;transform:translateX(30px)}
+  to{opacity:1;transform:translateX(0)}}
+@keyframes toastOut{to{opacity:0;transform:translateX(30px)}}
+.toast-title{font-weight:700;font-size:12px;letter-spacing:.5px;
+  margin-bottom:2px;color:#fff}
+.toast-msg{font-size:12px;color:#8fa4b0;line-height:1.4}
 
 ::-webkit-scrollbar{width:6px}
 ::-webkit-scrollbar-track{background:#081018}
@@ -274,6 +307,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 
 </div>
 
+<!-- Standard-Modal -->
 <div class="modal-bg" id="modal">
   <div class="modal">
     <div class="modal-header">
@@ -284,19 +318,32 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
   </div>
 </div>
 
+<!-- Confirm-Dialog (ersetzt confirm()) -->
+<div class="confirm-bg" id="confirmBg">
+  <div class="confirm">
+    <div class="confirm-icon" id="confirmIcon">⚠</div>
+    <h3 id="confirmTitle">Bestätigung</h3>
+    <p id="confirmMessage">—</p>
+    <div class="confirm-details" id="confirmDetails" style="display:none"></div>
+    <div class="confirm-buttons">
+      <button class="btn-cancel" id="confirmCancel">Abbrechen</button>
+      <button class="btn-confirm" id="confirmOk">Bestätigen</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast-Benachrichtigungen (ersetzen alert()) -->
+<div id="toasts"></div>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 /* ============================================================
-   KARTE — BUGFIX
-   ------------------------------------------------------------
-   Fix: maxBounds + worldCopyJump + maxBoundsViscosity
-   verhindern, dass die Welt mehrfach nebeneinander gerendert
-   wird (der doppelte Skandinavien/Frankreich-Bug).
+   KARTE
 ============================================================ */
 const EUROPE_CENTER = [50.5, 14];
 const EUROPE_BOUNDS = L.latLngBounds(
-  L.latLng(33, -25),   // Südwest
-  L.latLng(72, 45)     // Nordost
+  L.latLng(33, -25),
+  L.latLng(72, 45)
 );
 
 const map = L.map("map", {
@@ -305,8 +352,8 @@ const map = L.map("map", {
   minZoom: 4,
   maxZoom: 8,
   maxBounds: EUROPE_BOUNDS,
-  maxBoundsViscosity: 1.0,   // Karte klebt an den Grenzen
-  worldCopyJump: false,      // aus — wir wollen keine Kopien
+  maxBoundsViscosity: 1.0,
+  worldCopyJump: false,
   zoomSnap: 0.25,
   zoomDelta: 0.5,
   preferCanvas: true
@@ -361,14 +408,8 @@ const countryData = {
    PLAYER
 ============================================================ */
 let player = {
-  nation: null,
-  money: 1000,
-  manpower: 100,
-  military: 20,
-  territories: 1,
-  factories: 0,
-  population: 10,
-  income: 50
+  nation: null, money: 1000, manpower: 100, military: 20,
+  territories: 1, factories: 0, population: 10, income: 50
 };
 
 let selectedEnemy = null;
@@ -376,16 +417,13 @@ const countryLayers = {};
 const conqueredCountries = new Set();
 
 /* ============================================================
-   GEOJSON LADEN
+   GEODATEN LADEN
 ============================================================ */
 const GEOJSON_URL =
   "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_admin_0_countries.geojson";
 
 fetch(GEOJSON_URL)
-  .then(r => {
-    if (!r.ok) throw new Error("GeoJSON konnte nicht geladen werden.");
-    return r.json();
-  })
+  .then(r => { if (!r.ok) throw new Error("GeoJSON konnte nicht geladen werden."); return r.json(); })
   .then(data => {
     L.geoJSON(data, {
       filter: f => f.properties.CONTINENT === "Europe",
@@ -394,27 +432,19 @@ fetch(GEOJSON_URL)
         const iso = getISO(feature);
         if (!iso) return;
         countryLayers[iso] = layer;
-
         const info = countryData[iso];
         if (info) {
           layer.bindTooltip(info.flag + " " + info.german, {
-            sticky: true,
-            className: "country-label",
-            direction: "top"
+            sticky: true, className: "country-label", direction: "top"
           });
         }
-
         layer.on({
           mouseover: function () {
             if (!countryData[iso]) return;
             this.setStyle({ weight: 3, color: "#ffffff", fillOpacity: 1 });
           },
-          mouseout: function () {
-            refreshCountry(iso);
-          },
-          click: function () {
-            selectRealCountry(iso);
-          }
+          mouseout: function () { refreshCountry(iso); },
+          click: function () { selectRealCountry(iso); }
         });
       }
     }).addTo(map);
@@ -424,7 +454,7 @@ fetch(GEOJSON_URL)
   })
   .catch(err => {
     console.error(err);
-    notify("Fehler beim Laden der Europakarte.");
+    showToast("Fehler", "Europakarte konnte nicht geladen werden.", "error");
   });
 
 /* ============================================================
@@ -440,7 +470,7 @@ function getISO(feature) {
 }
 
 /* ============================================================
-   COUNTRY STYLE
+   STYLE
 ============================================================ */
 function getCountryStyle(iso) {
   const info = countryData[iso];
@@ -453,48 +483,123 @@ function getCountryStyle(iso) {
   if (isPlayer || isConquered) color = "#22d3ee";
   if (isEnemy) color = "#f87171";
 
-  let border = "#122330";
-  let weight = 1.2;
+  let border = "#122330", weight = 1.2;
+  if (isPlayer || isEnemy) { border = "#ffffff"; weight = 2.5; }
+  else if (isConquered) { border = "#67e8f9"; weight = 1.8; }
 
-  if (isPlayer || isEnemy) {
-    border = "#ffffff";
-    weight = 2.5;
-  } else if (isConquered) {
-    border = "#67e8f9";
-    weight = 1.8;
-  }
-
-  return {
-    color: border,
-    weight: weight,
-    fillColor: color,
-    fillOpacity: 0.88
-  };
+  return { color: border, weight, fillColor: color, fillOpacity: 0.88 };
 }
 
 function refreshCountry(iso) {
   const layer = countryLayers[iso];
-  if (!layer) return;
-  layer.setStyle(getCountryStyle(iso));
+  if (layer) layer.setStyle(getCountryStyle(iso));
 }
-
 function refreshAllCountries() {
   Object.keys(countryLayers).forEach(refreshCountry);
 }
 
 /* ============================================================
-   SELECTION
+   IN-GAME CONFIRM DIALOG (ersetzt confirm())
 ============================================================ */
-function selectRealCountry(iso) {
+let _confirmResolve = null;
+
+function showConfirm(options) {
+  return new Promise(resolve => {
+    _confirmResolve = resolve;
+    const bg = document.getElementById("confirmBg");
+    const icon = document.getElementById("confirmIcon");
+    const title = document.getElementById("confirmTitle");
+    const msg = document.getElementById("confirmMessage");
+    const details = document.getElementById("confirmDetails");
+    const okBtn = document.getElementById("confirmOk");
+    const cancelBtn = document.getElementById("confirmCancel");
+
+    icon.className = "confirm-icon" + (options.iconClass ? " " + options.iconClass : "");
+    icon.textContent = options.icon || "⚠";
+    title.textContent = options.title || "Bestätigung";
+    msg.textContent = options.message || "";
+
+    if (options.details) {
+      details.style.display = "block";
+      details.innerHTML = options.details;
+    } else {
+      details.style.display = "none";
+    }
+
+    okBtn.textContent = options.confirmText || "Bestätigen";
+    cancelBtn.textContent = options.cancelText || "Abbrechen";
+    okBtn.className = "btn-confirm" + (options.primary ? " primary" : "");
+
+    okBtn.onclick = () => closeConfirm(true);
+    cancelBtn.onclick = () => closeConfirm(false);
+
+    bg.classList.add("open");
+  });
+}
+
+function closeConfirm(result) {
+  document.getElementById("confirmBg").classList.remove("open");
+  if (_confirmResolve) {
+    _confirmResolve(result);
+    _confirmResolve = null;
+  }
+}
+
+// ESC-Taste schließt Dialoge
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") {
+    if (document.getElementById("confirmBg").classList.contains("open")) closeConfirm(false);
+    else if (document.getElementById("modal").classList.contains("open")) closeModal();
+  }
+});
+
+/* ============================================================
+   TOAST BENACHRICHTIGUNGEN (ersetzen alert())
+============================================================ */
+function showToast(title, message, type = "info", duration = 3200) {
+  const container = document.getElementById("toasts");
+  const toast = document.createElement("div");
+  toast.className = "toast" + (type !== "info" ? " " + type : "");
+  toast.innerHTML = `
+    <div class="toast-title">${title}</div>
+    <div class="toast-msg">${message}</div>
+  `;
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add("fade-out");
+    setTimeout(() => toast.remove(), 300);
+  }, duration);
+}
+
+/* ============================================================
+   SELECTION — jetzt mit In-Game-Confirm
+============================================================ */
+async function selectRealCountry(iso) {
   const info = countryData[iso];
   if (!info) return;
 
+  /* Nation wählen */
   if (!player.nation) {
-    if (!confirm(info.flag + " " + info.german + "\n\nAls diese Nation spielen?")) return;
+    const ok = await showConfirm({
+      icon: info.flag || "🌐",
+      iconClass: "info",
+      title: "Nation wählen",
+      message: "Möchtest du als diese Nation spielen?",
+      details: `
+        <div class="row"><span>Nation</span><b>${info.german}</b></div>
+        <div class="row"><span>Bevölkerung</span><b>${info.population}M</b></div>
+        <div class="row"><span>Militär</span><b>${info.military}</b></div>
+      `,
+      confirmText: "Spielen",
+      cancelText: "Abbrechen",
+      primary: true
+    });
+
+    if (!ok) return;
 
     player.nation = {
-      iso: iso, id: iso,
-      name: info.name, german: info.german,
+      iso, id: iso, name: info.name, german: info.german,
       flag: info.flag, color: info.color,
       population: info.population, military: info.military
     };
@@ -503,12 +608,13 @@ function selectRealCountry(iso) {
     player.manpower = 100;
     player.territories = 1;
 
-    notify(info.flag + " " + info.german + " ist deine Nation.");
+    showToast("Nation gewählt", `${info.flag} ${info.german} ist jetzt deine Nation.`, "success");
     updateUI();
     refreshAllCountries();
     return;
   }
 
+  /* Eigenes Land */
   if (player.nation.iso === iso) {
     selectedEnemy = null;
     updateTarget();
@@ -517,6 +623,7 @@ function selectRealCountry(iso) {
     return;
   }
 
+  /* Feind wählen */
   selectedEnemy = iso;
   updateTarget();
   refreshAllCountries();
@@ -526,20 +633,14 @@ function selectRealCountry(iso) {
 /* ============================================================
    MAP CONTROLS
 ============================================================ */
-function zoomMap(dir) {
-  if (dir > 0) map.zoomIn(0.5);
-  else map.zoomOut(0.5);
-}
-function resetMap() {
-  map.setView(EUROPE_CENTER, 4.5);
-}
+function zoomMap(dir) { dir > 0 ? map.zoomIn(0.5) : map.zoomOut(0.5); }
+function resetMap() { map.setView(EUROPE_CENTER, 4.5); }
 
 /* ============================================================
    UI UPDATE
 ============================================================ */
 function updateUI() {
   const n = player.nation;
-
   document.getElementById("nationName").innerText = n ? n.german : "No Nation";
   document.getElementById("flag").innerText = n ? n.flag : "🌐";
   document.getElementById("population").innerText = player.population + "M";
@@ -570,7 +671,6 @@ function updateTarget() {
   }
   const info = countryData[selectedEnemy];
   if (!info) return;
-
   target.innerHTML = `
     <div style="font-size:18px;font-weight:bold;margin-bottom:8px">
       ${info.flag} ${info.german}
@@ -583,61 +683,106 @@ function updateTarget() {
 }
 
 /* ============================================================
-   ACTIONS
+   ACTIONS — mit In-Game-Toasts statt alert()
 ============================================================ */
 function collectTaxes() {
-  if (!player.nation) return alert("Choose a nation first.");
+  if (!player.nation) {
+    return showToast("Aktion blockiert", "Wähle zuerst eine Nation.", "warning");
+  }
   player.money += player.income;
   updateUI();
-  notify("+" + player.income + " treasury");
+  showToast("Steuern eingezogen", `+${player.income} 💰 Treasury`, "success");
 }
 
 function recruit() {
-  if (!player.nation) return alert("Choose a nation first.");
-  if (player.money < 100) return alert("Not enough money.");
-  if (player.manpower < 10) return alert("Not enough manpower.");
+  if (!player.nation) {
+    return showToast("Aktion blockiert", "Wähle zuerst eine Nation.", "warning");
+  }
+  if (player.money < 100) {
+    return showToast("Zu wenig Geld", "Du brauchst 100 💰 für die Rekrutierung.", "error");
+  }
+  if (player.manpower < 10) {
+    return showToast("Zu wenig Manpower", "Du brauchst 10K 👥 für die Rekrutierung.", "error");
+  }
 
   player.money -= 100;
   player.manpower -= 10;
   player.military += 10;
   updateUI();
-  notify("+10 military power");
+  showToast("Armee rekrutiert", "+10 ⚔ Military Power", "success");
 }
 
 function buildFactory() {
-  if (!player.nation) return alert("Choose a nation first.");
-  if (player.money < 500) return alert("Factory costs 500.");
+  if (!player.nation) {
+    return showToast("Aktion blockiert", "Wähle zuerst eine Nation.", "warning");
+  }
+  if (player.money < 500) {
+    return showToast("Zu wenig Geld", "Fabrik kostet 500 💰.", "error");
+  }
   player.money -= 500;
   player.factories++;
   player.income += 30;
   updateUI();
-  notify("Factory constructed.");
+  showToast("Fabrik gebaut", "+30 💰 monatliches Einkommen", "success");
 }
 
-function declareWar() {
-  if (!player.nation) return alert("Choose a nation first.");
-  if (!selectedEnemy) return alert("Select an enemy country first.");
+/* ============================================================
+   WAR — mit In-Game-Confirm + Vorschau
+============================================================ */
+async function declareWar() {
+  if (!player.nation) {
+    return showToast("Krieg nicht möglich", "Wähle zuerst eine Nation.", "warning");
+  }
+  if (!selectedEnemy) {
+    return showToast("Kein Ziel", "Wähle zuerst ein Land auf der Karte.", "warning");
+  }
 
   const enemy = countryData[selectedEnemy];
   if (!enemy) return;
-  if (!confirm("Declare war on " + enemy.german + "?")) return;
 
-  const playerPower = player.military + player.factories * 5 + Math.random() * 40;
-  const enemyPower = enemy.military + Math.random() * 40;
+  // Kräfteverhältnis vorher berechnen (gleiche Formel wie declareWar)
+  const playerPower = Math.round(player.military + player.factories * 5);
+  const enemyPower = Math.round(enemy.military);
+  const ratio = playerPower / (enemyPower || 1);
+  const chance = ratio > 1.5 ? "Sehr hoch" : ratio > 1.1 ? "Hoch" : ratio > 0.9 ? "Ungewiss" : ratio > 0.6 ? "Niedrig" : "Sehr niedrig";
+  const chanceClass = ratio > 1.1 ? "win" : "lose";
 
-  if (playerPower > enemyPower) {
+  const ok = await showConfirm({
+    icon: "⚔",
+    title: "Kriegserklärung",
+    message: `Möchtest du ${enemy.german} den Krieg erklären?`,
+    details: `
+      <div class="row"><span>Ziel</span><b>${enemy.flag} ${enemy.german}</b></div>
+      <div class="row"><span>Deine Stärke</span><b>${playerPower} ⚔</b></div>
+      <div class="row"><span>Feind-Stärke</span><b>${enemyPower} ⚔</b></div>
+      <div class="row"><span>Erfolgschance</span><b class="${chanceClass}">${chance}</b></div>
+    `,
+    confirmText: "Angreifen",
+    cancelText: "Abbrechen"
+  });
+
+  if (!ok) return;
+
+  // Schlacht ausführen
+  const playerFinal = playerPower + Math.random() * 40;
+  const enemyFinal = enemyPower + Math.random() * 40;
+
+  if (playerFinal > enemyFinal) {
     player.money += 300;
     player.territories++;
     player.military = Math.max(1, player.military - 10);
     conqueredCountries.add(selectedEnemy);
-    notify("VICTORY — " + enemy.german + " has been defeated.");
+    const conquered = enemy.german;
     selectedEnemy = null;
+    updateUI();
+    refreshAllCountries();
+    showToast("SIEG!", `${conquered} wurde erobert. +300 💰`, "success", 4000);
   } else {
     player.military = Math.max(0, player.military - 15);
-    notify("DEFEAT — " + enemy.german + " resisted your attack.");
+    updateUI();
+    refreshAllCountries();
+    showToast("NIEDERLAGE", `${enemy.german} hat deinen Angriff abgewehrt. −15 ⚔`, "error", 4000);
   }
-  updateUI();
-  refreshAllCountries();
 }
 
 /* ============================================================
@@ -687,21 +832,21 @@ function openBuildMenu() {
 }
 
 function buildFarm() {
-  if (!player.nation) return alert("Choose a nation first.");
-  if (player.money < 250) return alert("Not enough money.");
+  if (!player.nation) return showToast("Aktion blockiert", "Wähle zuerst eine Nation.", "warning");
+  if (player.money < 250) return showToast("Zu wenig Geld", "Farm kostet 250 💰.", "error");
   player.money -= 250;
   player.income += 15;
   updateUI();
-  notify("Farm constructed.");
+  showToast("Farm gebaut", "+15 💰 monatliches Einkommen", "success");
 }
 
 function buildBarracks() {
-  if (!player.nation) return alert("Choose a nation first.");
-  if (player.money < 400) return alert("Not enough money.");
+  if (!player.nation) return showToast("Aktion blockiert", "Wähle zuerst eine Nation.", "warning");
+  if (player.money < 400) return showToast("Zu wenig Geld", "Kaserne kostet 400 💰.", "error");
   player.money -= 400;
   player.military += 15;
   updateUI();
-  notify("Barracks constructed.");
+  showToast("Kaserne gebaut", "+15 ⚔ Military Power", "success");
 }
 
 function openMilitary() {
@@ -718,10 +863,10 @@ function openMilitary() {
 function openModal(title, content) {
   document.getElementById("modalTitle").innerText = title;
   document.getElementById("modalContent").innerHTML = content;
-  document.getElementById("modal").style.display = "flex";
+  document.getElementById("modal").classList.add("open");
 }
 function closeModal() {
-  document.getElementById("modal").style.display = "none";
+  document.getElementById("modal").classList.remove("open");
 }
 function notify(text) {
   const el = document.getElementById("message");
@@ -743,8 +888,7 @@ function setSpeed(v) {
 /* ============================================================
    TIME
 ============================================================ */
-let year = 2026;
-let month = 0;
+let year = 2026, month = 0;
 const months = ["January","February","March","April","May","June",
   "July","August","September","October","November","December"];
 
@@ -766,7 +910,7 @@ setInterval(() => {
 }, 5000);
 
 /* ============================================================
-   SAVE / LOAD / NEW
+   SAVE / LOAD / NEW — mit In-Game-Confirm
 ============================================================ */
 function saveGame() {
   localStorage.setItem("ironNationsSave", JSON.stringify({
@@ -774,12 +918,26 @@ function saveGame() {
     conquered: [...conqueredCountries],
     year, month
   }));
-  notify("Game saved.");
+  showToast("Spiel gespeichert", "Dein Fortschritt wurde gesichert.", "success");
 }
 
-function loadGame() {
+async function loadGame() {
   const raw = localStorage.getItem("ironNationsSave");
-  if (!raw) return alert("No save game found.");
+  if (!raw) {
+    return showToast("Kein Spielstand", "Es wurde kein Save gefunden.", "warning");
+  }
+
+  const ok = await showConfirm({
+    icon: "📂",
+    iconClass: "info",
+    title: "Spiel laden",
+    message: "Dein aktueller Fortschritt geht verloren. Spielstand laden?",
+    confirmText: "Laden",
+    cancelText: "Abbrechen",
+    primary: true
+  });
+  if (!ok) return;
+
   try {
     const data = JSON.parse(raw);
     player = data.player;
@@ -789,7 +947,7 @@ function loadGame() {
       const info = countryData[iso];
       if (info) {
         player.nation = {
-          iso: iso, id: iso, name: info.name, german: info.german,
+          iso, id: iso, name: info.name, german: info.german,
           flag: info.flag, color: info.color,
           population: info.population, military: info.military
         };
@@ -812,15 +970,22 @@ function loadGame() {
 
     updateUI();
     refreshAllCountries();
-    notify("Game loaded.");
+    showToast("Spiel geladen", "Dein Fortschritt wurde wiederhergestellt.", "success");
   } catch (e) {
     console.error(e);
-    alert("Save game is corrupted.");
+    showToast("Fehler", "Der Spielstand ist beschädigt.", "error");
   }
 }
 
-function newGame() {
-  if (!confirm("Start a new game?")) return;
+async function newGame() {
+  const ok = await showConfirm({
+    icon: "🔄",
+    title: "Neues Spiel",
+    message: "Möchtest du wirklich ein neues Spiel starten? Dein aktueller Fortschritt geht verloren.",
+    confirmText: "Neu starten",
+    cancelText: "Abbrechen"
+  });
+  if (!ok) return;
 
   player = {
     nation: null, money: 1000, manpower: 100, military: 20,
@@ -841,7 +1006,7 @@ function newGame() {
   updateUI();
   refreshAllCountries();
   resetMap();
-  notify("Select a nation to begin.");
+  showToast("Neues Spiel", "Wähle eine Nation, um zu beginnen.", "info");
 }
 
 /* ============================================================

@@ -777,6 +777,87 @@ attackBtn.addEventListener('click', () => {
 });
 
 /* ============================================================
+   GRENZPUNKTE — gemeinsame Grenze aus Polygonen berechnen
+============================================================ */
+function getVertices(layer) {
+  const verts = [];
+  const geojson = layer.toGeoJSON();
+  function extract(coords) {
+    if (typeof coords[0] === 'number') {
+      verts.push([coords[1], coords[0]]); // [lat, lng]
+    } else {
+      coords.forEach(extract);
+    }
+  }
+  if (geojson.geometry) {
+    extract(geojson.geometry.coordinates);
+  } else if (geojson.features) {
+    geojson.features.forEach(f => {
+      if (f.geometry) extract(f.geometry.coordinates);
+    });
+  }
+  return verts;
+}
+
+function getBorderPoints(isoA, isoB) {
+  const vertsA = getVertices(countryLayers[isoA]);
+  const vertsB = getVertices(countryLayers[isoB]);
+  const threshold = 0.18; // ~18km Toleranz
+  const border = [];
+
+  // Ecken von A nahe B
+  for (const va of vertsA) {
+    for (const vb of vertsB) {
+      const d = Math.hypot(va[0] - vb[0], va[1] - vb[1]);
+      if (d < threshold) {
+        border.push([(va[0] + vb[0]) / 2, (va[1] + vb[1]) / 2]);
+        break;
+      }
+    }
+  }
+  // Ecken von B nahe A
+  for (const vb of vertsB) {
+    for (const va of vertsA) {
+      const d = Math.hypot(va[0] - vb[0], va[1] - vb[1]);
+      if (d < threshold) {
+        border.push([(vb[0] + va[0]) / 2, (vb[1] + va[1]) / 2]);
+        break;
+      }
+    }
+  }
+
+  // Duplikate entfernen
+  const dedup = [];
+  for (const p of border) {
+    let dupe = false;
+    for (const q of dedup) {
+      if (Math.abs(p[0] - q[0]) < 0.04 && Math.abs(p[1] - q[1]) < 0.04) {
+        dupe = true;
+        break;
+      }
+    }
+    if (!dupe) dedup.push(p);
+  }
+
+  // Entlang der dominierenden Achse sortieren (damit die Frontlinie sinnvoll verläuft)
+  let minLat = Infinity, maxLat = -Infinity;
+  let minLng = Infinity, maxLng = -Infinity;
+  for (const p of dedup) {
+    if (p[0] < minLat) minLat = p[0];
+    if (p[0] > maxLat) maxLat = p[0];
+    if (p[1] < minLng) minLng = p[1];
+    if (p[1] > maxLng) maxLng = p[1];
+  }
+  if (maxLat - minLat > maxLng - minLng) {
+    dedup.sort((a, b) => a[0] - b[0]);
+  } else {
+    dedup.sort((a, b) => a[1] - b[1]);
+  }
+
+  return dedup;
+}
+
+/* ============================================================
    SCHLACHT
 ============================================================ */
 function startBattle() {
@@ -820,6 +901,9 @@ function startBattle() {
   notify("⚔ SCHLACHT um " + countryData[war.defender].german.toUpperCase());
 }
 
+/* ============================================================
+   WAR FLAGS — Flaggen entlang der KOMPLETTEN Grenze
+============================================================ */
 function createWarFlags() {
   if (!war) return;
 
@@ -828,21 +912,45 @@ function createWarFlags() {
   const attC = countryLayers[war.attacker].getBounds().getCenter();
   const defC = countryLayers[war.defender].getBounds().getCenter();
 
-  const dLng = defC.lng - attC.lng;
-  const dLat = defC.lat - attC.lat;
-  const len = Math.sqrt(dLng * dLng + dLat * dLat) || 0.001;
-  const ux = dLng / len, uy = dLat / len;
-  const px = -uy, py = ux;
+  // Echte Grenzpunkte berechnen
+  let borderPts = getBorderPoints(war.attacker, war.defender);
 
-  const numFlags = 5;
-  const spread = Math.min(len * 0.5, 2.5);
+  // Fallback: falls keine gemeinsame Grenze gefunden → gerade Linie
+  if (borderPts.length < 2) {
+    const midLat = (attC.lat + defC.lat) / 2;
+    const midLng = (attC.lng + defC.lng) / 2;
+    const dLng = defC.lng - attC.lng, dLat = defC.lat - attC.lat;
+    const len = Math.hypot(dLat, dLng) || 1;
+    const px = -dLat / len, py = dLng / len;
+    borderPts = [];
+    for (let i = -4; i <= 4; i++) {
+      const t = i / 4;
+      borderPts.push([midLat + py * t * 1.5, midLng + px * t * 1.5]);
+    }
+  }
+
+  // Flaggenzahl abhängig von Grenzlänge
+  const numFlags = Math.max(3, Math.min(12, Math.ceil(borderPts.length / 3)));
+  const sampled = [];
+  for (let i = 0; i < numFlags; i++) {
+    const idx = Math.floor(i * (borderPts.length - 1) / (numFlags - 1 || 1));
+    sampled.push(borderPts[Math.min(idx, borderPts.length - 1)]);
+  }
+
+  const offsetDist = 0.12; // Flaggen-Offset von der Grenze ins Land hinein
+
   const flagLayers = { attacker: [], defender: [] };
 
-  for (let i = 0; i < numFlags; i++) {
-    const t = (i - (numFlags - 1) / 2) / numFlags;
+  for (let i = 0; i < sampled.length; i++) {
+    const lat = sampled[i][0];
+    const lng = sampled[i][1];
 
-    const attLat = attC.lat + py * spread * t;
-    const attLng = attC.lng + px * spread * t;
+    // Angreifer-Flagge: Richtung Angreifer-Zentrum versetzt
+    const dLatA = attC.lat - lat, dLngA = attC.lng - lng;
+    const lenA = Math.hypot(dLatA, dLngA) || 1;
+    const attFlagLat = lat + (dLatA / lenA) * offsetDist;
+    const attFlagLng = lng + (dLngA / lenA) * offsetDist;
+
     const attIcon = L.divIcon({
       className: 'war-flag-wrap',
       html: `<img class="war-flag-img attacker"
@@ -850,12 +958,16 @@ function createWarFlags() {
                   onerror="this.src='https://flagcdn.com/w40/un.png'">`,
       iconSize: [0, 0], iconAnchor: [0, 0]
     });
-    flagLayers.attacker.push(L.marker([attLat, attLng], {
+    flagLayers.attacker.push(L.marker([attFlagLat, attFlagLng], {
       icon: attIcon, interactive: false, zIndexOffset: 3000
     }).addTo(map));
 
-    const defLat = defC.lat + py * spread * t;
-    const defLng = defC.lng + px * spread * t;
+    // Verteidiger-Flagge: Richtung Verteidiger-Zentrum versetzt
+    const dLatD = defC.lat - lat, dLngD = defC.lng - lng;
+    const lenD = Math.hypot(dLatD, dLngD) || 1;
+    const defFlagLat = lat + (dLatD / lenD) * offsetDist;
+    const defFlagLng = lng + (dLngD / lenD) * offsetDist;
+
     const defIcon = L.divIcon({
       className: 'war-flag-wrap',
       html: `<img class="war-flag-img defender"
@@ -863,17 +975,13 @@ function createWarFlags() {
                   onerror="this.src='https://flagcdn.com/w40/un.png'">`,
       iconSize: [0, 0], iconAnchor: [0, 0]
     });
-    flagLayers.defender.push(L.marker([defLat, defLng], {
+    flagLayers.defender.push(L.marker([defFlagLat, defFlagLng], {
       icon: defIcon, interactive: false, zIndexOffset: 3000
     }).addTo(map));
   }
 
-  const pts = [];
-  for (let i = -10; i <= 10; i++) {
-    const t = i / 10;
-    pts.push([attC.lat + py * spread * t * 0.8, attC.lng + px * spread * t * 0.8]);
-  }
-  const frontLine = L.polyline(pts, {
+  // Frontlinie entlang der Grenzpunkte
+  const frontLine = L.polyline(sampled, {
     color: '#ffd54f', weight: 3, opacity: 0.9,
     dashArray: '10,8', interactive: false
   }).addTo(map);
@@ -881,45 +989,61 @@ function createWarFlags() {
   warFlags = [...flagLayers.attacker, ...flagLayers.defender, frontLine];
 
   warFlagData = {
-    flagLayers, frontLine, spread,
-    ux, uy, px, py, len,
-    attLat: attC.lat, attLng: attC.lng
+    flagLayers, frontLine,
+    borderPts: sampled,
+    attC, defC,
+    offsetDist
   };
 }
 
 function updateWarFlags() {
   if (!war || !warFlagData) return;
-  const { flagLayers, frontLine, spread, ux, uy, px, py, len, attLat, attLng } = warFlagData;
-  const frontPos = 0.4 + war.progress * 0.55;
-  const frontLat = attLat + uy * len * frontPos;
-  const frontLng = attLng + ux * len * frontPos;
+
+  const { flagLayers, frontLine, borderPts, attC, defC, offsetDist } = warFlagData;
+
+  // Wie weit die Front Richtung Verteidiger geschoben wird
+  const pushFactor = war.progress * 0.55;
+
+  const currentFront = [];
+  const attFlagPositions = [];
+  const defFlagPositions = [];
+
+  for (let i = 0; i < borderPts.length; i++) {
+    const lat = borderPts[i][0];
+    const lng = borderPts[i][1];
+
+    // Frontpunkt Richtung Verteidiger schieben
+    const dLatD = defC.lat - lat, dLngD = defC.lng - lng;
+    const lenD = Math.hypot(dLatD, dLngD) || 1;
+    const frontLat = lat + (dLatD / lenD) * pushFactor;
+    const frontLng = lng + (dLngD / lenD) * pushFactor;
+    currentFront.push([frontLat, frontLng]);
+
+    // Angreifer-Flagge: hinter der Front Richtung Angreifer
+    const dLatA = attC.lat - frontLat, dLngA = attC.lng - frontLng;
+    const lenA = Math.hypot(dLatA, dLngA) || 1;
+    attFlagPositions.push([
+      frontLat + (dLatA / lenA) * offsetDist,
+      frontLng + (dLngA / lenA) * offsetDist
+    ]);
+
+    // Verteidiger-Flagge: vor der Front Richtung Verteidiger
+    const dLatDef = defC.lat - frontLat, dLngDef = defC.lng - frontLng;
+    const lenDef = Math.hypot(dLatDef, dLngDef) || 1;
+    defFlagPositions.push([
+      frontLat + (dLatDef / lenDef) * offsetDist,
+      frontLng + (dLngDef / lenDef) * offsetDist
+    ]);
+  }
 
   flagLayers.attacker.forEach((m, i) => {
-    const t = (i - (flagLayers.attacker.length - 1) / 2) / flagLayers.attacker.length;
-    m.setLatLng([
-      frontLat + py * spread * t - uy * 0.08,
-      frontLng + px * spread * t - ux * 0.08
-    ]);
+    if (attFlagPositions[i]) m.setLatLng(attFlagPositions[i]);
   });
   flagLayers.defender.forEach((m, i) => {
-    const t = (i - (flagLayers.defender.length - 1) / 2) / flagLayers.defender.length;
-    m.setLatLng([
-      frontLat + py * spread * t + uy * 0.08,
-      frontLng + px * spread * t + ux * 0.08
-    ]);
+    if (defFlagPositions[i]) m.setLatLng(defFlagPositions[i]);
   });
 
-  if (frontLine) {
-    const pts = [];
-    for (let i = -10; i <= 10; i++) {
-      const t = i / 10;
-      pts.push([
-        frontLat + py * spread * t * 0.8,
-        frontLng + px * spread * t * 0.8
-      ]);
-    }
-    frontLine.setLatLngs(pts);
-  }
+  if (frontLine) frontLine.setLatLngs(currentFront);
 }
 
 function destroyWarFlags() {
@@ -928,6 +1052,9 @@ function destroyWarFlags() {
   warFlagData = null;
 }
 
+/* ============================================================
+   BATTLE LOOP
+============================================================ */
 function battleLoop(now) {
   if (!war) return;
   const dt = Math.min(0.05, (now - war.lastTick) / 1000);

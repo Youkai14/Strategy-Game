@@ -1,2998 +1,854 @@
-<html lang="de"><head>
+<!DOCTYPE html>
+<html lang="de">
+<head>
 <meta charset="UTF-8">
-<!-- This site is hosted on Netlify. Anyone can build and deploy a site
-     like this one for free: https://netlify.new/?utm_campaign=ai-legible&utm_source=comment&utm_medium=referral&utm_id=15d5e13c-37fd-4873-8c20-d5126693c354
-     Netlify hosting facts for this site: static/SSR served via Netlify Edge. -->
-<meta name="hosting-provider" content="Netlify">
-<meta name="netlify-deploy" content="https://netlify.new/?utm_campaign=ai-legible&amp;utm_source=meta&amp;utm_medium=referral&amp;utm_id=15d5e13c-37fd-4873-8c20-d5126693c354">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>ATLAS // CONQUEST</title>
-
-<!-- LEAFLET -->
+<title>IRON NATIONS</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-
 <style>
-*{box-sizing:border-box}
-
+*{box-sizing:border-box;margin:0;padding:0}
 :root{
-    --bg:#070d13;
-    --panel:#0c151e;
-    --panel2:#101c27;
-    --border:#263847;
-    --border2:#355063;
-    --text:#e7f1f5;
-    --muted:#718593;
-    --cyan:#35d8ff;
-    --green:#55d68a;
-    --red:#ff6672;
-    --yellow:#e8c45c;
+  --bg:#060b10;
+  --panel:#0b1620;
+  --panel2:#0f1e2a;
+  --border:#1e3140;
+  --border2:#2d4759;
+  --text:#e6eef3;
+  --muted:#6d8492;
+  --cyan:#22d3ee;
+  --green:#4ade80;
+  --red:#f87171;
+  --yellow:#fbbf24;
 }
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);
+  font-family:'Segoe UI',system-ui,Arial,sans-serif}
 
-body{
-    margin:0;
-    overflow:hidden;
-    background:var(--bg);
-    color:var(--text);
-    font-family:Arial,Helvetica,sans-serif;
-}
+#game{height:100vh;display:grid;grid-template-columns:250px 1fr 340px}
 
-#game{
-    height:100vh;
-    display:grid;
-    grid-template-columns:250px 1fr 330px;
-}
+/* ============ LEFT PANEL ============ */
+#left{background:linear-gradient(180deg,#0a141d,#060d13);
+  border-right:1px solid var(--border);padding:20px 16px;overflow-y:auto}
 
-/* =========================
-   LEFT
-========================= */
+.logo{font-size:20px;font-weight:800;letter-spacing:2px}
+.logo span{color:var(--cyan)}
+.subtitle{margin-top:5px;margin-bottom:22px;font-size:10px;letter-spacing:3px;color:var(--muted)}
 
-#left{
-    background:linear-gradient(180deg,#0b151e,#081018);
-    border-right:1px solid var(--border);
-    padding:20px 16px;
-    z-index:10;
-}
+.section-title{color:#5a7080;font-size:10px;letter-spacing:2px;margin:18px 4px 8px;text-transform:uppercase}
 
-.logo{
-    font-size:20px;
-    font-weight:800;
-    letter-spacing:2px;
-}
+.menu button,.action{width:100%;border:1px solid var(--border);
+  background:linear-gradient(180deg,#12212d,#0d1a24);color:var(--text);
+  border-radius:6px;padding:11px 12px;margin-bottom:6px;text-align:left;
+  cursor:pointer;transition:.15s;font-size:13px;font-family:inherit}
+.menu button:hover,.action:hover{border-color:var(--cyan);background:#142a37;transform:translateX(2px)}
+.menu button.active{border-color:var(--cyan);box-shadow:0 0 12px rgba(34,211,238,.15)}
 
-.logo span{
-    color:var(--cyan);
-}
-
-.subtitle{
-    margin-top:5px;
-    margin-bottom:25px;
-    font-size:10px;
-    letter-spacing:3px;
-    color:var(--muted);
-}
-
-.section-title{
-    color:#627582;
-    font-size:10px;
-    letter-spacing:2px;
-    margin:20px 4px 8px;
-}
-
-.menu button,
-.action{
-    width:100%;
-    border:1px solid var(--border);
-    background:linear-gradient(180deg,#12212d,#0e1a24);
-    color:var(--text);
-    border-radius:6px;
-    padding:11px 12px;
-    margin-bottom:7px;
-    text-align:left;
-    cursor:pointer;
-    transition:.15s;
-}
-
-.menu button:hover,
-.action:hover{
-    border-color:var(--cyan);
-    background:#142a37;
-    transform:translateX(2px);
-}
-
-.menu button.active{
-    border-color:var(--cyan);
-    box-shadow:0 0 12px #35d8ff18;
-}
-
-.box{
-    background:linear-gradient(180deg,#0f1b25,#0b151e);
-    border:1px solid var(--border);
-    border-radius:7px;
-    padding:13px;
-    margin-top:12px;
-}
-
-.small{
-    color:var(--muted);
-    font-size:10px;
-    letter-spacing:1px;
-}
-
-.big{
-    font-size:25px;
-    font-weight:800;
-    margin:5px 0 10px;
-}
-
-.speed-row{
-    display:flex;
-    gap:5px;
-}
-
-.speed-row button{
-    flex:1;
-    padding:8px 4px;
-    background:#0a141c;
-    border:1px solid var(--border);
-    color:white;
-    border-radius:4px;
-    cursor:pointer;
-}
-
-.speed-row button:hover{
-    border-color:var(--cyan);
-}
-
-/* =========================
-   REAL MAP
-========================= */
-
-#center{
-    position:relative;
-    overflow:hidden;
-    background:#071c25;
-}
-
-#map{
-    width:100%;
-    height:100%;
-    display:block;
-    background:#08232d;
-}
-
-.leaflet-container{
-    background:#08232d;
-    font-family:Arial,Helvetica,sans-serif;
-}
-
-.leaflet-control-zoom{
-    display:none;
-}
-
-.leaflet-control-attribution{
-    background:#071019cc !important;
-    color:#718593 !important;
-    font-size:9px !important;
-}
-
-.leaflet-control-attribution a{
-    color:#35d8ff !important;
-}
-
-.country-label{
-    background:transparent;
-    border:none;
-    box-shadow:none;
-    color:#fff;
-    font-weight:bold;
-    font-size:11px;
-    text-shadow:
-        0 1px 3px #000,
-        0 0 5px #000;
-}
-
-.country-label:before{
-    display:none;
-}
-
-/* TOPBAR */
-
-.topbar{
-    position:absolute;
-    top:12px;
-    left:15px;
-    right:15px;
-    height:56px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    pointer-events:none;
-    z-index:5;
-}
-
-.brand{
-    background:#071019eF;
-    border:1px solid var(--border2);
-    border-radius:7px;
-    padding:12px 16px;
-    font-weight:bold;
-    letter-spacing:1px;
-}
-
-.resources{
-    display:flex;
-    gap:8px;
-}
-
-.resource{
-    min-width:105px;
-    background:#071019eF;
-    border:1px solid var(--border2);
-    border-radius:6px;
-    padding:8px 12px;
-}
-
-.resource-label{
-    color:var(--muted);
-    font-size:9px;
-}
-
-.resource-value{
-    margin-top:3px;
-    font-weight:bold;
-}
-
-/* MAP BUTTONS */
-
-.map-controls{
-    position:absolute;
-    right:15px;
-    bottom:20px;
-    display:flex;
-    flex-direction:column;
-    gap:5px;
-    z-index:6;
-}
-
-.map-controls button{
-    width:38px;
-    height:38px;
-    background:#071019dd;
-    border:1px solid var(--border2);
-    color:white;
-    border-radius:5px;
-    cursor:pointer;
-    font-size:18px;
-}
-
-.map-controls button:hover{
-    border-color:var(--cyan);
-}
-
-/* DATE */
-
-.datebox{
-    position:absolute;
-    left:15px;
-    bottom:20px;
-    background:#071019eF;
-    border:1px solid var(--border2);
-    border-radius:6px;
-    padding:10px 15px;
-    z-index:6;
-}
-
-.date-year{
-    font-size:18px;
-    font-weight:bold;
-}
-
-.date-month{
-    color:var(--muted);
-    font-size:11px;
-}
-
-/* MESSAGE */
-
-#message{
-    position:absolute;
-    left:50%;
-    bottom:20px;
-    transform:translateX(-50%);
-    background:#071019f2;
-    border:1px solid var(--border2);
-    padding:10px 18px;
-    border-radius:6px;
-    font-size:12px;
-    z-index:7;
-    white-space:nowrap;
-}
-
-/* =========================
-   RIGHT
-========================= */
-
-#right{
-    background:linear-gradient(180deg,#0b151e,#081018);
-    border-left:1px solid var(--border);
-    padding:17px;
-    overflow-y:auto;
-    z-index:10;
-}
-
-.panel-title{
-    font-size:10px;
-    color:var(--muted);
-    letter-spacing:2px;
-    margin-bottom:9px;
-}
-
-.nation-name{
-    font-size:26px;
-    font-weight:800;
-    margin-bottom:14px;
-}
-
-.flag{
-    width:45px;
-    height:30px;
-    border:1px solid var(--border2);
-    border-radius:4px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:20px;
-    background:#172530;
-    margin-bottom:10px;
-}
-
-.stat{
-    display:flex;
-    justify-content:space-between;
-    border-bottom:1px solid #ffffff08;
-    padding:8px 0;
-    font-size:12px;
-}
-
-.stat:last-child{
-    border-bottom:0;
-}
-
-.value{
-    font-weight:bold;
-}
-
+.box{background:linear-gradient(180deg,#0f1b25,#0a141d);border:1px solid var(--border);
+  border-radius:7px;padding:13px;margin-top:12px}
+.small{color:var(--muted);font-size:10px;letter-spacing:1px}
+.big{font-size:24px;font-weight:800;margin:5px 0 8px}
+.cyan{color:var(--cyan)}
 .green{color:var(--green)}
 .red{color:var(--red)}
 .yellow{color:var(--yellow)}
-.cyan{color:var(--cyan)}
 
-.action{
-    text-align:center;
-    margin-bottom:6px;
-}
+.speed-row{display:flex;gap:5px}
+.speed-row button{flex:1;padding:8px 4px;background:#0a141c;border:1px solid var(--border);
+  color:white;border-radius:4px;cursor:pointer;font-family:inherit;font-size:11px}
+.speed-row button:hover{border-color:var(--cyan)}
 
-.action.war{
-    color:#ff8790;
-    border-color:#63333a;
-}
+/* ============ MAP ============ */
+#center{position:relative;overflow:hidden;background:#08161e}
+#map{width:100%;height:100%}
+.leaflet-container{background:#08161e;font-family:'Segoe UI',sans-serif}
+.leaflet-control-zoom{display:none}
+.leaflet-control-attribution{background:rgba(6,11,16,.8)!important;
+  color:#5a7080!important;font-size:9px!important}
+.leaflet-control-attribution a{color:var(--cyan)!important}
 
-.action.war:hover{
-    border-color:var(--red);
-    background:#30161a;
-}
+.country-label{background:transparent;border:none;box-shadow:none;
+  color:#fff;font-weight:700;font-size:11px;
+  text-shadow:0 1px 3px #000,0 0 6px #000;padding:0}
+.country-label::before{display:none}
 
-/* =========================
-   MODAL
-========================= */
+/* TOPBAR */
+.topbar{position:absolute;top:12px;left:14px;right:14px;
+  display:flex;justify-content:space-between;align-items:flex-start;
+  pointer-events:none;z-index:400}
 
-.modal-bg{
-    position:fixed;
-    inset:0;
-    background:#000000b8;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    z-index:50;
-    backdrop-filter:blur(4px);
-}
+.brand{background:rgba(6,16,25,.95);border:1px solid var(--border2);
+  border-radius:7px;padding:11px 16px;font-weight:800;
+  letter-spacing:2px;font-size:13px}
+.brand span{color:var(--cyan)}
 
-.modal{
-    width:760px;
-    max-width:90vw;
-    max-height:80vh;
-    overflow:auto;
-    background:#0b1721;
-    border:1px solid var(--border2);
-    border-radius:9px;
-    padding:22px;
-    box-shadow:0 20px 80px #000;
-}
+.resources{display:flex;gap:8px}
+.resource{min-width:110px;background:rgba(6,16,25,.95);
+  border:1px solid var(--border2);border-radius:6px;padding:8px 12px}
+.resource-label{color:var(--muted);font-size:9px;letter-spacing:1px}
+.resource-value{margin-top:3px;font-weight:700;font-size:13px}
 
-.modal-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    border-bottom:1px solid var(--border);
-    padding-bottom:14px;
-    margin-bottom:15px;
-}
+/* MAP CONTROLS */
+.map-controls{position:absolute;right:14px;bottom:20px;
+  display:flex;flex-direction:column;gap:5px;z-index:400}
+.map-controls button{width:38px;height:38px;background:rgba(6,16,25,.9);
+  border:1px solid var(--border2);color:white;border-radius:5px;
+  cursor:pointer;font-size:18px;font-family:inherit;transition:.15s}
+.map-controls button:hover{border-color:var(--cyan);background:#0e2230}
 
-.modal-header h2{
-    margin:0;
-}
+/* DATE */
+.datebox{position:absolute;left:14px;bottom:20px;
+  background:rgba(6,16,25,.95);border:1px solid var(--border2);
+  border-radius:6px;padding:10px 15px;z-index:400}
+.date-year{font-size:18px;font-weight:800}
+.date-month{color:var(--muted);font-size:11px;letter-spacing:1px}
 
-.close{
-    cursor:pointer;
-    color:var(--muted);
-    font-size:20px;
-}
+/* MESSAGE */
+#message{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);
+  background:rgba(6,16,25,.96);border:1px solid var(--border2);
+  padding:10px 20px;border-radius:6px;font-size:12px;z-index:400;
+  white-space:nowrap;transition:opacity .3s}
 
-.close:hover{
-    color:white;
-}
+/* ============ RIGHT PANEL ============ */
+#right{background:linear-gradient(180deg,#0a141d,#060d13);
+  border-left:1px solid var(--border);padding:17px;overflow-y:auto}
 
-.country{
-    padding:13px;
-    margin:7px 0;
-    background:#0f1e29;
-    border:1px solid var(--border);
-    border-radius:6px;
-    cursor:pointer;
-}
+.panel-title{font-size:10px;color:var(--muted);letter-spacing:2px;
+  margin-bottom:9px;text-transform:uppercase}
 
-.country:hover{
-    border-color:var(--cyan);
-    background:#132936;
-}
+.nation-name{font-size:24px;font-weight:800;margin-bottom:12px}
+.flag{width:48px;height:34px;border:1px solid var(--border2);border-radius:4px;
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+  background:#0f1e2a;margin-bottom:10px}
 
-.country-name{
-    font-weight:bold;
-}
+.stat{display:flex;justify-content:space-between;
+  border-bottom:1px solid rgba(255,255,255,.04);padding:8px 0;font-size:12px}
+.stat:last-child{border-bottom:0}
+.value{font-weight:700}
 
-.country-info{
-    color:var(--muted);
-    font-size:11px;
-    margin-top:4px;
-}
+.action{text-align:center;margin-bottom:6px}
+.action.war{color:#ff8790;border-color:#5c2e34}
+.action.war:hover{border-color:var(--red);background:#2c1317}
 
-::-webkit-scrollbar{
-    width:6px;
-}
+/* ============ MODAL ============ */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);
+  display:none;align-items:center;justify-content:center;z-index:1000;
+  backdrop-filter:blur(4px)}
+.modal{width:760px;max-width:92vw;max-height:80vh;overflow:auto;
+  background:#0a1620;border:1px solid var(--border2);border-radius:10px;
+  padding:22px;box-shadow:0 20px 80px rgba(0,0,0,.8)}
+.modal-header{display:flex;justify-content:space-between;align-items:center;
+  border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:15px}
+.modal-header h2{margin:0;font-size:16px;letter-spacing:2px;color:var(--cyan)}
+.close{cursor:pointer;color:var(--muted);font-size:22px;line-height:1}
+.close:hover{color:#fff}
 
-::-webkit-scrollbar-track{
-    background:#081018;
-}
+.country{padding:13px;margin:7px 0;background:#0d1c27;
+  border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:.15s}
+.country:hover{border-color:var(--cyan);background:#122838}
+.country-name{font-weight:700}
+.country-info{color:var(--muted);font-size:11px;margin-top:4px}
 
-::-webkit-scrollbar-thumb{
-    background:#263b48;
-    border-radius:10px;
-}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#081018}
+::-webkit-scrollbar-thumb{background:#22394a;border-radius:10px}
 </style>
 </head>
-
 <body>
 
 <div id="game">
 
-<!-- LEFT -->
-
 <aside id="left">
+  <div class="logo">IRON<span>//</span>NATIONS</div>
+  <div class="subtitle">GRAND STRATEGY</div>
 
-    <div class="logo">
-        ATLAS<span>//</span>CONQUEST
+  <div class="section-title">COMMAND</div>
+  <div class="menu">
+    <button class="active" onclick="openCountryMenu()">🗺️ &nbsp; EUROPE MAP</button>
+    <button onclick="openBuildMenu()">🏗️ &nbsp; CONSTRUCTION</button>
+    <button onclick="openDiplomacy()">🤝 &nbsp; DIPLOMACY</button>
+    <button onclick="openMilitary()">⚔️ &nbsp; MILITARY</button>
+  </div>
+
+  <div class="section-title">GAME</div>
+  <div class="menu">
+    <button onclick="saveGame()">💾 &nbsp; SAVE GAME</button>
+    <button onclick="loadGame()">📂 &nbsp; LOAD GAME</button>
+    <button onclick="newGame()">🔄 &nbsp; NEW GAME</button>
+  </div>
+
+  <div class="box">
+    <div class="small">GAME SPEED</div>
+    <div class="speed-row">
+      <button onclick="setSpeed(0)">Ⅱ</button>
+      <button onclick="setSpeed(1)">1×</button>
+      <button onclick="setSpeed(2)">2×</button>
+      <button onclick="setSpeed(4)">4×</button>
+      <button onclick="setSpeed(8)">8×</button>
     </div>
-
-    <div class="subtitle">
-        GRAND STRATEGY
+    <div style="margin-top:9px;text-align:center">
+      <span id="speedText" class="cyan">1×</span>
     </div>
+  </div>
 
-    <div class="section-title">COMMAND</div>
+  <div class="box">
+    <div class="small">CURRENT DATE</div>
+    <div class="big" id="year">2026</div>
+    <div id="month" class="cyan">January</div>
+  </div>
 
-    <div class="menu">
-
-        <button class="active" onclick="openCountryMenu()">
-            🗺️ &nbsp; EUROPE MAP
-        </button>
-
-        <button onclick="openBuildMenu()">
-            🏗️ &nbsp; CONSTRUCTION
-        </button>
-
-        <button onclick="openDiplomacy()">
-            🤝 &nbsp; DIPLOMACY
-        </button>
-
-        <button onclick="openMilitary()">
-            ⚔️ &nbsp; MILITARY
-        </button>
-
+  <div class="box">
+    <div class="small">GAME STATUS</div>
+    <div style="margin-top:8px;font-size:12px">● <span class="green">WORLD ACTIVE</span></div>
+    <div style="margin-top:7px;font-size:11px;color:var(--muted)">
+      European nations develop, build and prepare for war.
     </div>
-
-    <div class="section-title">GAME</div>
-
-    <div class="menu">
-
-        <button onclick="saveGame()">
-            💾 &nbsp; SAVE GAME
-        </button>
-
-        <button onclick="loadGame()">
-            📂 &nbsp; LOAD GAME
-        </button>
-
-        <button onclick="newGame()">
-            🔄 &nbsp; NEW GAME
-        </button>
-
-    </div>
-
-    <div class="box">
-
-        <div class="small">GAME SPEED</div>
-
-        <div class="speed-row">
-
-            <button onclick="setSpeed(0)">Ⅱ</button>
-            <button onclick="setSpeed(1)">1×</button>
-            <button onclick="setSpeed(2)">2×</button>
-            <button onclick="setSpeed(4)">4×</button>
-            <button onclick="setSpeed(8)">8×</button>
-
-        </div>
-
-        <div style="margin-top:9px;text-align:center">
-            <span id="speedText" class="cyan">1×</span>
-        </div>
-
-    </div>
-
-    <div class="box">
-
-        <div class="small">CURRENT DATE</div>
-
-        <div class="big" id="year">2026</div>
-
-        <div id="month" class="cyan">
-            January
-        </div>
-
-    </div>
-
-    <div class="box">
-
-        <div class="small">GAME STATUS</div>
-
-        <div style="margin-top:8px;font-size:12px">
-            ● <span class="green">WORLD ACTIVE</span>
-        </div>
-
-        <div style="margin-top:7px;font-size:11px;color:var(--muted)">
-            European nations are developing,
-            building and preparing for war.
-        </div>
-
-    </div>
-
+  </div>
 </aside>
-
-
-<!-- MAP -->
 
 <main id="center">
+  <div id="map"></div>
 
-    <div id="map" class="leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom" tabindex="0" style="position: relative;"><div class="leaflet-pane leaflet-map-pane" style="transform: translate3d(-277px, 0px, 0px);"><div class="leaflet-pane leaflet-tile-pane"></div><div class="leaflet-pane leaflet-overlay-pane"><svg pointer-events="none" class="leaflet-zoom-animated" width="932" height="1138" viewBox="199 -95 932 1138" style="transform: translate3d(199px, -95px, 0px);"><g><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#8d7650" fill-opacity="0.9" fill-rule="evenodd" d="M689 628L689 628z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#26343c" fill-opacity="0.9" fill-rule="evenodd" d="M524 509L522 509L523 508z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#26343c" fill-opacity="0.9" fill-rule="evenodd" d="M518 504L517 505L518 504z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#26343c" fill-opacity="0.9" fill-rule="evenodd" d="M497 418L494 420L493 419L497 413L497 417z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#4d6199" fill-opacity="0.9" fill-rule="evenodd" d="M517 466L513 467L510 470L506 470L503 466L500 467L500 465L497 464L491 466L487 461L500 453L502 449L500 442L497 442L495 444L494 443L500 436L507 434L512 435L512 432L516 434L514 434L512 431L514 426L512 424L515 419L511 419L506 412L508 406L512 402L508 402L502 406L492 405L491 408L488 403L494 392L494 390L491 388L492 384L495 383L492 380L492 378L491 381L488 383L487 381L490 377L485 382L486 385L484 394L481 394L484 385L483 386L483 380L488 366L483 371L479 369L479 367L477 367L482 364L480 363L482 362L484 356L481 353L483 349L482 344L488 342L485 338L486 335L490 333L490 327L494 329L496 327L497 329L512 326L512 331L501 342L503 343L500 349L508 346L523 346L527 350L518 370L510 374L514 373L517 375L516 377L510 381L505 380L523 383L529 392L532 406L546 419L545 422L548 429L544 426L539 426L544 427L550 434L551 437L548 441L550 444L553 441L558 441L563 442L567 446L566 454L561 463L556 464L557 467L552 469L553 468L557 471L563 470L563 474L558 478L549 482L536 481L531 479L532 480L530 482L524 482L525 484L518 484L514 482L508 484L505 491L499 488L493 490L488 495L483 493L492 485L499 474L511 474L519 464L518 465zM499 434L501 434L497 438L495 433L498 432zM518 313L517 311L520 311L519 312zM535 284L535 279L535 283zM532 283L532 285L535 285L532 298L532 291L530 292L530 290L528 290L531 288L531 285L529 284L532 282zM538 277L537 280L536 278L538 276zM511 322L510 323L508 320L510 320L511 322zM514 324L512 322L514 322zM512 317L516 319L511 320L509 318L510 315L513 317zM516 314L512 310L516 313zM472 369L471 370L472 368L473 369zM489 393L486 392L486 387L488 388L489 392zM481 374L477 376L475 375L477 374L477 371L475 370L477 368L479 371L481 371zM477 383L478 387L476 389L475 387L473 388L473 386L476 383zM479 385L478 384L481 379L481 381zM476 332L475 336L472 338L474 338L472 341L468 345L466 344L469 341L467 340L467 335L469 336L470 333L475 329L477 330zM476 362L474 361L476 361zM477 350L477 354L483 356L480 360L478 357L476 357L474 354L470 352L475 347L477 349zM465 346L465 350L461 348L464 347zM465 358L463 358L463 353L465 358zM463 362L461 362L462 360L463 361zM476 419L472 420L467 413L465 415L466 417L461 419L454 412L459 409L457 408L462 405L463 401L466 401L468 398L476 397L482 405L480 408L485 410L485 413L482 410L483 416L477 420zM535 483L533 485L530 483L532 481L534 482z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#a98c3d" fill-opacity="0.9" fill-rule="evenodd" d="M982 545L974 545L972 548L966 551L962 551L959 553L957 552L947 561L945 561L949 558L948 556L943 562L945 568L942 564L932 560L930 560L929 562L917 562L910 558L909 559L911 556L906 554L915 555L917 553L915 554L911 552L910 545L908 543L910 547L909 553L907 553L906 550L904 553L897 554L897 557L891 565L884 568L885 574L879 573L876 575L875 574L875 576L869 574L868 572L871 571L871 569L877 561L876 556L890 556L887 554L888 551L883 547L883 543L878 538L878 530L877 531L874 528L871 528L862 522L858 522L846 526L845 530L837 531L831 535L826 531L813 530L811 528L807 531L807 529L799 523L799 520L801 518L803 511L807 512L805 509L805 502L813 492L817 488L820 488L821 486L821 480L816 471L816 466L820 467L826 461L840 460L849 463L855 463L857 466L861 466L862 469L867 466L872 467L873 469L877 466L880 468L880 470L889 468L893 472L895 472L896 471L894 466L899 458L912 458L916 453L920 454L926 452L933 454L938 463L937 465L935 465L937 471L936 472L946 474L949 477L950 486L952 489L955 487L965 491L973 488L980 497L982 494L1000 503L1003 503L1004 506L1001 512L999 512L999 514L1002 516L998 518L1002 526L1000 532L989 533L988 535L983 537L982 544zM911 560L913 561L908 560L905 557L907 559z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#9c5555" fill-opacity="0.9" fill-rule="evenodd" d="M655 538L657 539L655 542L655 546L658 546L661 549L665 547L666 553L661 554L662 559L659 557L656 558L653 555L652 560L649 563L650 566L643 559L642 556L636 564L630 565L628 565L624 561L624 556L620 556L618 560L615 560L620 549L627 541L627 538L630 540L634 537L643 537L644 534L648 536L651 535L653 537z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#748f42" fill-opacity="0.9" fill-rule="evenodd" d="M764 343L761 346L762 352L760 356L753 363L755 359L753 355L753 349L758 343L762 341L763 342zM735 376L734 377L734 370L736 363L739 359L740 354L742 354L738 365zM677 317L678 320L681 314L680 306L682 300L689 293L690 283L687 272L692 270L694 264L685 255L687 242L685 234L686 224L684 217L686 209L693 198L697 196L706 198L708 194L707 186L702 183L712 164L714 150L712 141L717 140L723 136L722 131L734 114L734 111L730 103L736 98L738 89L744 83L751 87L754 80L753 72L755 69L773 75L775 74L777 72L774 70L779 60L776 55L782 54L797 70L806 74L816 88L814 90L814 103L816 103L818 106L816 108L816 114L820 121L816 134L822 150L819 151L817 149L810 151L806 148L804 150L802 148L801 149L798 158L796 157L797 159L792 161L792 165L791 163L793 168L788 177L790 184L792 186L786 194L783 202L779 206L774 208L771 212L767 212L764 218L761 217L762 219L760 219L755 224L758 224L754 229L750 227L752 231L750 236L748 238L745 236L745 240L748 243L746 244L745 249L746 256L743 255L742 259L744 277L743 278L745 281L749 283L750 282L758 290L758 292L762 295L763 301L754 309L751 310L754 311L757 309L759 311L757 311L752 318L740 325L731 326L740 329L736 330L738 335L735 344L736 352L734 355L734 365L727 379L715 378L715 381L713 380L709 384L710 391L708 394L704 393L699 395L694 393L695 388L689 376L693 376L691 372L693 372L694 369L688 363L684 351L683 352L680 345L680 340L678 340L677 332L675 332L674 316L676 316zM765 341L765 343L765 340L767 340zM757 317L757 316zM759 307L758 308L758 306L760 306L759 307z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#a18443" fill-opacity="0.9" fill-rule="evenodd" d="M565 676L563 676L565 676zM583 660L586 661L583 667L577 663L574 663L580 658L583 657L583 659zM596 659L591 656L595 656L596 658zM563 673L561 673L562 670L565 670L564 672zM527 605L531 607L531 611L532 610L540 614L544 614L546 616L553 616L555 613L563 617L564 620L584 620L584 627L571 637L561 640L555 644L557 646L547 656L543 664L545 672L549 674L549 676L541 681L538 692L532 692L528 695L522 704L497 704L494 707L488 708L486 713L481 713L477 710L476 706L474 705L475 702L474 703L469 698L469 696L463 698L462 694L462 690L468 684L463 679L467 671L461 662L468 660L468 642L476 634L472 631L472 628L470 627L465 627L464 629L454 629L454 624L446 628L448 620L447 617L444 616L445 615L442 611L443 608L446 606L450 606L453 604L454 601L459 599L462 599L464 602L480 601L496 605L503 603L520 606L526 605zM361 817L360 820L357 822L355 818L364 815zM391 810L390 811L390 809L393 806L393 809zM385 820L382 821L385 819L389 812L389 819zM372 820L372 824L368 825L368 821L372 820zM351 822L351 819L352 821zM343 824L342 826L341 825L343 824zM344 816L342 812L343 811L345 811L345 815z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#626d99" fill-opacity="0.9" fill-rule="evenodd" d="M803 511L799 523L795 524L791 520L782 520L778 525L773 528L771 526L766 529L762 529L760 531L761 532L757 534L749 534L742 530L739 523L742 515L746 516L750 514L753 511L753 509L759 504L765 506L768 503L772 507L772 509L775 510L778 506L786 507L787 505L793 505L803 511z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#5a809b" fill-opacity="0.9" fill-rule="evenodd" d="M735 555L733 554L732 557L724 561L725 565L721 568L722 572L716 572L713 569L710 572L706 571L705 573L701 571L705 570L702 564L700 563L702 561L699 560L701 556L707 555L713 557L717 553L723 553L726 551L729 552L730 549L733 550L735 555z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#755b91" fill-opacity="0.9" fill-rule="evenodd" d="M790 582L794 585L800 586L803 584L806 586L804 586L803 588L805 591L801 598L808 608L808 610L802 614L803 620L801 622L800 621L793 623L792 622L795 616L790 615L791 614L783 607L778 614L778 612L770 608L765 603L769 601L766 596L770 595L765 590L767 581L763 581L765 576L768 577L763 573L764 571L761 566L770 560L778 562L783 568L783 572L792 577L790 579L792 581L790 582z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#557d9b" fill-opacity="0.9" fill-rule="evenodd" d="M689 597L689 596z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#26343c" fill-opacity="0.9" fill-rule="evenodd" d="M1132 469L1129 465L1126 464L1119 472L1110 476L1104 484L1100 484L1103 495L1102 496L1098 498L1090 488L1087 488L1085 490L1085 495L1080 500L1080 506L1082 511L1078 516L1078 523L1082 525L1085 534L1089 533L1095 535L1104 550L1103 552L1100 551L1100 554L1107 557L1101 563L1102 565L1099 564L1091 569L1087 568L1088 572L1086 573L1083 581L1078 587L1086 595L1087 602L1089 597L1087 611L1097 625L1097 627L1100 629L1098 632L1091 639L1085 637L1079 629L1067 624L1067 619L1058 615L1056 617L1054 615L1047 618L1045 617L1045 615L1034 608L1020 608L1018 606L1004 602L1002 603L1002 605L987 590L981 589L978 584L974 585L970 580L964 577L967 575L965 573L968 573L969 575L975 573L979 563L980 562L980 564L985 562L983 559L978 557L977 554L985 552L984 550L994 546L993 542L991 542L990 544L986 543L982 545L982 539L990 532L999 532L1002 526L998 518L1002 516L999 514L999 512L1001 512L1004 507L1003 503L994 500L993 498L984 496L982 494L980 497L973 488L964 491L955 487L953 489L950 486L949 477L946 474L936 472L937 471L935 465L938 464L932 453L917 453L914 457L909 457L906 453L906 445L903 440L906 436L912 439L919 433L913 425L909 425L909 420L904 417L901 409L897 406L899 401L899 391L894 386L891 385L887 385L882 388L880 382L876 381L875 383L872 380L867 379L868 374L864 364L862 364L864 355L860 352L860 350L858 350L860 344L863 343L860 335L859 321L863 317L864 312L867 309L866 300L870 302L871 300L876 299L879 295L890 298L890 296L885 291L878 291L873 287L871 283L873 284L872 280L863 283L884 261L902 237L906 227L903 220L888 205L894 198L894 193L888 185L890 179L886 177L884 174L886 169L886 167L884 166L886 156L885 155L889 154L890 152L878 120L881 110L888 100L888 96L881 84L873 80L871 71L874 60L870 58L879 53L881 47L888 43L890 40L890 35L895 38L899 37L898 30L905 33L910 28L911 29L911 24L923 32L921 36L913 33L912 35L915 37L915 40L921 40L923 41L922 43L927 41L928 43L924 53L930 46L938 45L944 48L947 48L949 46L964 55L976 65L984 75L989 76L997 84L1000 84L999 81L1006 91L1013 95L1015 108L1016 110L1018 110L1016 121L1008 132L1003 136L987 143L978 142L971 138L951 133L943 127L939 129L939 126L929 122L928 123L922 119L922 113L910 111L917 116L916 118L922 125L925 125L925 129L930 132L927 136L929 135L935 138L943 148L941 158L938 161L943 172L943 177L945 178L944 184L946 187L948 189L953 188L961 198L972 203L979 200L980 196L979 190L976 188L971 189L963 178L963 174L966 172L967 167L974 169L979 175L999 183L1003 178L1007 179L999 160L1000 157L1011 145L1019 141L1027 130L1032 133L1039 133L1043 135L1044 137L1042 141L1045 140L1049 144L1050 133L1053 125L1053 118L1051 113L1045 109L1045 106L1050 86L1050 76L1040 65L1050 70L1060 68L1065 69L1069 72L1078 87L1078 91L1065 94L1058 102L1058 106L1065 111L1071 121L1076 122L1089 117L1092 99L1101 95L1103 96L1101 90L1102 89L1104 91L1106 90L1125 76L1132 73zM1132 -38L1132 -45zM955 167L954 173L951 168L954 167zM1033 125L1030 124L1030 122L1032 122L1033 124zM1093 572L1093 570zM1119 49L1118 54L1117 52L1115 53L1112 60L1101 64L1098 61L1096 52L1100 41L1103 39L1107 39L1118 47zM785 396L781 402L783 403L788 403L789 396L796 400L804 400L804 402L807 404L805 409L806 413L788 414L771 412L774 403L779 403L785 396zM929 562L932 560L938 562L939 564L942 564L949 574L959 572L963 573L959 579L952 578L946 583L944 582L939 584L935 589L931 589L928 587L929 578L927 576L925 577L922 574L917 573L924 567L928 566L930 563z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#79669b" fill-opacity="0.9" fill-rule="evenodd" d="M868 572L869 574L874 576L874 574L876 575L879 573L885 575L883 582L878 583L878 580L876 580L876 586L873 591L872 599L868 599L856 593L845 595L837 601L811 597L808 598L808 593L803 589L806 586L803 584L798 587L790 582L792 577L783 572L783 568L777 561L782 561L788 558L797 541L797 538L811 528L813 530L826 531L831 535L837 531L845 530L846 526L852 525L868 552L867 571z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#5d8c58" fill-opacity="0.9" fill-rule="evenodd" d="M351 758L356 759L355 761L351 758zM447 627L453 624L455 629L464 629L466 627L472 627L473 632L476 633L468 642L470 652L467 654L468 660L461 662L464 665L465 669L467 670L463 679L466 683L468 683L462 690L463 698L458 700L445 700L447 694L446 679L448 680L447 678L442 680L442 676L444 676L445 671L447 670L442 676L439 675L441 668L440 666L442 665L445 659L449 641L446 629zM262 701L260 700L262 700zM239 677L235 675L238 674L239 676zM231 678L225 675L229 677zM221 678L219 677L222 678zM227 679L228 680L223 680L222 679L224 678zM255 688L260 688L260 690L254 689L254 687z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#a85b5b" fill-opacity="0.9" fill-rule="evenodd" d="M816 468L816 472L821 480L821 486L817 488L805 502L805 509L807 511L805 512L800 510L793 505L788 505L786 507L779 506L775 510L772 509L768 502L765 506L763 506L756 496L755 497L753 495L749 495L747 492L749 491L748 490L746 491L740 488L740 491L737 493L732 488L734 485L732 483L730 484L725 482L721 480L721 478L719 477L717 477L718 479L716 480L718 473L713 463L715 458L713 454L713 449L708 443L711 437L709 426L713 428L713 426L709 423L730 416L735 410L739 410L743 407L750 405L758 406L761 409L758 407L758 411L761 414L768 414L771 412L788 414L807 413L814 418L819 440L819 446L814 449L811 453L816 458L815 466z"></path><path class="leaflet-interactive" stroke="#ffffff" stroke-opacity="1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="#ff5967" fill-opacity="0.9" fill-rule="evenodd" d="M782 54L776 55L779 60L774 70L777 72L774 75L756 69L753 72L754 80L751 87L744 83L738 89L736 97L730 103L734 113L722 131L723 136L718 140L712 141L714 149L712 164L702 183L707 186L708 194L706 197L698 196L691 199L686 209L684 217L686 224L685 234L687 242L685 255L694 264L692 270L689 271L687 275L690 283L689 293L682 300L680 305L681 314L679 320L676 316L670 314L668 309L668 301L665 308L666 312L664 317L660 319L657 315L657 318L653 321L654 322L640 337L627 339L624 336L624 338L622 338L623 335L616 332L610 324L610 318L616 321L619 318L616 319L614 317L615 311L620 306L610 311L608 314L605 313L608 303L613 303L618 300L612 299L619 287L622 287L621 291L624 285L627 284L619 286L606 304L606 294L612 293L607 291L605 285L611 280L607 282L605 281L604 271L624 269L626 270L626 273L628 273L627 270L634 267L631 267L632 262L630 264L630 268L626 269L622 267L621 269L616 268L609 270L605 268L604 263L608 261L603 256L603 251L609 251L615 254L624 252L607 250L605 248L606 245L608 245L612 239L622 239L623 237L617 239L618 234L626 233L634 235L635 234L633 234L633 232L639 231L624 231L626 226L633 221L639 222L645 228L640 218L645 216L645 214L642 211L646 208L651 209L651 212L653 209L656 208L661 214L663 212L668 213L669 208L676 203L674 201L676 200L676 197L671 200L673 202L665 209L661 211L658 206L656 207L657 202L659 201L667 187L678 179L679 177L676 179L676 174L685 167L687 170L689 169L694 163L689 167L685 164L691 147L695 146L695 144L692 142L699 139L703 139L707 136L696 138L697 126L702 122L706 122L702 119L708 112L709 113L710 111L712 112L715 110L723 109L711 108L717 99L723 103L724 106L724 103L726 101L723 101L720 98L722 94L721 93L718 96L716 96L715 92L719 87L721 87L722 89L725 88L721 85L729 79L732 90L732 86L734 83L732 82L731 78L733 74L741 75L746 73L745 71L735 71L739 65L742 65L745 62L748 52L753 50L754 41L755 40L759 45L762 45L759 39L763 37L765 31L771 29L770 42L772 39L774 28L777 25L779 25L778 38L775 44L780 38L783 38L781 35L782 26L788 26L791 22L797 29L795 20L790 17L790 15L792 14L795 15L800 12L801 14L802 11L805 10L808 12L809 19L812 23L812 16L816 9L821 6L825 -3L823 -4L829 -12L834 -6L836 -8L840 -6L831 15L832 19L836 15L845 -4L850 -9L851 -2L849 0L849 9L854 5L856 -3L860 -5L857 -8L857 -10L861 -15L870 -11L869 -5L864 0L869 0L867 11L868 14L875 -7L878 -7L886 1L888 -1L891 2L891 4L895 5L899 9L899 13L891 19L874 18L875 20L884 23L884 29L886 32L889 32L891 27L893 32L894 29L896 29L898 30L899 34L898 38L895 38L891 35L888 43L881 46L878 54L875 51L881 40L879 34L870 29L864 21L861 21L856 26L849 25L842 36L839 58L834 61L831 68L818 61L812 66L803 64L795 50L791 46L787 48L787 53L782 53zM603 270L602 271L602 268L604 269zM605 288L605 291L603 290L604 285L604 287zM888 29L886 30L886 26L889 28zM683 155L682 156L681 153L684 153zM643 207L641 206L647 203L647 206zM639 215L636 214L639 212L640 215zM814 -5L809 3L802 6L799 4L797 0L799 1L802 -1L808 -1L813 -6zM838 -16L844 -13L844 -11L838 -10L835 -13L836 -15zM816 4L815 9L812 11L812 13L810 13L808 8L810 5L812 6L815 3zM820 4L818 5L816 3L816 0L818 -3L818 -1L820 -1L821 1zM705 78L708 79L699 86L697 84L698 81L704 78zM695 90L693 92L694 86L696 84L696 88zM720 57L722 60L722 66L718 68L715 66L711 66L712 62L715 61L716 58L718 59L718 55L720 56zM772 15L774 18L776 18L775 20L772 19L770 15L771 14zM783 20L782 21L779 19L780 16L784 16zM766 20L767 22L770 22L770 24L767 29L765 29L762 32L761 37L753 37L752 36L756 30L760 28L759 27L764 20L766 14L766 17zM689 147L688 146L690 144L692 144L692 146zM688 143L687 142L690 139L690 142zM675 176L669 175L672 173L675 174zM746 36L748 38L749 37L753 43L751 45L751 49L746 49L741 55L740 53L738 53L740 51L740 44L741 42L745 43L745 41L743 40L744 38L746 38L746 36zM726 69L730 65L731 60L734 60L735 67L731 70L729 74L723 77L721 75L718 78L717 77L713 80L709 80L709 78L713 74L719 73L724 59L723 54L728 46L730 46L729 52L727 54L727 67zM445 -6L443 -6L450 -12L452 -16L456 -18L456 -13L449 -9z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#a76c55" fill-opacity="0.9" fill-rule="evenodd" d="M615 482L611 480L613 474L609 472L607 473L605 469L603 470L601 468L600 470L597 469L597 471L593 469L590 470L586 467L590 466L596 469L593 467L595 466L592 462L599 451L601 441L605 441L610 435L614 433L625 432L627 435L629 435L627 447L623 448L623 450L627 451L627 453L623 458L624 461L617 461L615 463L618 469L616 473L617 474L614 477L616 479zM595 470L593 473L585 472L585 470L594 471zM619 431L617 431L619 430zM614 432L611 431L614 431zM605 434L603 436L604 434zM608 433L606 433L611 432zM603 439L601 440L603 437zM592 464L592 466L590 464zM624 429L624 428z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#83564c" fill-opacity="0.9" fill-rule="evenodd" d="M765 603L769 608L779 613L775 615L776 617L774 619L772 619L772 617L768 620L766 624L767 629L757 619L757 611L759 611L759 607L763 607L764 605L762 603L765 603z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#876a4a" fill-opacity="0.9" fill-rule="evenodd" d="M850 525L852 523L854 524L862 522L867 526L874 528L876 531L878 530L878 538L883 543L883 547L888 551L887 554L890 556L889 557L880 557L879 555L876 556L877 560L871 571L868 572L866 570L868 557L866 547L857 535L853 526L851 525z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#26343c" fill-opacity="0.9" fill-rule="evenodd" d="M632 599L631 600L632 599z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#9a5757" fill-opacity="0.9" fill-rule="evenodd" d="M713 717L710 716L712 716zM710 714L708 714L710 714z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#a06e3e" fill-opacity="0.9" fill-rule="evenodd" d="M792 623L800 621L809 630L808 636L806 639L797 640L792 644L783 643L780 638L781 629L783 628L783 626L792 623z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#667d9a" fill-opacity="0.9" fill-rule="evenodd" d="M617 493L618 497L621 500L619 504L616 505L613 503L614 502L612 497L615 492L617 493z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#768e48" fill-opacity="0.9" fill-rule="evenodd" d="M785 396L787 390L786 395zM806 414L805 410L807 405L804 402L804 400L796 400L788 395L789 392L786 380L793 375L798 373L807 373L809 375L811 374L824 376L829 373L832 377L838 379L846 387L850 389L848 394L852 396L850 399L846 399L840 405L838 414L840 418L838 418L837 415L832 419L830 418L827 422L815 423L814 418L807 413z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#4e6f92" fill-opacity="0.9" fill-rule="evenodd" d="M656 546L655 542L656 545z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#895353" fill-opacity="0.9" fill-rule="evenodd" d="M850 388L847 387L839 379L832 377L830 373L825 376L798 373L786 380L786 368L794 349L804 346L812 359L816 361L819 361L825 354L823 344L824 342L833 338L834 340L835 339L843 343L845 347L849 350L852 348L860 350L860 352L864 355L861 364L863 364L867 370L868 378L864 380L861 385L855 385L850 388z"></path><path class="leaflet-interactive" stroke="#ffffff" stroke-opacity="1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="#ff5967" fill-opacity="0.9" fill-rule="evenodd" d="M778 614L782 611L781 608L784 607L791 614L790 615L795 616L792 623L790 623L789 625L783 625L782 629L781 624L777 621L775 616L777 614z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#4d8d63" fill-opacity="0.9" fill-rule="evenodd" d="M627 564L630 565L638 563L639 559L642 556L644 561L647 562L649 566L649 563L652 560L652 555L654 555L656 558L659 557L661 559L662 553L666 554L666 549L669 549L671 551L675 547L681 547L685 545L688 552L703 555L699 558L699 560L702 561L700 563L701 566L705 569L704 570L702 567L697 567L694 570L689 572L690 571L688 571L686 573L686 576L689 580L689 582L687 582L686 584L688 592L701 602L706 616L712 623L720 628L729 627L731 629L728 632L728 634L751 647L756 651L757 657L754 659L750 652L746 652L743 651L743 649L741 649L738 652L735 659L736 662L742 666L742 673L740 672L736 674L736 679L732 682L730 686L726 687L725 683L731 672L726 657L717 653L718 651L716 647L711 648L711 645L707 645L703 638L695 638L678 621L674 620L674 618L667 610L663 596L653 590L647 589L644 590L639 597L632 599L634 593L626 591L625 587L627 582L625 582L622 578L628 576L627 571L624 568L624 566L626 565zM689 628L688 628zM689 597L688 597zM665 613L666 616L662 614L665 614zM706 646L705 645L706 646zM684 704L684 703zM724 683L720 689L719 695L721 699L718 705L713 704L708 699L705 699L697 693L690 691L689 689L692 683L693 685L699 683L703 686L710 686L716 683L719 684L725 682zM657 643L659 649L657 653L656 668L650 668L650 671L648 673L644 671L643 668L644 659L640 645L641 643L645 644L649 640L651 640L651 638L655 639L656 643zM643 670L643 672L643 670zM641 641L640 642L642 641z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#56895f" fill-opacity="0.9" fill-rule="evenodd" d="M434 423L430 422L434 421zM465 400L463 401L462 405L457 408L459 410L454 412L461 419L464 419L467 413L471 420L477 420L475 422L477 428L478 442L475 452L473 453L475 454L469 456L468 454L467 456L462 457L455 462L451 461L452 464L447 467L436 469L435 468L438 465L432 465L438 461L429 463L429 461L434 457L429 456L431 454L436 454L434 451L437 449L447 446L434 448L439 444L441 438L445 436L439 436L435 434L436 433L432 432L432 430L435 429L434 426L438 425L438 423L434 424L435 419L434 420L434 418L432 418L433 416L436 415L449 417L449 414L454 410L447 408L452 404L451 402L453 399L458 398L460 396L460 402L462 401L462 396L464 396L463 394L468 397L465 399z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#52789f" fill-opacity="0.9" fill-rule="evenodd" d="M370 138L374 137L377 134L380 134L375 141L376 143L380 144L378 151L383 150L384 154L382 156L386 154L392 158L390 162L392 165L390 167L393 169L390 172L388 178L386 180L384 179L381 187L376 191L364 195L358 202L354 202L344 206L343 210L340 210L340 212L335 214L328 213L322 210L317 210L314 206L315 203L313 205L306 200L304 202L289 202L288 197L289 196L291 199L297 196L299 191L303 188L297 190L297 185L301 182L300 181L298 184L295 184L293 182L294 180L291 177L281 177L276 179L274 175L283 172L284 173L287 171L298 171L299 167L296 169L291 167L298 161L297 159L293 159L292 157L289 156L286 156L275 161L269 158L271 155L276 157L273 151L278 153L282 151L277 151L276 149L279 148L276 144L280 144L280 139L285 142L286 145L288 143L290 145L290 148L292 147L292 143L286 139L287 137L291 137L284 135L286 132L292 132L305 147L304 152L301 152L304 156L303 159L305 159L307 165L310 155L311 154L314 157L315 155L316 142L318 142L323 150L326 151L326 143L332 139L341 152L339 140L343 140L346 145L348 145L352 139L355 141L359 139L359 132L362 130L365 130L368 133L369 137z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#8d684d" fill-opacity="0.9" fill-rule="evenodd" d="M799 523L804 528L806 528L807 531L799 536L793 546L793 549L791 551L792 552L789 554L787 559L784 559L782 561L770 560L767 563L759 565L757 567L751 567L744 563L733 552L733 550L730 549L735 545L734 540L736 540L737 538L736 536L734 536L736 534L740 535L741 530L744 530L749 534L757 534L760 533L762 529L766 529L770 526L773 528L778 525L782 520L790 520L795 524L799 523z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#4d82a4" fill-opacity="0.9" fill-rule="evenodd" d="M864 707L864 706zM782 680L784 684L783 685L779 681L781 679zM785 689L786 690L784 691L782 688L784 688zM782 677L782 674L783 677zM783 681L783 679L783 681zM775 665L776 666L771 661L773 659L773 663L775 665zM813 672L814 674L821 676L823 683L827 686L822 684L822 682L817 680L812 674L807 673L812 671zM818 670L816 670L815 668zM819 669L820 667L819 668zM828 674L827 675L825 673L827 673zM829 647L826 647L827 645L829 647zM815 687L813 687L815 686zM809 712L808 709L810 711zM856 722L855 720L857 717L857 722zM854 701L853 700L855 701zM854 704L857 702L855 704zM838 701L836 701L837 697L838 700zM835 699L833 699L835 699zM837 709L836 710L837 708zM836 705L836 704zM852 689L855 690L849 690L851 689zM843 693L844 691L847 691L845 692zM841 703L843 702zM848 706L846 706L848 706zM824 692L823 693L825 691zM825 695L824 696L824 694L826 694zM826 704L824 705L825 704zM831 693L831 695L830 693zM831 689L828 687L829 686L831 689zM834 692L832 691L834 691zM828 701L829 701zM844 683L843 684L843 681L841 679L843 677L845 679L844 683zM847 667L850 671L849 670L848 672L844 670L846 669L844 670L841 668L847 666zM839 650L838 651L837 649L839 650zM836 657L836 660L832 659L832 657L837 656zM836 694L835 693L837 694zM826 699L826 698zM864 715L862 715L862 712L868 708L866 713L867 714L865 714zM818 721L821 720L821 722L824 723L840 724L841 727L846 724L846 728L829 729L825 726L815 725L815 721L817 721L817 719L818 721zM846 631L850 634L850 636L847 638L847 642L843 646L841 644L833 642L829 644L825 642L821 646L817 645L819 651L824 654L819 651L817 652L820 655L820 657L816 653L814 653L816 657L813 657L812 653L808 651L808 648L804 649L804 655L812 667L811 670L811 668L807 668L809 671L804 673L812 676L816 681L820 682L821 689L820 691L814 685L809 687L814 694L811 696L809 693L806 692L806 695L810 703L809 705L811 708L809 708L806 703L804 703L803 708L798 700L796 704L793 699L794 696L788 688L791 683L792 684L795 681L797 681L808 687L807 685L811 684L802 680L787 680L783 672L788 672L783 671L778 667L775 661L776 662L779 659L779 656L782 655L786 648L785 645L791 643L792 644L800 639L804 640L806 639L806 637L826 633L827 635L834 638L842 637L845 635L845 630z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#3e78a0" fill-opacity="0.9" fill-rule="evenodd" d="M655 538L651 535L648 536L645 534L643 534L643 536L645 536L633 536L633 529L640 513L634 512L632 510L627 511L626 509L625 510L622 508L619 504L621 500L616 493L619 490L619 486L617 486L618 485L615 482L616 479L614 477L617 475L616 474L618 469L615 463L617 461L624 461L623 458L627 454L623 447L627 447L629 441L629 435L627 433L629 428L638 427L640 430L639 431L640 432L641 429L644 433L644 425L652 424L657 430L652 423L648 422L648 416L645 415L645 413L649 412L646 403L652 405L656 404L660 406L661 410L659 412L669 415L672 414L673 416L670 420L671 421L677 422L681 418L685 418L690 412L694 413L700 418L703 418L705 424L709 426L711 437L708 443L713 449L715 457L713 462L715 466L714 467L717 469L718 473L715 481L712 477L710 477L709 478L711 479L695 486L695 488L692 487L685 491L689 496L688 500L691 505L704 516L704 520L700 520L700 523L692 528L696 536L695 539L691 535L686 535L676 540L672 540L668 537L663 542L663 540L659 537L656 538zM703 414L703 416L697 415L697 411L700 407L703 411L702 413zM709 422L709 424L705 423L704 420L707 420zM675 413L673 412L675 411L675 413zM642 406L641 403L643 400L642 404L645 404L642 405zM645 407L643 407L645 407z"></path><path class="leaflet-interactive" stroke="#ffffff" stroke-opacity="1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="#ff5967" fill-opacity="0.9" fill-rule="evenodd" d="M655 614L656 624L652 635L647 632L648 631L646 630L647 628L645 628L646 626L644 623L646 622L645 621L647 617L651 615L652 616L654 611L655 613zM634 537L632 537L630 540L628 538L626 539L625 544L620 548L620 551L617 553L617 557L615 560L618 560L620 556L624 556L624 560L627 564L624 566L624 568L627 571L628 576L622 578L625 582L627 582L625 586L626 590L634 594L632 598L623 605L622 608L617 610L613 610L612 608L609 608L604 604L600 605L591 602L584 608L582 612L582 617L584 620L581 619L571 621L566 619L566 617L555 613L554 616L547 616L544 614L540 614L539 612L530 610L531 607L527 605L530 602L533 586L535 584L533 584L533 577L535 571L538 573L540 579L539 573L533 567L535 567L534 558L527 555L523 549L524 546L522 544L524 542L526 543L525 541L520 542L518 538L515 538L515 536L513 537L511 535L497 532L497 530L494 529L498 527L495 526L496 525L499 525L496 523L493 524L493 522L495 519L505 518L510 515L513 516L516 521L519 519L524 520L526 518L531 519L529 516L529 509L526 502L531 500L533 501L534 506L547 507L552 505L548 504L549 500L563 494L565 490L566 479L576 475L577 481L581 481L589 489L593 489L595 496L599 496L602 492L602 499L604 499L610 504L617 504L621 506L624 510L632 510L634 512L639 513L640 515L636 519L633 529L633 536zM534 565L533 566L531 562L532 563z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#26343c" fill-opacity="0.9" fill-rule="evenodd" d="M774 287L776 287L778 290L772 294L771 290L772 289L772 291L772 287L774 287zM771 291L770 292L770 290zM782 295L779 294L781 294z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#607e9f" fill-opacity="0.9" fill-rule="evenodd" d="M822 150L816 134L819 128L820 121L816 114L816 109L818 106L816 103L814 103L814 90L816 88L810 78L806 74L797 70L791 65L785 58L785 56L782 54L787 54L788 47L793 46L802 64L812 66L817 64L818 61L831 68L834 61L839 58L843 34L849 26L855 26L861 21L863 21L870 29L879 34L881 40L875 50L877 54L870 58L874 59L871 70L873 80L881 84L888 96L888 100L883 106L878 117L890 152L885 155L886 156L884 165L886 166L886 168L884 173L885 176L890 179L888 184L890 189L894 192L894 198L888 205L903 220L906 227L902 237L884 261L862 284L859 285L855 283L854 285L849 286L849 281L847 286L843 285L843 287L840 289L839 288L825 295L812 297L809 300L808 299L811 296L808 291L805 295L803 295L802 294L804 291L804 287L791 281L790 271L793 258L789 249L790 240L788 238L787 233L791 223L793 223L792 219L796 219L801 216L800 213L803 207L806 207L814 197L816 197L826 177L831 175L834 176L835 174L835 159L830 154L828 154L827 149L825 151L823 150zM797 288L795 287L795 285L797 287zM788 218L791 218L789 220L788 217zM799 287L802 289L801 292L798 289L799 287zM791 283L790 284L789 282zM795 292L794 293L796 291zM793 293L791 293L793 292zM830 172L828 173L827 171L831 170L830 171z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#4f7893" fill-opacity="0.9" fill-rule="evenodd" d="M858 350L854 348L849 350L843 344L835 339L824 343L826 332L825 331L821 334L817 332L814 325L816 323L814 323L814 314L821 311L824 307L827 308L830 306L836 306L838 304L854 308L864 309L866 307L867 309L864 312L863 317L859 321L860 335L863 342L860 344L858 349zM804 326L807 326L812 329L806 334L800 336L800 339L798 341L797 340L799 337L796 334L796 329L804 326zM808 322L806 322L803 325L802 321L798 319L803 318L804 316L808 318L809 322zM813 328L809 326L810 325L813 327z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#26343c" fill-opacity="0.9" fill-rule="evenodd" d="M472 253L471 254L469 252L470 251L472 253zM471 262L468 258L471 261zM465 245L467 247L465 248L463 245L465 245zM472 243L471 246L469 246L471 249L470 250L465 242L470 242zM474 242L474 244L472 243L472 240L473 241z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#a65353" fill-opacity="0.9" fill-rule="evenodd" d="M690 386L690 388L686 391L688 396L685 398L684 405L682 406L680 398L675 397L674 390L672 387L675 387L679 382L681 388L683 385L682 382L686 379L690 380L690 383zM658 405L646 403L645 393L640 390L640 369L645 371L648 366L650 365L652 367L651 360L649 361L647 367L643 368L641 364L645 359L653 358L656 356L660 349L664 348L667 345L667 356L664 361L664 369L666 371L670 371L671 374L669 377L664 377L663 384L660 385L661 386L656 392L657 397L655 401L657 401L657 403zM668 389L670 398L668 401L666 401L660 397L659 391L668 389zM676 404L680 405L681 408L677 409L673 406L673 404L675 403zM669 406L668 405L671 401L671 398L669 406zM690 402L686 404L685 403L687 400L689 402zM691 390L689 389L691 389zM666 405L663 403L667 404zM661 404L658 400L661 403zM668 386L667 383L668 385zM673 356L671 355L673 355zM719 401L714 400L714 397L715 396L719 400z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#526f9c" fill-opacity="0.9" fill-rule="evenodd" d="M761 504L754 508L749 515L742 515L740 520L736 516L730 517L722 513L717 513L717 516L714 518L714 520L708 520L691 505L688 500L689 497L685 491L686 490L687 492L690 488L694 488L699 484L709 480L710 477L712 477L715 481L717 477L719 477L722 481L727 482L729 484L732 483L734 485L731 488L736 493L740 491L740 488L742 488L745 491L749 490L747 493L755 497L758 497L761 503z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#526e9e" fill-opacity="0.9" fill-rule="evenodd" d="M701 571L705 573L710 572L713 569L716 572L722 572L721 568L725 566L724 561L732 557L733 554L738 556L745 564L750 567L757 567L762 564L762 570L764 571L764 574L768 576L765 576L763 581L756 577L742 577L739 575L735 576L732 579L729 576L727 576L726 582L731 588L731 592L743 604L745 608L748 610L748 612L739 605L728 602L720 593L719 591L723 591L717 586L716 578L711 574L709 575L706 582L703 580L701 572zM736 611L743 612L737 612zM743 609L734 608L735 607L741 609zM738 607L734 606L739 606zM720 594L718 593zM716 580L711 578L713 576L715 578zM716 583L714 583L715 582zM720 590L715 585L720 590zM720 597L716 593L717 594zM722 596L723 597L721 595zM712 585L710 577L712 580L712 584zM747 615L749 616L745 614zM757 618L758 620L750 614L741 611L749 613L756 617z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#68804e" fill-opacity="0.9" fill-rule="evenodd" d="M866 627L861 628L857 625L849 627L849 629L844 631L845 635L842 637L834 638L827 635L826 633L808 637L809 631L807 627L801 622L803 620L802 614L805 613L808 610L808 608L803 603L801 598L804 592L806 592L809 594L807 597L808 598L811 597L837 601L845 595L855 593L864 596L868 599L872 599L871 605L867 605L864 611L864 615L860 619L865 626z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#526b99" fill-opacity="0.9" fill-rule="evenodd" d="M767 581L765 591L770 595L767 596L769 602L763 603L763 607L762 606L759 608L759 611L757 611L757 618L749 612L747 612L748 611L745 608L744 604L737 599L731 592L731 588L726 583L726 579L728 576L732 579L735 576L739 575L742 577L750 578L756 577L763 582L767 581z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#82713d" fill-opacity="0.9" fill-rule="evenodd" d="M595 470L600 470L601 468L603 470L604 469L607 473L609 472L613 474L611 480L617 483L617 486L619 486L619 490L612 497L614 501L613 503L610 504L604 499L602 499L602 493L599 496L595 496L593 489L589 489L587 486L584 485L582 481L577 481L576 475L581 472L585 470L586 473L593 473L595 471z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#26343c" fill-opacity="0.9" fill-rule="evenodd" d="M908 457L899 458L894 466L896 471L895 472L893 472L889 468L880 470L878 466L875 467L874 469L872 467L864 466L862 469L861 466L857 466L855 463L854 464L840 460L824 461L822 465L816 466L816 468L816 459L811 454L813 449L819 446L818 435L814 422L829 422L830 418L832 419L837 415L837 417L840 418L838 414L840 410L840 405L846 399L850 399L850 397L852 396L848 395L850 389L854 385L861 386L864 380L867 378L875 383L876 381L880 382L882 387L887 385L894 386L899 391L899 401L897 406L901 409L904 417L909 420L908 425L913 425L919 432L919 434L916 435L913 439L907 436L904 437L903 439L906 444L906 453L908 457z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#9b5558" fill-opacity="0.9" fill-rule="evenodd" d="M655 542L657 539L656 538L658 537L664 542L668 537L672 540L676 540L679 537L687 535L691 535L695 539L696 536L692 529L693 527L699 524L700 520L703 521L705 517L707 520L714 520L714 518L717 517L717 513L721 513L730 517L735 516L740 519L739 523L742 530L740 535L736 534L734 536L736 536L737 538L734 541L734 546L729 550L729 552L726 551L723 553L716 553L713 557L688 552L685 548L686 545L681 547L675 547L671 551L665 547L661 549L658 546L656 546L656 542z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#665b8d" fill-opacity="0.9" fill-rule="evenodd" d="M566 619L564 620L563 617L567 618z"></path><path class="leaflet-interactive" stroke="#162b35" stroke-opacity="1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#8f4c50" fill-opacity="0.9" fill-rule="evenodd" d="M767 629L766 624L771 617L773 619L775 618L781 624L780 638L783 643L786 644L786 648L783 651L782 655L778 657L779 659L776 662L773 656L769 654L767 651L769 638L768 635L770 632L769 629z"></path></g></svg></div><div class="leaflet-pane leaflet-shadow-pane"></div><div class="leaflet-pane leaflet-marker-pane"></div><div class="leaflet-pane leaflet-tooltip-pane"></div><div class="leaflet-pane leaflet-popup-pane"></div><div class="leaflet-proxy leaflet-zoom-animated" style="transform: translate3d(2166.5px, 1368px, 0px) scale(8);"></div></div><div class="leaflet-control-container"><div class="leaflet-top leaflet-left"></div><div class="leaflet-top leaflet-right"></div><div class="leaflet-bottom leaflet-left"></div><div class="leaflet-bottom leaflet-right"><div class="leaflet-control-attribution leaflet-control"><a href="https://leafletjs.com" title="A JavaScript library for interactive maps"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" class="leaflet-attribution-flag"><path fill="#4C7BE1" d="M0 0h12v4H0z"></path><path fill="#FFD500" d="M0 4h12v3H0z"></path><path fill="#E0BC00" d="M0 7h12v1H0z"></path></svg> Leaflet</a></div></div></div></div>
-
-    <div class="topbar">
-
-        <div class="brand">
-            ATLAS // CONQUEST
-        </div>
-
-        <div class="resources">
-
-            <div class="resource">
-                <div class="resource-label">TREASURY</div>
-                <div class="resource-value">
-                    💰 <span id="moneyTop">1000</span>
-                </div>
-            </div>
-
-            <div class="resource">
-                <div class="resource-label">MANPOWER</div>
-                <div class="resource-value">
-                    👥 <span id="manpowerTop">100K</span>
-                </div>
-            </div>
-
-            <div class="resource">
-                <div class="resource-label">MILITARY</div>
-                <div class="resource-value">
-                    ⚔ <span id="militaryTop">20</span>
-                </div>
-            </div>
-
-        </div>
-
+  <div class="topbar">
+    <div class="brand">IRON <span>//</span> NATIONS</div>
+    <div class="resources">
+      <div class="resource">
+        <div class="resource-label">TREASURY</div>
+        <div class="resource-value">💰 <span id="moneyTop">1000</span></div>
+      </div>
+      <div class="resource">
+        <div class="resource-label">MANPOWER</div>
+        <div class="resource-value">👥 <span id="manpowerTop">100K</span></div>
+      </div>
+      <div class="resource">
+        <div class="resource-label">MILITARY</div>
+        <div class="resource-value">⚔ <span id="militaryTop">20</span></div>
+      </div>
     </div>
+  </div>
 
-    <div class="datebox">
+  <div class="datebox">
+    <div class="date-year" id="mapYear">2026</div>
+    <div class="date-month" id="mapMonth">JANUARY</div>
+  </div>
 
-        <div class="date-year" id="mapYear">
-            2026
-        </div>
+  <div class="map-controls">
+    <button onclick="zoomMap(1)">+</button>
+    <button onclick="zoomMap(-1)">−</button>
+    <button onclick="resetMap()">⌂</button>
+  </div>
 
-        <div class="date-month" id="mapMonth">
-            JANUARY
-        </div>
-
-    </div>
-
-    <div class="map-controls">
-
-        <button onclick="zoomMap(1)">+</button>
-
-        <button onclick="zoomMap(-1)">−</button>
-
-        <button onclick="resetMap()">⌂</button>
-
-    </div>
-
-    <div id="message">Karte geladen — wähle eine Nation.</div>
-
+  <div id="message">Karte geladen — wähle eine Nation.</div>
 </main>
 
-
-<!-- RIGHT -->
-
 <aside id="right">
+  <div class="panel-title">YOUR NATION</div>
+  <div class="box">
+    <div class="flag" id="flag">🌐</div>
+    <div class="nation-name" id="nationName">No Nation</div>
+    <div class="stat"><span>Population</span><span id="population" class="value">10M</span></div>
+    <div class="stat"><span>Treasury</span><span id="money" class="value">1000</span></div>
+    <div class="stat"><span>Manpower</span><span id="manpower" class="value">100K</span></div>
+    <div class="stat"><span>Military Power</span><span id="military" class="value">20</span></div>
+    <div class="stat"><span>Territories</span><span id="territories" class="value">1</span></div>
+  </div>
 
-    <div class="panel-title">
-        YOUR NATION
-    </div>
+  <div class="box">
+    <div class="panel-title">NATIONAL ACTIONS</div>
+    <button class="action" onclick="collectTaxes()">💰 COLLECT TAXES</button>
+    <button class="action" onclick="recruit()">🪖 RECRUIT ARMY</button>
+    <button class="action" onclick="buildFactory()">🏭 BUILD FACTORY</button>
+    <button class="action war" onclick="declareWar()">⚔ DECLARE WAR</button>
+  </div>
 
-    <div class="box">
+  <div class="box">
+    <div class="panel-title">ECONOMY</div>
+    <div class="stat"><span>Factories</span><span id="factories" class="value">0</span></div>
+    <div class="stat"><span>Monthly Income</span><span id="income" class="value green">50</span></div>
+    <div class="stat"><span>Tax Rate</span><span class="value">20%</span></div>
+  </div>
 
-        <div class="flag" id="flag">🌐</div>
-
-        <div class="nation-name" id="nationName">No Nation</div>
-
-        <div class="stat">
-            <span>Population</span>
-            <span id="population" class="value">10M</span>
-        </div>
-
-        <div class="stat">
-            <span>Treasury</span>
-            <span id="money" class="value">1000</span>
-        </div>
-
-        <div class="stat">
-            <span>Manpower</span>
-            <span id="manpower" class="value">100K</span>
-        </div>
-
-        <div class="stat">
-            <span>Military Power</span>
-            <span id="military" class="value">20</span>
-        </div>
-
-        <div class="stat">
-            <span>Territories</span>
-            <span id="territories" class="value">1</span>
-        </div>
-
-    </div>
-
-
-    <div class="box">
-
-        <div class="panel-title">
-            NATIONAL ACTIONS
-        </div>
-
-        <button class="action" onclick="collectTaxes()">
-            💰 COLLECT TAXES
-        </button>
-
-        <button class="action" onclick="recruit()">
-            🪖 RECRUIT ARMY
-        </button>
-
-        <button class="action" onclick="buildFactory()">
-            🏭 BUILD FACTORY
-        </button>
-
-        <button class="action war" onclick="declareWar()">
-            ⚔ DECLARE WAR
-        </button>
-
-    </div>
-
-
-    <div class="box">
-
-        <div class="panel-title">
-            ECONOMY
-        </div>
-
-        <div class="stat">
-            <span>Factories</span>
-            <span id="factories" class="value">0</span>
-        </div>
-
-        <div class="stat">
-            <span>Monthly Income</span>
-            <span id="income" class="value green">50</span>
-        </div>
-
-        <div class="stat">
-            <span>Tax Rate</span>
-            <span class="value">20%</span>
-        </div>
-
-    </div>
-
-
-    <div class="box">
-
-        <div class="panel-title">
-            SELECTED TARGET
-        </div>
-
-        <div id="target"><span class="small">
-            Click a country on the map.
-        </span></div>
-
-    </div>
-
+  <div class="box">
+    <div class="panel-title">SELECTED TARGET</div>
+    <div id="target"><span class="small">Click a country on the map.</span></div>
+  </div>
 </aside>
 
 </div>
 
-
-<!-- MODAL -->
-
 <div class="modal-bg" id="modal">
-
-    <div class="modal">
-
-        <div class="modal-header">
-
-            <h2 id="modalTitle">
-                Atlas
-            </h2>
-
-            <div class="close" onclick="closeModal()">
-                ✕
-            </div>
-
-        </div>
-
-        <div id="modalContent"></div>
-
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modalTitle">Iron Nations</h2>
+      <div class="close" onclick="closeModal()">✕</div>
     </div>
-
+    <div id="modalContent"></div>
+  </div>
 </div>
 
-
-<!-- LEAFLET -->
-
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <script>
-
-/* =====================================================
-   REAL EUROPE MAP
-===================================================== */
-
-const map = L.map("map", {
-
-    zoomControl:false,
-
-    attributionControl:true,
-
-    minZoom:3,
-
-    maxZoom:8,
-
-    worldCopyJump:false
-
-});
-
-
-/* Europa */
-
-map.setView(
-    [51.2,10.5],
-    4
+/* ============================================================
+   KARTE — BUGFIX
+   ------------------------------------------------------------
+   Fix: maxBounds + worldCopyJump + maxBoundsViscosity
+   verhindern, dass die Welt mehrfach nebeneinander gerendert
+   wird (der doppelte Skandinavien/Frankreich-Bug).
+============================================================ */
+const EUROPE_CENTER = [50.5, 14];
+const EUROPE_BOUNDS = L.latLngBounds(
+  L.latLng(33, -25),   // Südwest
+  L.latLng(72, 45)     // Nordost
 );
 
-
-/* =====================================================
-   COUNTRY DATA
-===================================================== */
-
-const countryData = {
-
-    DEU:{
-        name:"Germany",
-        german:"Deutschland",
-        flag:"🇩🇪",
-        color:"#3e78a0",
-        population:84,
-        military:80
-    },
-
-    FRA:{
-        name:"France",
-        german:"Frankreich",
-        flag:"🇫🇷",
-        color:"#4d659b",
-        population:68,
-        military:85
-    },
-
-    POL:{
-        name:"Poland",
-        german:"Polen",
-        flag:"🇵🇱",
-        color:"#a85b5b",
-        population:38,
-        military:70
-    },
-
-    ESP:{
-        name:"Spain",
-        german:"Spanien",
-        flag:"🇪🇸",
-        color:"#a18443",
-        population:48,
-        military:55
-    },
-
-    ITA:{
-        name:"Italy",
-        german:"Italien",
-        flag:"🇮🇹",
-        color:"#4d8d63",
-        population:59,
-        military:60
-    },
-
-    GBR:{
-        name:"United Kingdom",
-        german:"Vereinigtes Königreich",
-        flag:"🇬🇧",
-        color:"#4d6199",
-        population:69,
-        military:75
-    },
-
-    NLD:{
-        name:"Netherlands",
-        german:"Niederlande",
-        flag:"🇳🇱",
-        color:"#a76c55",
-        population:18,
-        military:25
-    },
-
-    BEL:{
-        name:"Belgium",
-        german:"Belgien",
-        flag:"🇧🇪",
-        color:"#82713d",
-        population:12,
-        military:20
-    },
-
-    AUT:{
-        name:"Austria",
-        german:"Österreich",
-        flag:"🇦🇹",
-        color:"#9b5558",
-        population:9,
-        military:20
-    },
-
-    CZE:{
-        name:"Czechia",
-        german:"Tschechien",
-        flag:"🇨🇿",
-        color:"#526f9c",
-        population:11,
-        military:25
-    },
-
-    DNK:{
-        name:"Denmark",
-        german:"Dänemark",
-        flag:"🇩🇰",
-        color:"#a65353",
-        population:6,
-        military:15
-    },
-
-    SWE:{
-        name:"Sweden",
-        german:"Schweden",
-        flag:"🇸🇪",
-        color:"#748f42",
-        population:11,
-        military:30
-    },
-
-    NOR:{
-        name:"Norway",
-        german:"Norwegen",
-        flag:"🇳🇴",
-        color:"#8e5050",
-        population:6,
-        military:20
-    },
-
-    FIN:{
-        name:"Finland",
-        german:"Finnland",
-        flag:"🇫🇮",
-        color:"#607e9f",
-        population:6,
-        military:25
-    },
-
-    UKR:{
-        name:"Ukraine",
-        german:"Ukraine",
-        flag:"🇺🇦",
-        color:"#a98c3d",
-        population:37,
-        military:65
-    },
-
-    ROU:{
-        name:"Romania",
-        german:"Rumänien",
-        flag:"🇷🇴",
-        color:"#79669b",
-        population:19,
-        military:35
-    },
-
-    HUN:{
-        name:"Hungary",
-        german:"Ungarn",
-        flag:"🇭🇺",
-        color:"#8d684d",
-        population:10,
-        military:25
-    },
-
-    GRC:{
-        name:"Greece",
-        german:"Griechenland",
-        flag:"🇬🇷",
-        color:"#4d82a4",
-        population:10,
-        military:25
-    },
-
-    PRT:{
-        name:"Portugal",
-        german:"Portugal",
-        flag:"🇵🇹",
-        color:"#5d8c58",
-        population:10,
-        military:20
-    },
-
-    CHE:{
-        name:"Switzerland",
-        german:"Schweiz",
-        flag:"🇨🇭",
-        color:"#9c5555",
-        population:9,
-        military:15
-    },
-
-    SRB:{
-        name:"Serbia",
-        german:"Serbien",
-        flag:"🇷🇸",
-        color:"#755b91",
-        population:7,
-        military:25
-    },
-
-    HRV:{
-        name:"Croatia",
-        german:"Kroatien",
-        flag:"🇭🇷",
-        color:"#526e9e",
-        population:4,
-        military:15
-    },
-
-    BGR:{
-        name:"Bulgaria",
-        german:"Bulgarien",
-        flag:"🇧🇬",
-        color:"#68804e",
-        population:6,
-        military:20
-    },
-
-    SVK:{
-        name:"Slovakia",
-        german:"Slowakei",
-        flag:"🇸🇰",
-        color:"#626d99",
-        population:5,
-        military:15
-    },
-
-    SVN:{
-        name:"Slovenia",
-        german:"Slowenien",
-        flag:"🇸🇮",
-        color:"#5a809b",
-        population:2,
-        military:10
-    },
-
-    BIH:{
-        name:"Bosnia and Herzegovina",
-        german:"Bosnien und Herzegowina",
-        flag:"🇧🇦",
-        color:"#526b99",
-        population:3,
-        military:10
-    },
-
-    IRL:{
-        name:"Ireland",
-        german:"Irland",
-        flag:"🇮🇪",
-        color:"#56895f",
-        population:5,
-        military:10
-    },
-
-    ISL:{
-        name:"Iceland",
-        german:"Island",
-        flag:"🇮🇸",
-        color:"#52789f",
-        population:0.4,
-        military:5
-    },
-
-    LTU:{
-        name:"Lithuania",
-        german:"Litauen",
-        flag:"🇱🇹",
-        color:"#768e48",
-        population:3,
-        military:12
-    },
-
-    LVA:{
-        name:"Latvia",
-        german:"Lettland",
-        flag:"🇱🇻",
-        color:"#895353",
-        population:2,
-        military:10
-    },
-
-    EST:{
-        name:"Estonia",
-        german:"Estland",
-        flag:"🇪🇪",
-        color:"#4f7893",
-        population:1.3,
-        military:10
-    },
-
-    MDA:{
-        name:"Moldova",
-        german:"Moldau",
-        flag:"🇲🇩",
-        color:"#876a4a",
-        population:2.5,
-        military:8
-    },
-
-    ALB:{
-        name:"Albania",
-        german:"Albanien",
-        flag:"🇦🇱",
-        color:"#8f4c50",
-        population:2.7,
-        military:10
-    },
-
-    MKD:{
-        name:"North Macedonia",
-        german:"Nordmazedonien",
-        flag:"🇲🇰",
-        color:"#a06e3e",
-        population:1.8,
-        military:8
-    },
-
-    MNE:{
-        name:"Montenegro",
-        german:"Montenegro",
-        flag:"🇲🇪",
-        color:"#83564c",
-        population:0.6,
-        military:6
-    },
-
-    LUX:{
-        name:"Luxembourg",
-        german:"Luxemburg",
-        flag:"🇱🇺",
-        color:"#667d9a",
-        population:0.7,
-        military:4
-    },
-
-    AND:{
-        name:"Andorra",
-        german:"Andorra",
-        flag:"🇦🇩",
-        color:"#665b8d",
-        population:0.08,
-        military:2
-    },
-
-    LIE:{
-        name:"Liechtenstein",
-        german:"Liechtenstein",
-        flag:"🇱🇮",
-        color:"#4e6f92",
-        population:0.04,
-        military:1
-    },
-
-    MLT:{
-        name:"Malta",
-        german:"Malta",
-        flag:"🇲🇹",
-        color:"#9a5757",
-        population:0.6,
-        military:5
-    },
-
-    SMR:{
-        name:"San Marino",
-        german:"San Marino",
-        flag:"🇸🇲",
-        color:"#557d9b",
-        population:0.03,
-        military:1
-    },
-
-    VAT:{
-        name:"Vatican City",
-        german:"Vatikanstadt",
-        flag:"🇻🇦",
-        color:"#8d7650",
-        population:0.001,
-        military:1
-    }
-
-};
-
-
-/* =====================================================
-   PLAYER
-===================================================== */
-
-let player={
-
-    nation:null,
-
-    money:1000,
-
-    manpower:100,
-
-    military:20,
-
-    territories:1,
-
-    factories:0,
-
-    population:10,
-
-    income:50
-
-};
-
-
-let selectedEnemy=null;
-
-
-/* =====================================================
-   LEAFLET COUNTRY LAYERS
-===================================================== */
-
-const countryLayers={};
-
-const conqueredCountries=new Set();
-
-
-/* =====================================================
-   LOAD GEOJSON
-===================================================== */
-
-const GEOJSON_URL =
-    "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_admin_0_countries.geojson";
-
-
-fetch(GEOJSON_URL)
-
-.then(response=>{
-
-    if(!response.ok){
-
-        throw new Error(
-            "GeoJSON konnte nicht geladen werden."
-        );
-
-    }
-
-    return response.json();
-
-})
-
-.then(data=>{
-
-    L.geoJSON(data,{
-
-        filter:feature=>{
-
-            return feature.properties.CONTINENT==="Europe";
-
-        },
-
-        style:feature=>{
-
-            const iso=
-                getISO(feature);
-
-            return getCountryStyle(iso);
-
-        },
-
-        onEachFeature:(feature,layer)=>{
-
-            const iso=
-                getISO(feature);
-
-            if(!iso)return;
-
-
-            countryLayers[iso]=layer;
-
-
-            const info=
-                countryData[iso];
-
-
-            if(info){
-
-                layer.bindTooltip(
-
-                    info.flag+
-                    " "+
-                    info.german,
-
-                    {
-                        sticky:true,
-                        className:"country-label"
-                    }
-
-                );
-
-            }
-
-
-            layer.on({
-
-                mouseover:function(){
-
-                    const data=
-                        countryData[iso];
-
-                    if(!data)return;
-
-
-                    this.setStyle({
-
-                        weight:3,
-
-                        color:"#ffffff",
-
-                        fillOpacity:1
-
-                    });
-
-                },
-
-
-                mouseout:function(){
-
-                    refreshCountry(iso);
-
-                },
-
-
-                click:function(){
-
-                    selectRealCountry(iso);
-
-                }
-
-            });
-
-        }
-
-    }).addTo(map);
-
-
-    refreshAllCountries();
-
-
-    notify(
-        "Karte geladen — wähle eine Nation."
-    );
-
-})
-
-.catch(error=>{
-
-    console.error(error);
-
-    notify(
-        "Fehler beim Laden der Europakarte."
-    );
-
+const map = L.map("map", {
+  zoomControl: false,
+  attributionControl: true,
+  minZoom: 4,
+  maxZoom: 8,
+  maxBounds: EUROPE_BOUNDS,
+  maxBoundsViscosity: 1.0,   // Karte klebt an den Grenzen
+  worldCopyJump: false,      // aus — wir wollen keine Kopien
+  zoomSnap: 0.25,
+  zoomDelta: 0.5,
+  preferCanvas: true
 });
 
+map.setView(EUROPE_CENTER, 4.5);
 
-/* =====================================================
-   ISO HELPER
-===================================================== */
+/* ============================================================
+   COUNTRY DATA
+============================================================ */
+const countryData = {
+  DEU:{name:"Germany",german:"Deutschland",flag:"🇩🇪",color:"#3d6f96",population:84,military:80},
+  FRA:{name:"France",german:"Frankreich",flag:"🇫🇷",color:"#4a608f",population:68,military:85},
+  POL:{name:"Poland",german:"Polen",flag:"🇵🇱",color:"#9c5454",population:38,military:70},
+  ESP:{name:"Spain",german:"Spanien",flag:"🇪🇸",color:"#987a3d",population:48,military:55},
+  ITA:{name:"Italy",german:"Italien",flag:"🇮🇹",color:"#4a835c",population:59,military:60},
+  GBR:{name:"United Kingdom",german:"Vereinigtes Königreich",flag:"🇬🇧",color:"#4a5d92",population:69,military:75},
+  NLD:{name:"Netherlands",german:"Niederlande",flag:"🇳🇱",color:"#a3674f",population:18,military:25},
+  BEL:{name:"Belgium",german:"Belgien",flag:"🇧🇪",color:"#7c6b39",population:12,military:20},
+  AUT:{name:"Austria",german:"Österreich",flag:"🇦🇹",color:"#955052",population:9,military:20},
+  CZE:{name:"Czechia",german:"Tschechien",flag:"🇨🇿",color:"#4f6a94",population:11,military:25},
+  DNK:{name:"Denmark",german:"Dänemark",flag:"🇩🇰",color:"#9e4e4e",population:6,military:15},
+  SWE:{name:"Sweden",german:"Schweden",flag:"🇸🇪",color:"#6f8a3f",population:11,military:30},
+  NOR:{name:"Norway",german:"Norwegen",flag:"🇳🇴",color:"#8a4d4d",population:6,military:20},
+  FIN:{name:"Finland",german:"Finnland",flag:"🇫🇮",color:"#5c7996",population:6,military:25},
+  UKR:{name:"Ukraine",german:"Ukraine",flag:"🇺🇦",color:"#a1853b",population:37,military:65},
+  ROU:{name:"Romania",german:"Rumänien",flag:"🇷🇴",color:"#756294",population:19,military:35},
+  HUN:{name:"Hungary",german:"Ungarn",flag:"🇭🇺",color:"#87624a",population:10,military:25},
+  GRC:{name:"Greece",german:"Griechenland",flag:"🇬🇷",color:"#4a7d9c",population:10,military:25},
+  PRT:{name:"Portugal",german:"Portugal",flag:"🇵🇹",color:"#5a8756",population:10,military:20},
+  CHE:{name:"Switzerland",german:"Schweiz",flag:"🇨🇭",color:"#955050",population:9,military:15},
+  SRB:{name:"Serbia",german:"Serbien",flag:"🇷🇸",color:"#70568a",population:7,military:25},
+  HRV:{name:"Croatia",german:"Kroatien",flag:"🇭🇷",color:"#4f6a94",population:4,military:15},
+  BGR:{name:"Bulgaria",german:"Bulgarien",flag:"🇧🇬",color:"#637a4a",population:6,military:20},
+  SVK:{name:"Slovakia",german:"Slowakei",flag:"🇸🇰",color:"#5e6892",population:5,military:15},
+  SVN:{name:"Slovenia",german:"Slowenien",flag:"🇸🇮",color:"#567a94",population:2,military:10},
+  BIH:{name:"Bosnia and Herzegovina",german:"Bosnien und Herzegowina",flag:"🇧🇦",color:"#4f6792",population:3,military:10},
+  IRL:{name:"Ireland",german:"Irland",flag:"🇮🇪",color:"#52855a",population:5,military:10},
+  ISL:{name:"Iceland",german:"Island",flag:"🇮🇸",color:"#4f7396",population:0.4,military:5},
+  LTU:{name:"Lithuania",german:"Litauen",flag:"🇱🇹",color:"#718a44",population:3,military:12},
+  LVA:{name:"Latvia",german:"Lettland",flag:"🇱🇻",color:"#835050",population:2,military:10},
+  EST:{name:"Estonia",german:"Estland",flag:"🇪🇪",color:"#4b7390",population:1.3,military:10},
+  MDA:{name:"Moldova",german:"Moldau",flag:"🇲🇩",color:"#816446",population:2.5,military:8},
+  ALB:{name:"Albania",german:"Albanien",flag:"🇦🇱",color:"#894a4e",population:2.7,military:10},
+  MKD:{name:"North Macedonia",german:"Nordmazedonien",flag:"🇲🇰",color:"#9a6a3b",population:1.8,military:8},
+  MNE:{name:"Montenegro",german:"Montenegro",flag:"🇲🇪",color:"#7d5248",population:0.6,military:6},
+  LUX:{name:"Luxembourg",german:"Luxemburg",flag:"🇱🇺",color:"#627894",population:0.7,military:4},
+  MLT:{name:"Malta",german:"Malta",flag:"🇲🇹",color:"#945454",population:0.6,military:5}
+};
 
-function getISO(feature){
+/* ============================================================
+   PLAYER
+============================================================ */
+let player = {
+  nation: null,
+  money: 1000,
+  manpower: 100,
+  military: 20,
+  territories: 1,
+  factories: 0,
+  population: 10,
+  income: 50
+};
 
-    const p=
-        feature.properties || {};
+let selectedEnemy = null;
+const countryLayers = {};
+const conqueredCountries = new Set();
 
-    let iso=
-        p.ISO_A3 ||
-        p.ADM0_A3 ||
-        p.SOV_A3;
+/* ============================================================
+   GEOJSON LADEN
+============================================================ */
+const GEOJSON_URL =
+  "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_admin_0_countries.geojson";
 
-    if(!iso)return null;
+fetch(GEOJSON_URL)
+  .then(r => {
+    if (!r.ok) throw new Error("GeoJSON konnte nicht geladen werden.");
+    return r.json();
+  })
+  .then(data => {
+    L.geoJSON(data, {
+      filter: f => f.properties.CONTINENT === "Europe",
+      style: f => getCountryStyle(getISO(f)),
+      onEachFeature: (feature, layer) => {
+        const iso = getISO(feature);
+        if (!iso) return;
+        countryLayers[iso] = layer;
 
-    /*
-       Natural Earth kann bei manchen
-       Ländern Sondercodes verwenden.
-    */
+        const info = countryData[iso];
+        if (info) {
+          layer.bindTooltip(info.flag + " " + info.german, {
+            sticky: true,
+            className: "country-label",
+            direction: "top"
+          });
+        }
 
-    const aliases={
-
-        "-99":null,
-
-        "KOS":"UNK"
-
-    };
-
-    if(
-        Object.prototype.hasOwnProperty.call(
-            aliases,
-            iso
-        )
-    ){
-
-        iso=aliases[iso];
-
-    }
-
-    return iso;
-
-}
-
-
-/* =====================================================
-   COUNTRY STYLE
-===================================================== */
-
-function getCountryStyle(iso){
-
-    const info=
-        countryData[iso];
-
-
-    let color=
-        info
-        ?info.color
-        :"#26343c";
-
-
-    if(
-        player.nation &&
-        player.nation.iso===iso
-    ){
-
-        color="#35d8ff";
-
-    }
-
-
-    if(
-        conqueredCountries.has(iso)
-    ){
-
-        color="#35d8ff";
-
-    }
-
-
-    if(
-        selectedEnemy===iso
-    ){
-
-        color="#ff5967";
-
-    }
-
-
-    return{
-
-        color:
-            player.nation &&
-            player.nation.iso===iso
-            ?"#ffffff"
-            :selectedEnemy===iso
-            ?"#ffffff"
-            :"#162b35",
-
-        weight:
-            player.nation &&
-            player.nation.iso===iso
-            ?3
-            :selectedEnemy===iso
-            ?3
-            :1.2,
-
-        fillColor:color,
-
-        fillOpacity:.9
-
-    };
-
-}
-
-
-/* =====================================================
-   REFRESH COUNTRY
-===================================================== */
-
-function refreshCountry(iso){
-
-    const layer=
-        countryLayers[iso];
-
-    if(!layer)return;
-
-    layer.setStyle(
-        getCountryStyle(iso)
-    );
-
-}
-
-
-function refreshAllCountries(){
-
-    Object.keys(
-        countryLayers
-    ).forEach(
-        iso=>{
+        layer.on({
+          mouseover: function () {
+            if (!countryData[iso]) return;
+            this.setStyle({ weight: 3, color: "#ffffff", fillOpacity: 1 });
+          },
+          mouseout: function () {
             refreshCountry(iso);
-        }
-    );
-
-}
-
-
-/* =====================================================
-   COUNTRY SELECTION
-===================================================== */
-
-function selectRealCountry(iso){
-
-    const info=
-        countryData[iso];
-
-    if(!info)return;
-
-
-    /* Nation auswählen */
-
-    if(!player.nation){
-
-        const confirmed=
-            confirm(
-                info.flag+
-                " "+
-                info.german+
-                "\n\nAls diese Nation spielen?"
-            );
-
-        if(!confirmed)return;
-
-
-        player.nation={
-
-            iso:iso,
-
-            id:iso,
-
-            name:info.name,
-
-            german:info.german,
-
-            flag:info.flag,
-
-            color:info.color,
-
-            population:info.population,
-
-            military:info.military
-
-        };
-
-
-        player.population=
-            info.population;
-
-        player.military=
-            info.military;
-
-        player.manpower=100;
-
-        player.territories=1;
-
-        notify(
-            info.flag+
-            " "+
-            info.german+
-            " ist deine Nation."
-        );
-
-
-        updateUI();
-
-        refreshAllCountries();
-
-        return;
-
-    }
-
-
-    /* Eigenes Land */
-
-    if(
-        player.nation.iso===iso
-    ){
-
-        selectedEnemy=null;
-
-        updateTarget();
-
-        refreshAllCountries();
-
-        notify(
-            "Dein eigenes Land."
-        );
-
-        return;
-
-    }
-
-
-    /* Feind auswählen */
-
-    selectedEnemy=iso;
-
-    updateTarget();
+          },
+          click: function () {
+            selectRealCountry(iso);
+          }
+        });
+      }
+    }).addTo(map);
 
     refreshAllCountries();
+    notify("Karte geladen — wähle eine Nation.");
+  })
+  .catch(err => {
+    console.error(err);
+    notify("Fehler beim Laden der Europakarte.");
+  });
 
-    notify(
-        info.flag+
-        " "+
-        info.german+
-        " ausgewählt."
-    );
-
+/* ============================================================
+   ISO HELPER
+============================================================ */
+function getISO(feature) {
+  const p = feature.properties || {};
+  let iso = p.ISO_A3 || p.ADM0_A3 || p.SOV_A3;
+  if (!iso) return null;
+  const aliases = { "-99": null, "KOS": "UNK" };
+  if (Object.prototype.hasOwnProperty.call(aliases, iso)) iso = aliases[iso];
+  return iso;
 }
 
+/* ============================================================
+   COUNTRY STYLE
+============================================================ */
+function getCountryStyle(iso) {
+  const info = countryData[iso];
+  let color = info ? info.color : "#1e2b35";
 
-/* =====================================================
-   MAP ZOOM
-===================================================== */
+  const isPlayer = player.nation && player.nation.iso === iso;
+  const isConquered = conqueredCountries.has(iso);
+  const isEnemy = selectedEnemy === iso;
 
-function zoomMap(direction){
+  if (isPlayer || isConquered) color = "#22d3ee";
+  if (isEnemy) color = "#f87171";
 
-    if(direction>0){
+  let border = "#122330";
+  let weight = 1.2;
 
-        map.zoomIn();
+  if (isPlayer || isEnemy) {
+    border = "#ffffff";
+    weight = 2.5;
+  } else if (isConquered) {
+    border = "#67e8f9";
+    weight = 1.8;
+  }
 
-    }else{
-
-        map.zoomOut();
-
-    }
-
+  return {
+    color: border,
+    weight: weight,
+    fillColor: color,
+    fillOpacity: 0.88
+  };
 }
 
-
-function resetMap(){
-
-    map.setView(
-        [51.2,10.5],
-        4
-    );
-
+function refreshCountry(iso) {
+  const layer = countryLayers[iso];
+  if (!layer) return;
+  layer.setStyle(getCountryStyle(iso));
 }
 
-
-/* =====================================================
-   UI
-===================================================== */
-
-function updateUI(){
-
-    const nation=
-        player.nation;
-
-
-    document.getElementById(
-        "nationName"
-    ).innerText=
-        nation
-        ?nation.german
-        :"No Nation";
-
-
-    document.getElementById(
-        "flag"
-    ).innerText=
-        nation
-        ?nation.flag
-        :"🌐";
-
-
-    document.getElementById(
-        "population"
-    ).innerText=
-        player.population+
-        "M";
-
-
-    document.getElementById(
-        "money"
-    ).innerText=
-        Math.floor(
-            player.money
-        );
-
-
-    document.getElementById(
-        "moneyTop"
-    ).innerText=
-        Math.floor(
-            player.money
-        );
-
-
-    document.getElementById(
-        "manpower"
-    ).innerText=
-        player.manpower+
-        "K";
-
-
-    document.getElementById(
-        "manpowerTop"
-    ).innerText=
-        player.manpower+
-        "K";
-
-
-    document.getElementById(
-        "military"
-    ).innerText=
-        Math.floor(
-            player.military
-        );
-
-
-    document.getElementById(
-        "militaryTop"
-    ).innerText=
-        Math.floor(
-            player.military
-        );
-
-
-    document.getElementById(
-        "territories"
-    ).innerText=
-        player.territories;
-
-
-    document.getElementById(
-        "factories"
-    ).innerText=
-        player.factories;
-
-
-    document.getElementById(
-        "income"
-    ).innerText=
-        player.income;
-
-
-    updateTarget();
-
+function refreshAllCountries() {
+  Object.keys(countryLayers).forEach(refreshCountry);
 }
 
-
-/* =====================================================
-   TARGET
-===================================================== */
-
-function updateTarget(){
-
-    const target=
-        document.getElementById(
-            "target"
-        );
-
-
-    if(!selectedEnemy){
-
-        target.innerHTML=
-        `<span class="small">
-            Click a country on the map.
-        </span>`;
-
-        return;
-
-    }
-
-
-    const info=
-        countryData[
-            selectedEnemy
-        ];
-
-
-    if(!info)return;
-
-
-    target.innerHTML=`
-
-        <div style="
-            font-size:18px;
-            font-weight:bold;
-            margin-bottom:8px;
-        ">
-
-            ${info.flag}
-            ${info.german}
-
-        </div>
-
-        <div class="stat">
-            <span>Population</span>
-
-            <span>
-                ${info.population}M
-            </span>
-        </div>
-
-        <div class="stat">
-            <span>Military</span>
-
-            <span class="red">
-                ${info.military}
-            </span>
-        </div>
-
-        <div style="
-            margin-top:10px;
-            color:#718593;
-            font-size:10px;
-        ">
-            Click DECLARE WAR to attack.
-        </div>
-
-    `;
-
-}
-
-
-/* =====================================================
-   TAXES
-===================================================== */
-
-function collectTaxes(){
-
-    if(!player.nation){
-
-        alert(
-            "Choose a nation first."
-        );
-
-        return;
-
-    }
-
-
-    player.money+=
-        player.income;
-
-
-    updateUI();
-
-
-    notify(
-        "+"+
-        player.income+
-        " treasury"
-    );
-
-}
-
-
-/* =====================================================
-   RECRUIT
-===================================================== */
-
-function recruit(){
-
-    if(!player.nation){
-
-        alert(
-            "Choose a nation first."
-        );
-
-        return;
-
-    }
-
-
-    if(player.money<100){
-
-        alert(
-            "Not enough money."
-        );
-
-        return;
-
-    }
-
-
-    if(player.manpower<10){
-
-        alert(
-            "Not enough manpower."
-        );
-
-        return;
-
-    }
-
-
-    player.money-=100;
-
-    player.manpower-=10;
-
-    player.military+=10;
-
-
-    updateUI();
-
-
-    notify(
-        "+10 military power"
-    );
-
-}
-
-
-/* =====================================================
-   FACTORY
-===================================================== */
-
-function buildFactory(){
-
-    if(!player.nation){
-
-        alert(
-            "Choose a nation first."
-        );
-
-        return;
-
-    }
-
-
-    if(player.money<500){
-
-        alert(
-            "Factory costs 500."
-        );
-
-        return;
-
-    }
-
-
-    player.money-=500;
-
-    player.factories++;
-
-    player.income+=30;
-
-
-    updateUI();
-
-
-    notify(
-        "Factory constructed."
-    );
-
-}
-
-
-/* =====================================================
-   WAR
-===================================================== */
-
-function declareWar(){
-
-    if(!player.nation){
-
-        alert(
-            "Choose a nation first."
-        );
-
-        return;
-
-    }
-
-
-    if(!selectedEnemy){
-
-        alert(
-            "Select an enemy country first."
-        );
-
-        return;
-
-    }
-
-
-    const enemy=
-        countryData[
-            selectedEnemy
-        ];
-
-
-    if(!enemy)return;
-
-
-    if(
-        !confirm(
-            "Declare war on "+
-            enemy.german+
-            "?"
-        )
-    )return;
-
-
-    const playerPower=
-        player.military+
-        player.factories*5+
-        Math.random()*40;
-
-
-    const enemyPower=
-        enemy.military+
-        Math.random()*40;
-
-
-    if(playerPower>enemyPower){
-
-        player.money+=300;
-
-        player.territories++;
-
-
-        player.military=
-            Math.max(
-                1,
-                player.military-10
-            );
-
-
-        conqueredCountries.add(
-            selectedEnemy
-        );
-
-
-        notify(
-            "VICTORY — "+
-            enemy.german+
-            " has been defeated."
-        );
-
-
-        selectedEnemy=null;
-
-
-    }else{
-
-        player.military=
-            Math.max(
-                0,
-                player.military-15
-            );
-
-
-        notify(
-            "DEFEAT — "+
-            enemy.german+
-            " resisted your attack."
-        );
-
-    }
-
-
-    updateUI();
-
-    refreshAllCountries();
-
-}
-
-
-/* =====================================================
-   DIPLOMACY
-===================================================== */
-
-function openDiplomacy(){
-
-    let html="";
-
-
-    Object.keys(
-        countryData
-    ).forEach(iso=>{
-
-        const country=
-            countryData[iso];
-
-
-        if(
-            player.nation &&
-            player.nation.iso===iso
-        )return;
-
-
-        html+=`
-
-        <div class="country"
-             onclick="selectRealCountry('${iso}');closeModal()">
-
-            <div class="country-name">
-
-                ${country.flag}
-                ${country.german}
-
-            </div>
-
-            <div class="country-info">
-
-                Population:
-                ${country.population}M
-
-                &nbsp; | &nbsp;
-
-                Military:
-                ${country.military}
-
-            </div>
-
-        </div>
-
-        `;
-
-    });
-
-
-    openModal(
-        "DIPLOMACY",
-        html
-    );
-
-}
-
-
-/* =====================================================
-   COUNTRY MENU
-===================================================== */
-
-function openCountryMenu(){
-
-    let html="";
-
-
-    Object.keys(
-        countryData
-    ).forEach(iso=>{
-
-        const country=
-            countryData[iso];
-
-
-        html+=`
-
-        <div class="country"
-             onclick="selectRealCountry('${iso}');closeModal()">
-
-            <div class="country-name">
-
-                ${country.flag}
-                ${country.german}
-
-            </div>
-
-            <div class="country-info">
-
-                Population:
-                ${country.population}M
-
-                &nbsp; • &nbsp;
-
-                Military:
-                ${country.military}
-
-            </div>
-
-        </div>
-
-        `;
-
-    });
-
-
-    openModal(
-        "EUROPEAN NATIONS",
-        html
-    );
-
-}
-
-
-/* =====================================================
-   BUILD MENU
-===================================================== */
-
-function openBuildMenu(){
-
-    openModal(
-
-        "CONSTRUCTION",
-
-        `
-
-        <div class="country"
-             onclick="buildFactory();closeModal()">
-
-            🏭
-            <b>Factory</b>
-
-            <div class="country-info">
-
-                Cost: 500
-
-                <br>
-
-                +30 monthly income
-
-            </div>
-
-        </div>
-
-
-        <div class="country"
-             onclick="buildFarm();closeModal()">
-
-            🌾
-            <b>Farm</b>
-
-            <div class="country-info">
-
-                Cost: 250
-
-                <br>
-
-                +15 monthly income
-
-            </div>
-
-        </div>
-
-
-        <div class="country"
-             onclick="buildBarracks();closeModal()">
-
-            🪖
-            <b>Barracks</b>
-
-            <div class="country-info">
-
-                Cost: 400
-
-                <br>
-
-                +15 military power
-
-            </div>
-
-        </div>
-
-        `
-
-    );
-
-}
-
-
-function buildFarm(){
-
-    if(!player.nation){
-
-        alert(
-            "Choose a nation first."
-        );
-
-        return;
-
-    }
-
-
-    if(player.money<250){
-
-        alert(
-            "Not enough money."
-        );
-
-        return;
-
-    }
-
-
-    player.money-=250;
-
-    player.income+=15;
-
-
-    updateUI();
-
-
-    notify(
-        "Farm constructed."
-    );
-
-}
-
-
-function buildBarracks(){
-
-    if(!player.nation){
-
-        alert(
-            "Choose a nation first."
-        );
-
-        return;
-
-    }
-
-
-    if(player.money<400){
-
-        alert(
-            "Not enough money."
-        );
-
-        return;
-
-    }
-
-
-    player.money-=400;
-
-    player.military+=15;
-
-
-    updateUI();
-
-
-    notify(
-        "Barracks constructed."
-    );
-
-}
-
-
-/* =====================================================
-   MILITARY
-===================================================== */
-
-function openMilitary(){
-
-    openModal(
-
-        "MILITARY",
-
-        `
-
-        <div class="box">
-
-            <div class="big">
-
-                ⚔
-                ${Math.floor(
-                    player.military
-                )}
-
-            </div>
-
-            <div class="small">
-                CURRENT MILITARY POWER
-            </div>
-
-        </div>
-
-
-        <div class="country">
-
-            🪖 Infantry
-
-            <div class="country-info">
-                Basic ground troops.
-            </div>
-
-        </div>
-
-
-        <div class="country">
-
-            🛡 Defensive Forces
-
-            <div class="country-info">
-                Protect national territory.
-            </div>
-
-        </div>
-
-
-        <div class="country">
-
-            🚀 Future Units
-
-            <div class="country-info">
-                Advanced military units
-                will become available later.
-            </div>
-
-        </div>
-
-        `
-
-    );
-
-}
-
-
-/* =====================================================
-   MODAL
-===================================================== */
-
-function openModal(title,content){
-
-    document.getElementById(
-        "modalTitle"
-    ).innerText=title;
-
-
-    document.getElementById(
-        "modalContent"
-    ).innerHTML=content;
-
-
-    document.getElementById(
-        "modal"
-    ).style.display="flex";
-
-}
-
-
-function closeModal(){
-
-    document.getElementById(
-        "modal"
-    ).style.display="none";
-
-}
-
-
-/* =====================================================
-   NOTIFICATION
-===================================================== */
-
-function notify(text){
-
-    document.getElementById(
-        "message"
-    ).innerText=text;
-
-}
-
-
-/* =====================================================
-   SPEED
-===================================================== */
-
-let speed=1;
-
-
-function setSpeed(value){
-
-    speed=value;
-
-
-    document.getElementById(
-        "speedText"
-    ).innerText=
-        value===0
-        ?"PAUSED"
-        :value+"×";
-
-}
-
-
-/* =====================================================
-   TIME
-===================================================== */
-
-let year=2026;
-
-let month=0;
-
-
-const months=[
-
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December"
-
-];
-
-
-setInterval(()=>{
-
-    if(!player.nation)return;
-
-    if(speed===0)return;
-
-
-    month+=speed;
-
-
-    while(month>=12){
-
-        month-=12;
-
-        year++;
-
-    }
-
-
-    document.getElementById(
-        "year"
-    ).innerText=year;
-
-
-    document.getElementById(
-        "month"
-    ).innerText=
-        months[month];
-
-
-    document.getElementById(
-        "mapYear"
-    ).innerText=year;
-
-
-    document.getElementById(
-        "mapMonth"
-    ).innerText=
-        months[month].toUpperCase();
-
-
-    player.money+=
-        player.income*
-        speed;
-
-
-    player.manpower=
-        Math.min(
-
-            1000,
-
-            player.manpower+
-            Math.floor(
-                player.population*
-                .05*
-                speed
-            )
-
-        );
-
-
-    updateUI();
-
-},5000);
-
-
-/* =====================================================
-   SAVE
-===================================================== */
-
-function saveGame(){
-
-    localStorage.setItem(
-
-        "atlasConquestSave",
-
-        JSON.stringify({
-
-            player:{
-
-                ...player,
-
-                nationISO:
-                    player.nation
-                    ?player.nation.iso
-                    :null
-
-            },
-
-            conquered:
-                [...conqueredCountries],
-
-            year,
-
-            month
-
-        })
-
-    );
-
-
-    notify(
-        "Game saved."
-    );
-
-}
-
-
-/* =====================================================
-   LOAD
-===================================================== */
-
-function loadGame(){
-
-    const raw=
-        localStorage.getItem(
-            "atlasConquestSave"
-        );
-
-
-    if(!raw){
-
-        alert(
-            "No save game found."
-        );
-
-        return;
-
-    }
-
-
-    try{
-
-        const data=
-            JSON.parse(raw);
-
-
-        player=
-            data.player;
-
-
-        if(
-            player.nationISO
-        ){
-
-            const iso=
-                player.nationISO;
-
-
-            const info=
-                countryData[iso];
-
-
-            if(info){
-
-                player.nation={
-
-                    iso:iso,
-
-                    id:iso,
-
-                    name:info.name,
-
-                    german:info.german,
-
-                    flag:info.flag,
-
-                    color:info.color,
-
-                    population:info.population,
-
-                    military:info.military
-
-                };
-
-            }
-
-        }else{
-
-            player.nation=null;
-
-        }
-
-
-        delete player.nationISO;
-
-
-        conqueredCountries.clear();
-
-
-        if(data.conquered){
-
-            data.conquered.forEach(
-                iso=>{
-                    conqueredCountries.add(iso);
-                }
-            );
-
-        }
-
-
-        year=
-            data.year;
-
-
-        month=
-            data.month;
-
-
-        document.getElementById(
-            "year"
-        ).innerText=year;
-
-
-        document.getElementById(
-            "month"
-        ).innerText=
-            months[month];
-
-
-        document.getElementById(
-            "mapYear"
-        ).innerText=year;
-
-
-        document.getElementById(
-            "mapMonth"
-        ).innerText=
-            months[month].toUpperCase();
-
-
-        updateUI();
-
-        refreshAllCountries();
-
-
-        notify(
-            "Game loaded."
-        );
-
-    }catch(error){
-
-        console.error(error);
-
-        alert(
-            "Save game is corrupted."
-        );
-
-    }
-
-}
-
-
-/* =====================================================
-   NEW GAME
-===================================================== */
-
-function newGame(){
-
-    if(
-        !confirm(
-            "Start a new game?"
-        )
-    )return;
-
-
-    player={
-
-        nation:null,
-
-        money:1000,
-
-        manpower:100,
-
-        military:20,
-
-        territories:1,
-
-        factories:0,
-
-        population:10,
-
-        income:50
-
+/* ============================================================
+   SELECTION
+============================================================ */
+function selectRealCountry(iso) {
+  const info = countryData[iso];
+  if (!info) return;
+
+  if (!player.nation) {
+    if (!confirm(info.flag + " " + info.german + "\n\nAls diese Nation spielen?")) return;
+
+    player.nation = {
+      iso: iso, id: iso,
+      name: info.name, german: info.german,
+      flag: info.flag, color: info.color,
+      population: info.population, military: info.military
     };
+    player.population = info.population;
+    player.military = info.military;
+    player.manpower = 100;
+    player.territories = 1;
 
+    notify(info.flag + " " + info.german + " ist deine Nation.");
+    updateUI();
+    refreshAllCountries();
+    return;
+  }
 
-    selectedEnemy=null;
+  if (player.nation.iso === iso) {
+    selectedEnemy = null;
+    updateTarget();
+    refreshAllCountries();
+    notify("Dein eigenes Land.");
+    return;
+  }
 
+  selectedEnemy = iso;
+  updateTarget();
+  refreshAllCountries();
+  notify(info.flag + " " + info.german + " ausgewählt.");
+}
+
+/* ============================================================
+   MAP CONTROLS
+============================================================ */
+function zoomMap(dir) {
+  if (dir > 0) map.zoomIn(0.5);
+  else map.zoomOut(0.5);
+}
+function resetMap() {
+  map.setView(EUROPE_CENTER, 4.5);
+}
+
+/* ============================================================
+   UI UPDATE
+============================================================ */
+function updateUI() {
+  const n = player.nation;
+
+  document.getElementById("nationName").innerText = n ? n.german : "No Nation";
+  document.getElementById("flag").innerText = n ? n.flag : "🌐";
+  document.getElementById("population").innerText = player.population + "M";
+
+  const money = Math.floor(player.money);
+  document.getElementById("money").innerText = money;
+  document.getElementById("moneyTop").innerText = money;
+
+  document.getElementById("manpower").innerText = player.manpower + "K";
+  document.getElementById("manpowerTop").innerText = player.manpower + "K";
+
+  const mil = Math.floor(player.military);
+  document.getElementById("military").innerText = mil;
+  document.getElementById("militaryTop").innerText = mil;
+
+  document.getElementById("territories").innerText = player.territories;
+  document.getElementById("factories").innerText = player.factories;
+  document.getElementById("income").innerText = player.income;
+
+  updateTarget();
+}
+
+function updateTarget() {
+  const target = document.getElementById("target");
+  if (!selectedEnemy) {
+    target.innerHTML = '<span class="small">Click a country on the map.</span>';
+    return;
+  }
+  const info = countryData[selectedEnemy];
+  if (!info) return;
+
+  target.innerHTML = `
+    <div style="font-size:18px;font-weight:bold;margin-bottom:8px">
+      ${info.flag} ${info.german}
+    </div>
+    <div class="stat"><span>Population</span><span>${info.population}M</span></div>
+    <div class="stat"><span>Military</span><span class="red">${info.military}</span></div>
+    <div style="margin-top:10px;color:#6d8492;font-size:10px">
+      Click DECLARE WAR to attack.
+    </div>`;
+}
+
+/* ============================================================
+   ACTIONS
+============================================================ */
+function collectTaxes() {
+  if (!player.nation) return alert("Choose a nation first.");
+  player.money += player.income;
+  updateUI();
+  notify("+" + player.income + " treasury");
+}
+
+function recruit() {
+  if (!player.nation) return alert("Choose a nation first.");
+  if (player.money < 100) return alert("Not enough money.");
+  if (player.manpower < 10) return alert("Not enough manpower.");
+
+  player.money -= 100;
+  player.manpower -= 10;
+  player.military += 10;
+  updateUI();
+  notify("+10 military power");
+}
+
+function buildFactory() {
+  if (!player.nation) return alert("Choose a nation first.");
+  if (player.money < 500) return alert("Factory costs 500.");
+  player.money -= 500;
+  player.factories++;
+  player.income += 30;
+  updateUI();
+  notify("Factory constructed.");
+}
+
+function declareWar() {
+  if (!player.nation) return alert("Choose a nation first.");
+  if (!selectedEnemy) return alert("Select an enemy country first.");
+
+  const enemy = countryData[selectedEnemy];
+  if (!enemy) return;
+  if (!confirm("Declare war on " + enemy.german + "?")) return;
+
+  const playerPower = player.military + player.factories * 5 + Math.random() * 40;
+  const enemyPower = enemy.military + Math.random() * 40;
+
+  if (playerPower > enemyPower) {
+    player.money += 300;
+    player.territories++;
+    player.military = Math.max(1, player.military - 10);
+    conqueredCountries.add(selectedEnemy);
+    notify("VICTORY — " + enemy.german + " has been defeated.");
+    selectedEnemy = null;
+  } else {
+    player.military = Math.max(0, player.military - 15);
+    notify("DEFEAT — " + enemy.german + " resisted your attack.");
+  }
+  updateUI();
+  refreshAllCountries();
+}
+
+/* ============================================================
+   MENUS
+============================================================ */
+function openDiplomacy() {
+  let html = "";
+  Object.keys(countryData).forEach(iso => {
+    if (player.nation && player.nation.iso === iso) return;
+    const c = countryData[iso];
+    html += `
+      <div class="country" onclick="selectRealCountry('${iso}');closeModal()">
+        <div class="country-name">${c.flag} ${c.german}</div>
+        <div class="country-info">Population: ${c.population}M &nbsp;|&nbsp; Military: ${c.military}</div>
+      </div>`;
+  });
+  openModal("DIPLOMACY", html);
+}
+
+function openCountryMenu() {
+  let html = "";
+  Object.keys(countryData).forEach(iso => {
+    const c = countryData[iso];
+    html += `
+      <div class="country" onclick="selectRealCountry('${iso}');closeModal()">
+        <div class="country-name">${c.flag} ${c.german}</div>
+        <div class="country-info">Population: ${c.population}M &nbsp;•&nbsp; Military: ${c.military}</div>
+      </div>`;
+  });
+  openModal("EUROPEAN NATIONS", html);
+}
+
+function openBuildMenu() {
+  openModal("CONSTRUCTION", `
+    <div class="country" onclick="buildFactory();closeModal()">
+      🏭 <b>Factory</b>
+      <div class="country-info">Cost: 500 — +30 monthly income</div>
+    </div>
+    <div class="country" onclick="buildFarm();closeModal()">
+      🌾 <b>Farm</b>
+      <div class="country-info">Cost: 250 — +15 monthly income</div>
+    </div>
+    <div class="country" onclick="buildBarracks();closeModal()">
+      🪖 <b>Barracks</b>
+      <div class="country-info">Cost: 400 — +15 military power</div>
+    </div>`);
+}
+
+function buildFarm() {
+  if (!player.nation) return alert("Choose a nation first.");
+  if (player.money < 250) return alert("Not enough money.");
+  player.money -= 250;
+  player.income += 15;
+  updateUI();
+  notify("Farm constructed.");
+}
+
+function buildBarracks() {
+  if (!player.nation) return alert("Choose a nation first.");
+  if (player.money < 400) return alert("Not enough money.");
+  player.money -= 400;
+  player.military += 15;
+  updateUI();
+  notify("Barracks constructed.");
+}
+
+function openMilitary() {
+  openModal("MILITARY", `
+    <div class="box">
+      <div class="big">⚔ ${Math.floor(player.military)}</div>
+      <div class="small">CURRENT MILITARY POWER</div>
+    </div>
+    <div class="country">🪖 Infantry<div class="country-info">Basic ground troops.</div></div>
+    <div class="country">🛡 Defensive Forces<div class="country-info">Protect national territory.</div></div>
+    <div class="country">🚀 Future Units<div class="country-info">Advanced units unlocked later.</div></div>`);
+}
+
+function openModal(title, content) {
+  document.getElementById("modalTitle").innerText = title;
+  document.getElementById("modalContent").innerHTML = content;
+  document.getElementById("modal").style.display = "flex";
+}
+function closeModal() {
+  document.getElementById("modal").style.display = "none";
+}
+function notify(text) {
+  const el = document.getElementById("message");
+  el.innerText = text;
+  el.style.opacity = "1";
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.style.opacity = "0.85"; }, 3000);
+}
+
+/* ============================================================
+   SPEED
+============================================================ */
+let speed = 1;
+function setSpeed(v) {
+  speed = v;
+  document.getElementById("speedText").innerText = v === 0 ? "PAUSED" : v + "×";
+}
+
+/* ============================================================
+   TIME
+============================================================ */
+let year = 2026;
+let month = 0;
+const months = ["January","February","March","April","May","June",
+  "July","August","September","October","November","December"];
+
+setInterval(() => {
+  if (!player.nation || speed === 0) return;
+  month += speed;
+  while (month >= 12) { month -= 12; year++; }
+
+  document.getElementById("year").innerText = year;
+  document.getElementById("month").innerText = months[month];
+  document.getElementById("mapYear").innerText = year;
+  document.getElementById("mapMonth").innerText = months[month].toUpperCase();
+
+  player.money += player.income * speed;
+  player.manpower = Math.min(1000,
+    player.manpower + Math.floor(player.population * .05 * speed));
+
+  updateUI();
+}, 5000);
+
+/* ============================================================
+   SAVE / LOAD / NEW
+============================================================ */
+function saveGame() {
+  localStorage.setItem("ironNationsSave", JSON.stringify({
+    player: { ...player, nationISO: player.nation ? player.nation.iso : null },
+    conquered: [...conqueredCountries],
+    year, month
+  }));
+  notify("Game saved.");
+}
+
+function loadGame() {
+  const raw = localStorage.getItem("ironNationsSave");
+  if (!raw) return alert("No save game found.");
+  try {
+    const data = JSON.parse(raw);
+    player = data.player;
+
+    if (player.nationISO) {
+      const iso = player.nationISO;
+      const info = countryData[iso];
+      if (info) {
+        player.nation = {
+          iso: iso, id: iso, name: info.name, german: info.german,
+          flag: info.flag, color: info.color,
+          population: info.population, military: info.military
+        };
+      }
+    } else {
+      player.nation = null;
+    }
+    delete player.nationISO;
 
     conqueredCountries.clear();
+    (data.conquered || []).forEach(iso => conqueredCountries.add(iso));
 
+    year = data.year;
+    month = data.month;
 
-    year=2026;
-
-    month=0;
-
-    speed=1;
-
-
-    document.getElementById(
-        "year"
-    ).innerText="2026";
-
-
-    document.getElementById(
-        "month"
-    ).innerText="January";
-
-
-    document.getElementById(
-        "mapYear"
-    ).innerText="2026";
-
-
-    document.getElementById(
-        "mapMonth"
-    ).innerText="JANUARY";
-
-
-    document.getElementById(
-        "speedText"
-    ).innerText="1×";
-
+    document.getElementById("year").innerText = year;
+    document.getElementById("month").innerText = months[month];
+    document.getElementById("mapYear").innerText = year;
+    document.getElementById("mapMonth").innerText = months[month].toUpperCase();
 
     updateUI();
-
     refreshAllCountries();
-
-    resetMap();
-
-
-    notify(
-        "Select a nation to begin."
-    );
-
+    notify("Game loaded.");
+  } catch (e) {
+    console.error(e);
+    alert("Save game is corrupted.");
+  }
 }
 
+function newGame() {
+  if (!confirm("Start a new game?")) return;
 
-/* =====================================================
+  player = {
+    nation: null, money: 1000, manpower: 100, military: 20,
+    territories: 1, factories: 0, population: 10, income: 50
+  };
+  selectedEnemy = null;
+  conqueredCountries.clear();
+  year = 2026;
+  month = 0;
+  speed = 1;
+
+  document.getElementById("year").innerText = "2026";
+  document.getElementById("month").innerText = "January";
+  document.getElementById("mapYear").innerText = "2026";
+  document.getElementById("mapMonth").innerText = "JANUARY";
+  document.getElementById("speedText").innerText = "1×";
+
+  updateUI();
+  refreshAllCountries();
+  resetMap();
+  notify("Select a nation to begin.");
+}
+
+/* ============================================================
    START
-===================================================== */
-
+============================================================ */
 updateUI();
-
 </script>
 
-
-
-<script async="" src="/.netlify/scripts/hud?variant=public" data-nf-variant="public" data-netlify-site-id="15d5e13c-37fd-4873-8c20-d5126693c354" data-app-host="app.netlify.com"></script>
-<iframe id="nl-badge-frame" title="Powered by Netlify" srcdoc="&lt;!doctype html&gt;&lt;html&gt;&lt;head&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;meta name=&quot;color-scheme&quot; content=&quot;dark&quot;&gt;&lt;style&gt;
-    :root{--nl-vw:1912px;--nl-vh:948px}
-    *{box-sizing:border-box}
-    html,body{margin:0;padding:0;background:transparent;overflow:hidden}
-    body{display:flex;align-items:flex-end;justify-content:flex-end;height:100vh;
-      padding:8px 18px 18px 8px;
-      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.5;color:#f4f9f9;-webkit-font-smoothing:antialiased}
-    .nl-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:10px;width:max-content;max-width:calc(var(--nl-vw,100vw) - 26px)}
-    button{font-family:inherit;cursor:pointer}
-    :focus-visible{outline:2px solid #32e6e2;outline-offset:2px;border-radius:6px}
-    .nl-icon-btn{position:relative;flex:none;width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;border:1px solid transparent;background:transparent;color:#d5e3e6;transition:background .15s ease,color .15s ease}
-    .nl-icon-btn:hover{background:rgba(255,255,255,0.08);color:#f4f9f9}
-    .nl-tap::after{content:&quot;&quot;;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-      width:max(100%,44px);height:max(100%,44px)}
-    @keyframes nl-rise{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
-    @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition:none!important}}
-  
-      .nl-card{position:relative;display:none;width:min(340px,calc(var(--nl-vw,100vw) - 26px));max-height:calc(var(--nl-vh,100vh) - 84px);overflow-y:auto;background:linear-gradient(180deg,#132832 0%,#0e1e25 100%);border:1px solid rgba(255,255,255,0.09);border-radius:18px;padding:18px;transform-origin:bottom right;animation:nl-rise .3s cubic-bezier(.34,1.4,.4,1) both}
-      .nl-card.open{display:block}
-      .nl-card-close{position:absolute;top:10px;right:10px}
-      .nl-card h2{margin:0;padding-right:30px;font-size:16px;font-weight:750;letter-spacing:-0.015em;line-height:1.35}
-      .nl-card h2 em{font-style:normal;background:linear-gradient(90deg,#32e6e2,#4d7cfe,#9a6bff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
-      .nl-card p{margin:8px 0 0;font-size:12.5px;color:#d5e3e6}
-      .nl-prompt{position:relative;margin-top:14px;background:#10222b;border:1px solid rgba(255,255,255,0.09);border-radius:14px;padding:10px 12px;transition:border-color .15s ease,box-shadow .15s ease}
-      .nl-prompt:focus-within{border-color:#05bdba;box-shadow:0 0 0 3px rgba(5,189,186,0.18)}
-      .nl-prompt textarea{display:block;width:100%;height:38px;resize:none;border:0;outline:none;background:transparent;color:#f4f9f9;font:inherit;font-size:13px;line-height:19px;padding:0 28px 0 0}
-      .nl-prompt textarea::placeholder{color:#a9bdc2}
-      .nl-send{position:absolute;right:9px;bottom:9px;width:24px;height:24px;flex:none;display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:50%;background:#05bdba;color:#02191b;transition:background .15s ease}
-      .nl-send:hover{background:#32e6e2}
-      @media (pointer: coarse){
-        .nl-prompt textarea{font-size:16px;line-height:21px;height:42px}
-      }
-      .nl-or{display:flex;align-items:center;gap:10px;margin:12px 0;font-size:10.5px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#a9bdc2}
-      .nl-or::before,.nl-or::after{content:&quot;&quot;;flex:1;height:1px;background:rgba(255,255,255,0.09)}
-      .nl-drop{display:flex;align-items:center;justify-content:space-between;gap:6px;text-decoration:none;background:#1b3a45;border:1px solid rgba(255,255,255,0.09);border-radius:10px;padding:10px 12px;font-size:13px;font-weight:600;color:#cfe0e3;transition:background .15s ease,color .15s ease,border-color .15s ease}
-      .nl-drop:hover{background:#224753;color:#f4f9f9;border-color:rgba(50,230,226,0.3)}
-      .nl-drop .nl-arrow{transition:transform .18s cubic-bezier(.34,1.4,.4,1)}
-      .nl-drop:hover .nl-arrow{transform:translateX(3px)}
-      .nl-badge{display:flex;align-items:center;gap:9px;white-space:nowrap;border:1px solid rgba(255,255,255,0.09);background:linear-gradient(180deg,#142b34,#0e1e25);color:#f4f9f9;border-radius:999px;padding:9px 14px 9px 11px;font-size:13px;font-weight:600;letter-spacing:0.01em;transition:border-color .2s ease}
-      .nl-badge:hover{border-color:rgba(50,230,226,0.26)}
-      .nl-hide{display:block;width:100%;margin-top:10px;border:0;background:transparent;color:#a9bdc2;font-size:11.5px;font-weight:600;padding:4px;border-radius:8px;transition:color .15s ease}
-      .nl-hide:hover{color:#d5e3e6;text-decoration:underline}
-      .nl-badge-label{color:#d5e3e6;font-weight:500}
-      .nl-badge-brand{font-weight:750}
-    &lt;/style&gt;&lt;/head&gt;&lt;body&gt;
-      &lt;div class=&quot;nl-wrap&quot;&gt;
-        &lt;section class=&quot;nl-card&quot; id=&quot;nl-card&quot; aria-label=&quot;Build your own site on Netlify&quot;&gt;
-          &lt;button type=&quot;button&quot; class=&quot;nl-icon-btn nl-tap nl-card-close&quot; id=&quot;nl-card-close&quot; aria-label=&quot;Close&quot;&gt;&lt;svg width=&quot;14&quot; height=&quot;14&quot; viewBox=&quot;0 0 16 16&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.9&quot; stroke-linecap=&quot;round&quot; aria-hidden=&quot;true&quot;&gt;&lt;path d=&quot;M4.5 4.5 11.5 11.5M11.5 4.5 4.5 11.5&quot;/&gt;&lt;/svg&gt;&lt;/button&gt;
-          &lt;h2&gt;&lt;em&gt;Build your own site with Netlify&lt;/em&gt;&lt;/h2&gt;
-          &lt;p&gt;Describe what you want, and an AI agent designs, builds and deploys it in minutes.&lt;/p&gt;
-          &lt;form class=&quot;nl-prompt&quot; action=&quot;https://app.netlify.com/start&quot; method=&quot;get&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;
-            &lt;textarea name=&quot;prompt&quot; rows=&quot;2&quot; required maxlength=&quot;300&quot; autocomplete=&quot;off&quot;
-                      enterkeyhint=&quot;go&quot;
-                      placeholder=&quot;A shop for my handmade surfboards&amp;hellip;&quot;
-                      aria-label=&quot;Describe the site you want to build&quot;&gt;&lt;/textarea&gt;
-            &lt;button type=&quot;submit&quot; class=&quot;nl-send nl-tap&quot; aria-label=&quot;Build this site&quot;&gt;&lt;svg width=&quot;13&quot; height=&quot;13&quot; viewBox=&quot;0 0 16 16&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.8&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; aria-hidden=&quot;true&quot;&gt;&lt;path d=&quot;M8 12.75v-9.5M3.9 7.35 8 3.25l4.1 4.1&quot;/&gt;&lt;/svg&gt;&lt;/button&gt;
-            &lt;input type=&quot;hidden&quot; name=&quot;utm_source&quot; value=&quot;netlify_badge&quot;&gt;
-            
-            &lt;input type=&quot;hidden&quot; name=&quot;utm_id&quot; value=&quot;15d5e13c-37fd-4873-8c20-d5126693c354&quot;&gt;
-          &lt;/form&gt;
-          &lt;div class=&quot;nl-or&quot;&gt;&lt;span&gt;or&lt;/span&gt;&lt;/div&gt;
-          &lt;a class=&quot;nl-drop&quot; href=&quot;https://app.netlify.com/drop?utm_source=netlify_badge&amp;utm_id=15d5e13c-37fd-4873-8c20-d5126693c354&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;
-            &lt;span&gt;Drop a site you already have&lt;/span&gt;&lt;span class=&quot;nl-arrow&quot; aria-hidden=&quot;true&quot;&gt;&amp;rarr;&lt;/span&gt;
-          &lt;/a&gt;
-          &lt;button type=&quot;button&quot; class=&quot;nl-hide&quot; id=&quot;nl-hide&quot;&gt;Hide this badge&lt;/button&gt;
-        &lt;/section&gt;
-        &lt;button type=&quot;button&quot; class=&quot;nl-badge&quot; id=&quot;nl-badge&quot; aria-expanded=&quot;false&quot; aria-controls=&quot;nl-card&quot;
-                aria-label=&quot;Powered by Netlify — build your own site&quot;&gt;
-          &lt;svg width=&quot;18&quot; height=&quot;18&quot; viewBox=&quot;0 0 32 32&quot; fill=&quot;none&quot; aria-hidden=&quot;true&quot;&gt;
-    &lt;path fill=&quot;#fff&quot; d=&quot;M17.9922 18.3225H14.005L13.6746 17.9921V14.005L14.005 13.6746H17.9922L18.3226 14.005V17.9921L17.9922 18.3225Z&quot;/&gt;
-    &lt;g fill=&quot;#05BDBA&quot;&gt;
-      &lt;path d=&quot;M9.6958 24.3311H9.35705L7.6661 22.6401V22.3041L10.2511 19.7164L12.042 19.7191L12.2808 19.9552V21.7461L9.6958 24.3311Z&quot;/&gt;
-      &lt;path d=&quot;M7.6661 9.69576V9.35701L9.35705 7.66606H9.6958L12.2808 10.2511V12.0392L12.042 12.2808H10.2511L7.6661 9.69576Z&quot;/&gt;
-      &lt;path d=&quot;M10.0457 17.4369H0.205466L0 17.2314V14.7658L0.205466 14.5603H10.0457L10.2511 14.7658V17.2314L10.0457 17.4369Z&quot;/&gt;
-      &lt;path d=&quot;M31.7945 17.4369H21.9544L21.7489 17.2314V14.7658L21.9544 14.5603H31.7945L32 14.7658V17.2314L31.7945 17.4369Z&quot;/&gt;
-      &lt;path d=&quot;M14.5631 10.0456V2.66547L14.7686 2.46001H17.2343L17.4396 2.66547V10.0456L17.2343 10.2511H14.7686L14.5631 10.0456Z&quot;/&gt;
-      &lt;path d=&quot;M14.5631 29.3316V21.9515L14.7686 21.746H17.2343L17.4396 21.9515V29.3316L17.2343 29.5371H14.7686L14.5631 29.3316Z&quot;/&gt;
-    &lt;/g&gt;&lt;/svg&gt;
-          &lt;span&gt;&lt;span class=&quot;nl-badge-label&quot;&gt;Powered by&lt;/span&gt; &lt;span class=&quot;nl-badge-brand&quot;&gt;Netlify&lt;/span&gt;&lt;/span&gt;
-        &lt;/button&gt;
-      &lt;/div&gt;
-      &lt;script&gt;
-        
-    function nlSend(){
-      var wrap=document.querySelector('.nl-wrap'),boxes=[];
-      for(var i=0;i&lt;wrap.children.length;i++){
-        var c=wrap.children[i];
-        if(!c.offsetWidth||!c.offsetHeight)continue;
-        boxes.push({x:c.offsetLeft-wrap.offsetLeft+8,
-                    y:c.offsetTop-wrap.offsetTop+8,
-                    w:c.offsetWidth,h:c.offsetHeight});
-      }
-      parent.postMessage({nlHud:'resize',
-        width:wrap.offsetWidth+26,
-        height:wrap.offsetHeight+26,
-        boxes:boxes},'*');
-    }
-    function nlSendSoon(){requestAnimationFrame(nlSend);}
-    window.addEventListener('load',nlSend);
-    window.addEventListener('message',function(e){
-      if(e.source!==parent||!e.data||e.data.nlHud!=='viewport')return;
-      var s=document.documentElement.style;
-      s.setProperty('--nl-vw',e.data.w+'px');
-      s.setProperty('--nl-vh',e.data.h+'px');
-      document.documentElement.classList.toggle('nl-narrow',e.data.w&lt;600);
-      nlSendSoon();
-    });
-    var nlCoarse=window.matchMedia('(pointer: coarse)').matches;
-    function nlSubmit(form){
-      if(form.requestSubmit)return form.requestSubmit();
-      if(form.checkValidity&amp;&amp;!form.checkValidity())
-        return form.reportValidity&amp;&amp;form.reportValidity();
-      form.submit();
-    }
-  
-        var badge=document.getElementById('nl-badge'),card=document.getElementById('nl-card'),
-            box=card.querySelector('textarea');
-        function setOpen(open){
-          card.classList.toggle('open',open);
-          badge.setAttribute('aria-expanded',open?'true':'false');
-          nlSendSoon();
-          if(open&amp;&amp;!nlCoarse)box.focus();
-        }
-        box.addEventListener('keydown',function(e){
-          if(e.key==='Enter'&amp;&amp;!e.shiftKey){e.preventDefault();nlSubmit(box.form);}
-        });
-        badge.addEventListener('click',function(){setOpen(!card.classList.contains('open'));});
-        document.getElementById('nl-card-close').addEventListener('click',function(){setOpen(false);badge.focus();});
-        document.addEventListener('keydown',function(e){
-          if(e.key==='Escape'&amp;&amp;card.classList.contains('open')){setOpen(false);badge.focus();}
-        });
-        document.getElementById('nl-hide').addEventListener('click',function(){
-          parent.postMessage({nlHud:'state',value:'hidden'},'*');
-        });
-      &lt;/script&gt;
-    &lt;/body&gt;&lt;/html&gt;" style="position: fixed; bottom: 0px; right: 0px; border: 0px; margin: 0px; padding: 0px; background: transparent; color-scheme: dark; z-index: 2147483645; width: 197px; height: 64px; clip-path: path(&quot;M 3 3 H 184 V 51 H 3 Z&quot;);" data-nl-ready="1"></iframe></body></html>
+</body>
+</html>

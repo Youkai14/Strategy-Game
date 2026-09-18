@@ -46,10 +46,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
 .leaflet-control-attribution{background:rgba(6,11,16,.8)!important;
   color:#5a7080!important;font-size:9px!important}
 .leaflet-control-attribution a{color:var(--cyan)!important}
+
 .country-label{background:transparent;border:none;box-shadow:none;
-  color:#fff;font-weight:700;font-size:11px;
+  color:#fff;font-weight:700;font-size:12px;
   text-shadow:0 1px 3px #000,0 0 6px #000;padding:0}
 .country-label::before{display:none}
+.country-label.owned{
+  font-size:13px;font-weight:800;color:#e0f7ff;
+  text-shadow:0 1px 4px #000,0 0 8px rgba(34,211,238,.6)}
 
 .topbar{position:absolute;top:12px;left:14px;right:14px;
   display:flex;justify-content:space-between;align-items:flex-start;
@@ -113,23 +117,26 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
 .country-name{font-weight:700}
 .country-info{color:var(--muted);font-size:11px;margin-top:4px}
 
-/* ============ FLAGS ON MAP ============ */
-.war-flag{display:flex;align-items:center;justify-content:center;
-  font-size:22px;background:rgba(6,16,25,.95);
-  border:2px solid #fff;border-radius:50%;
-  width:36px;height:36px;
-  box-shadow:0 2px 10px rgba(0,0,0,.8);
-  transition:transform .15s}
-.war-flag.attacker{border-color:var(--cyan);
-  box-shadow:0 0 14px rgba(34,211,238,.8),0 2px 10px rgba(0,0,0,.8)}
-.war-flag.defender{border-color:var(--red);
-  box-shadow:0 0 14px rgba(248,113,113,.8),0 2px 10px rgba(0,0,0,.8)}
+/* ============ WAR FLAGS — nur Flaggen, kein Kreis ============ */
+.war-flag{
+  font-size:34px;
+  line-height:1;
+  text-align:center;
+  filter: drop-shadow(0 2px 5px rgba(0,0,0,.9));
+  transition: filter .2s, transform .15s;
+  pointer-events:none;
+  user-select:none}
+.war-flag.attacker{
+  filter: drop-shadow(0 0 12px #22d3ee) drop-shadow(0 0 6px #22d3ee)
+          drop-shadow(0 2px 5px rgba(0,0,0,.9))}
+.war-flag.defender{
+  filter: drop-shadow(0 0 12px #f87171) drop-shadow(0 0 6px #f87171)
+          drop-shadow(0 2px 5px rgba(0,0,0,.9))}
 
 /* ============ ATTACK BAR ============ */
 .attack-bar{
   position:absolute;left:50%;bottom:16px;transform:translateX(-50%);
-  width:820px;max-width:calc(100vw - 640px);
-  min-width:560px;
+  width:820px;max-width:calc(100vw - 640px);min-width:560px;
   background:linear-gradient(180deg,rgba(10,22,32,.98),rgba(6,14,22,.98));
   border:1px solid var(--border2);border-radius:14px;
   padding:14px 22px;z-index:600;
@@ -179,34 +186,21 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
   transform:translateY(-1px);
   box-shadow:0 6px 20px rgba(199,58,58,.5)}
 .attack-btn:disabled{opacity:.4;cursor:not-allowed}
-
-.attack-btn.retreat{
-  background:linear-gradient(180deg,#2a3a48,#1a2632);
-  border-color:var(--border2)}
-.attack-btn.retreat:hover{filter:brightness(1.2)}
-
-/* War mode — Attack bar changes */
 .attack-bar.war-mode .attack-btn{
   background:linear-gradient(180deg,#3a3a3a,#1f1f1f);
   border-color:#555;cursor:not-allowed}
 .attack-bar.war-mode .attack-btn:hover{filter:none;transform:none;box-shadow:none}
 
-/* Progress bar in war mode */
-.war-progress{
-  height:14px;background:#050a10;border-radius:7px;
-  overflow:hidden;position:relative;
-  border:1px solid #1a2430}
-.war-progress-fill{
-  height:100%;
+.war-progress{height:14px;background:#050a10;border-radius:7px;
+  overflow:hidden;position:relative;border:1px solid #1a2430}
+.war-progress-fill{height:100%;
   background:linear-gradient(90deg,#22d3ee,#0891b2);
   transition:width .1s linear;width:0%;
   box-shadow:0 0 12px rgba(34,211,238,.6)}
-.war-progress-text{
-  position:absolute;inset:0;display:flex;align-items:center;
+.war-progress-text{position:absolute;inset:0;display:flex;align-items:center;
   justify-content:center;font-size:10px;font-weight:700;
   color:#fff;letter-spacing:1px;text-shadow:0 1px 2px #000}
 
-/* ============ TOASTS ============ */
 #toasts{position:fixed;top:80px;right:20px;z-index:3000;
   display:flex;flex-direction:column;gap:8px;pointer-events:none}
 .toast{background:rgba(10,22,32,.97);border:1px solid var(--border2);
@@ -243,7 +237,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
   <div class="menu">
     <button class="active" onclick="openCountryMenu()">🗺️ &nbsp; EUROPE MAP</button>
     <button onclick="openBuildMenu()">🏗️ &nbsp; CONSTRUCTION</button>
-    <button onclick="openDiplomacy()">🤝 &nbsp; DIPLOMACY</button>
     <button onclick="openMilitary()">⚔️ &nbsp; MILITARY</button>
   </div>
 
@@ -295,7 +288,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
       </div>
       <div class="resource">
         <div class="resource-label">TERRITORIES</div>
-        <div class="resource-value">🗺 <span id="terrTop">1</span></div>
+        <div class="resource-value">🗺 <span id="terrTop">0</span></div>
       </div>
       <div class="resource">
         <div class="resource-label">TROOPS</div>
@@ -323,9 +316,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
   <div class="box">
     <div class="flag" id="flag">🌐</div>
     <div class="nation-name" id="nationName">No Nation</div>
-    <div class="stat"><span>Population</span><span id="population" class="value">10M</span></div>
+    <div class="stat"><span>Population</span><span id="population" class="value">0M</span></div>
     <div class="stat"><span>Treasury</span><span id="money" class="value">1000</span></div>
-    <div class="stat"><span>Territories</span><span id="territories" class="value">1</span></div>
+    <div class="stat"><span>Territories</span><span id="territories" class="value">0</span></div>
     <div class="stat"><span>Total Troops</span><span id="totalTroops" class="value">0</span></div>
   </div>
 
@@ -349,9 +342,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
 
 </div>
 
-<!-- ATTACK BAR (slider + button) -->
 <div id="attackBar" class="attack-bar hidden">
-  <div class="attack-side attacker" id="attackerSide">
+  <div class="attack-side attacker">
     <div class="flag-icon" id="abAttackerFlag">🇩🇪</div>
     <div class="flag-name" id="abAttackerName">Deutschland</div>
     <div class="flag-troops" id="abAttackerTroops">—</div>
@@ -372,7 +364,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
     </div>
   </div>
 
-  <div class="attack-side enemy" id="defenderSide">
+  <div class="attack-side enemy">
     <div class="flag-icon" id="abDefenderFlag">🇵🇱</div>
     <div class="flag-name" id="abDefenderName">Polen</div>
     <div class="flag-troops" id="abDefenderTroops">—</div>
@@ -381,7 +373,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
   <button class="attack-btn" id="attackBtn">⚔ ANGRIFF</button>
 </div>
 
-<!-- MODAL -->
 <div class="modal-bg" id="modal">
   <div class="modal">
     <div class="modal-header">
@@ -392,7 +383,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
   </div>
 </div>
 
-<!-- TOASTS -->
 <div id="toasts"></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -401,8 +391,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
    KARTE
 ============================================================ */
 const EUROPE_CENTER = [50.5, 14];
-const EUROPE_BOUNDS = L.latLngBounds(
-  L.latLng(33, -25), L.latLng(72, 45));
+const EUROPE_BOUNDS = L.latLngBounds(L.latLng(33, -25), L.latLng(72, 45));
 
 const map = L.map("map", {
   zoomControl: false, attributionControl: true,
@@ -458,9 +447,7 @@ const countryData = {
 /* ============================================================
    STATE
 ============================================================ */
-let player = {
-  nation: null, money: 1000, territories: 1, population: 10, income: 50
-};
+let player = { nation: null, money: 1000, territories: 0, population: 0, income: 50 };
 let selectedOwn = null;
 let selectedEnemy = null;
 let war = null;
@@ -469,7 +456,6 @@ const countryLayers = {};
 const conqueredCountries = new Set();
 const currentTroops = {};
 
-// Init troops
 Object.keys(countryData).forEach(iso => {
   currentTroops[iso] = countryData[iso].military * 10000;
 });
@@ -516,17 +502,13 @@ fetch(GEOJSON_URL)
         const iso = getISO(feature);
         if (!iso) return;
         countryLayers[iso] = layer;
-        const info = countryData[iso];
-        if (info) {
-          layer.bindTooltip(info.flag + " " + info.german, {
-            sticky: true, className: "country-label", direction: "top"
-          });
-        }
+        updateCountryLabel(iso);
+
         layer.on({
           mouseover: function () {
-            if (!countryData[iso]) return;
-            if (war) return;
-            this.setStyle({ weight: 3, color: "#ffffff", fillOpacity: 1 });
+            if (!countryData[iso] || war) return;
+            const cur = getCountryStyle(iso);
+            this.setStyle({ ...cur, weight: 3, color: "#ffd54f" });
           },
           mouseout: function () { refreshCountry(iso); },
           click: function () {
@@ -555,27 +537,53 @@ function getISO(feature) {
 }
 
 /* ============================================================
-   STYLE
+   STYLE — Grenzen verschmelzen bei gleichem Besitzer
+   ------------------------------------------------------------
+   Trick: Wenn ein Land dem Spieler gehört, wird seine Grenze
+   GENAU in der Füllfarbe gezeichnet. Dadurch ist die Grenze
+   zum Nachbarland (ebenfalls cyan) unsichtbar — die Länder
+   wirken wie eine einzige Fläche.
 ============================================================ */
 function getCountryStyle(iso) {
   const info = countryData[iso];
   let color = info ? info.color : "#1e2b35";
+  let border = "#122330";
+  let weight = 1.2;
+  let opacity = 1;
 
   const isOwned = isPlayerOwned(iso);
   const isSelectedOwn = selectedOwn === iso;
   const isSelectedEnemy = selectedEnemy === iso;
 
-  if (isOwned) color = "#22d3ee";
-  if (isSelectedEnemy) color = "#f87171";
-
-  let border = "#122330", weight = 1.2;
-  if (isSelectedOwn || isSelectedEnemy) {
-    border = "#ffd54f"; weight = 3;
-  } else if (isOwned) {
-    border = "#67e8f9"; weight = 1.6;
+  if (isOwned) {
+    // Eigenes Land: Fill und Border = Cyan → interne Grenzen unsichtbar
+    color = "#22d3ee";
+    border = "#22d3ee";
+    weight = 0;
+    opacity = 0.88;
   }
 
-  return { color: border, weight, fillColor: color, fillOpacity: 0.88 };
+  if (isSelectedOwn) {
+    // Ausgewähltes eigenes Land → gelber Ring
+    border = "#ffd54f";
+    weight = 3;
+    opacity = 1;
+  }
+
+  if (isSelectedEnemy) {
+    // Ausgewähltes Feindland → rot + weißer Ring
+    color = "#f87171";
+    border = "#ffffff";
+    weight = 3;
+  }
+
+  return {
+    color: border,
+    weight: weight,
+    opacity: opacity,
+    fillColor: color,
+    fillOpacity: 0.88
+  };
 }
 
 function refreshCountry(iso) {
@@ -587,14 +595,54 @@ function refreshAllCountries() {
 }
 
 /* ============================================================
+   LABELS — eroberte Länder zeigen Besitzer-Namen
+============================================================ */
+function updateCountryLabel(iso) {
+  const layer = countryLayers[iso];
+  const info = countryData[iso];
+  if (!layer || !info) return;
+
+  layer.unbindTooltip();
+
+  const isHome = player.nation && player.nation.iso === iso;
+  const isConquered = conqueredCountries.has(iso);
+
+  if (isHome) {
+    // Eigenes Heimatland → permanentes Label mit eigenem Namen
+    layer.bindTooltip(`${info.flag} ${info.german}`, {
+      permanent: true,
+      direction: 'center',
+      className: 'country-label owned'
+    });
+  } else if (isConquered && player.nation) {
+    // Erobertes Land → permanentes Label mit BESIEGER-Namen
+    layer.bindTooltip(`${player.nation.flag} ${player.nation.german}`, {
+      permanent: true,
+      direction: 'center',
+      className: 'country-label owned'
+    });
+  } else {
+    // Normales Land → Hover-Tooltip mit eigenem Namen
+    layer.bindTooltip(`${info.flag} ${info.german}`, {
+      sticky: true,
+      direction: 'top',
+      className: 'country-label'
+    });
+  }
+}
+
+function refreshAllLabels() {
+  Object.keys(countryLayers).forEach(updateCountryLabel);
+}
+
+/* ============================================================
    SELECTION
 ============================================================ */
 function selectRealCountry(iso) {
   const info = countryData[iso];
-  if (!info) return;
+  if (!info || war) return;
 
   if (!player.nation) {
-    // Nation wählen (kein Confirm mehr, direkt per Doppelklick)
     player.nation = {
       iso, id: iso, name: info.name, german: info.german,
       flag: info.flag, color: info.color,
@@ -605,33 +653,32 @@ function selectRealCountry(iso) {
     selectedOwn = iso;
     selectedEnemy = null;
     showToast("Nation gewählt", `${info.flag} ${info.german}`, "success");
-    updateUI();
     refreshAllCountries();
+    refreshAllLabels();
+    updateUI();
     updateAttackBar();
     return;
   }
 
-  // Klick auf eigenes Gebiet
   if (isPlayerOwned(iso)) {
     selectedOwn = iso;
     selectedEnemy = null;
-    updateUI();
     refreshAllCountries();
+    updateUI();
     updateAttackBar();
     notify("Eigenes Gebiet: " + info.german);
     return;
   }
 
-  // Klick auf Feind (muss eigenes Land gewählt sein)
   if (!selectedOwn) {
     notify("Wähle zuerst ein eigenes Land.");
     return;
   }
 
   selectedEnemy = iso;
+  refreshAllCountries();
   updateTarget();
   updateAttackBar();
-  refreshAllCountries();
   notify("Ziel: " + info.german);
 }
 
@@ -666,7 +713,6 @@ function updateAttackBar() {
   attackSlider.disabled = false;
   attackBtn.disabled = false;
   attackBtn.textContent = "⚔ ANGRIFF";
-  attackBtn.classList.remove("retreat");
 
   document.getElementById("warProgressWrap").style.display = "none";
 
@@ -675,7 +721,7 @@ function updateAttackBar() {
 }
 
 function updateSliderLabels() {
-  if (!selectedOwn) return;
+  if (!selectedOwn || !selectedEnemy) return;
   const ownTroops = Math.floor(currentTroops[selectedOwn]);
   const enemyTroops = Math.floor(currentTroops[selectedEnemy]);
 
@@ -701,7 +747,6 @@ attackSlider.addEventListener("input", updateSliderLabels);
    WAR SYSTEM
 ============================================================ */
 let warFlags = { attacker: [], defender: [], frontLine: null };
-let warStartTime = 0;
 let warLastFrame = 0;
 
 function startWar() {
@@ -717,7 +762,6 @@ function startWar() {
     return;
   }
 
-  // Truppen abziehen
   currentTroops[selectedOwn] -= send;
 
   war = {
@@ -731,19 +775,15 @@ function startWar() {
     active: true
   };
 
-  // UI in War-Mode
   attackBar.classList.add("war-mode");
   attackSlider.disabled = true;
   attackBtn.disabled = true;
   attackBtn.textContent = "⚔ SCHLACHT";
   document.getElementById("warProgressWrap").style.display = "block";
 
-  // Flaggen positionieren
   spawnWarFlags();
 
-  // Animation starten
-  warStartTime = performance.now();
-  warLastFrame = warStartTime;
+  warLastFrame = performance.now();
   requestAnimationFrame(warLoop);
 
   notify("⚔ SCHLACHT UM " + countryData[war.defender].german.toUpperCase());
@@ -755,57 +795,36 @@ function warLoop(timestamp) {
   const dt = Math.min(0.05, (timestamp - warLastFrame) / 1000);
   warLastFrame = timestamp;
 
-  // Truppenverluste (beide Seiten verlieren proportional zur Gegnerstärke)
   const rate = 0.20;
-  const attLoss = war.defenderTroops * rate * dt;
-  const defLoss = war.attackerTroops * rate * dt;
+  war.attackerTroops = Math.max(0, war.attackerTroops - war.defenderTroops * rate * dt);
+  war.defenderTroops = Math.max(0, war.defenderTroops - war.attackerTroops * rate * dt);
 
-  war.attackerTroops = Math.max(0, war.attackerTroops - attLoss);
-  war.defenderTroops = Math.max(0, war.defenderTroops - defLoss);
-
-  // Progress: wie viel vom Verteidiger ist weg
   war.progress = 1 - war.defenderTroops / war.initialDef;
 
-  // Ende?
-  if (war.defenderTroops <= 1) {
-    endWar(true);
-    return;
-  }
-  if (war.attackerTroops <= 1) {
-    endWar(false);
-    return;
-  }
+  if (war.defenderTroops <= 1) { endWar(true); return; }
+  if (war.attackerTroops <= 1) { endWar(false); return; }
 
   updateWarVisuals();
   requestAnimationFrame(warLoop);
 }
 
 /* ============================================================
-   WAR FLAGS
+   WAR FLAGS — nur Flaggen, kein Kreis
 ============================================================ */
 function spawnWarFlags() {
   if (!war) return;
 
   const attacker = countryData[war.attacker];
   const defender = countryData[war.defender];
-  const attLayer = countryLayers[war.attacker];
-  const defLayer = countryLayers[war.defender];
+  const attCenter = countryLayers[war.attacker].getBounds().getCenter();
+  const defCenter = countryLayers[war.defender].getBounds().getCenter();
 
-  const attCenter = attLayer.getBounds().getCenter();
-  const defCenter = defLayer.getBounds().getCenter();
-
-  // Richtung der Angriffsachse
   const dx = defCenter.lng - attCenter.lng;
   const dy = defCenter.lat - attCenter.lat;
-  const len = Math.sqrt(dx*dx + dy*dy);
-  const ux = dx / len;
-  const uy = dy / len;
+  const len = Math.sqrt(dx*dx + dy*dy) || 1;
+  const ux = dx / len, uy = dy / len;
+  const px = -uy, py = ux;
 
-  // Perpendicular: (-uy, ux)
-  const px = -uy;
-  const py = ux;
-
-  // 5 Flaggen pro Seite entlang der Perpendicular
   const numFlags = 5;
   const spread = Math.min(len * 0.4, 6);
 
@@ -814,30 +833,29 @@ function spawnWarFlags() {
     const offsetLng = px * spread * t;
     const offsetLat = py * spread * t;
 
-    // Attacker flag
     const attIcon = L.divIcon({
       className: '',
       html: `<div class="war-flag attacker">${attacker.flag}</div>`,
-      iconSize: [36, 36],
-      iconAnchor: [18, 18]
+      iconSize: [40, 40], iconAnchor: [20, 20]
     });
-    const attMarker = L.marker([attCenter.lat + offsetLat, attCenter.lng + offsetLng],
-      { icon: attIcon, interactive: false, zIndexOffset: 1000 }).addTo(map);
-    warFlags.attacker.push({ marker: attMarker, sideOffset: { lng: offsetLng, lat: offsetLat } });
+    const attMarker = L.marker(
+      [attCenter.lat + offsetLat, attCenter.lng + offsetLng],
+      { icon: attIcon, interactive: false, zIndexOffset: 2000 }
+    ).addTo(map);
+    warFlags.attacker.push(attMarker);
 
-    // Defender flag
     const defIcon = L.divIcon({
       className: '',
       html: `<div class="war-flag defender">${defender.flag}</div>`,
-      iconSize: [36, 36],
-      iconAnchor: [18, 18]
+      iconSize: [40, 40], iconAnchor: [20, 20]
     });
-    const defMarker = L.marker([defCenter.lat + offsetLat, defCenter.lng + offsetLng],
-      { icon: defIcon, interactive: false, zIndexOffset: 1000 }).addTo(map);
-    warFlags.defender.push({ marker: defMarker, sideOffset: { lng: offsetLng, lat: offsetLat } });
+    const defMarker = L.marker(
+      [defCenter.lat + offsetLat, defCenter.lng + offsetLng],
+      { icon: defIcon, interactive: false, zIndexOffset: 2000 }
+    ).addTo(map);
+    warFlags.defender.push(defMarker);
   }
 
-  // Front line
   const frontPoints = [];
   for (let i = -10; i <= 10; i++) {
     const t = i / 10;
@@ -848,7 +866,6 @@ function spawnWarFlags() {
     color: '#ffffff', weight: 3, opacity: 0.9, dashArray: '8,6'
   }).addTo(map);
 
-  // Speichere Achse für spätere Updates
   war.axis = { attLat: attCenter.lat, attLng: attCenter.lng, ux, uy, px, py, len, spread };
 }
 
@@ -856,31 +873,27 @@ function updateWarFlags() {
   if (!war || !war.axis) return;
   const { attLat, attLng, ux, uy, px, py, len, spread } = war.axis;
 
-  // Frontposition: 0.4 (Grenze) → 0.95 (durch Feind)
   const frontPos = 0.4 + war.progress * 0.55;
-
   const frontLat = attLat + uy * len * frontPos;
   const frontLng = attLng + ux * len * frontPos;
 
-  // Attacker flaggen an der Front
-  warFlags.attacker.forEach((f, i) => {
-    const numFlags = warFlags.attacker.length;
+  const numFlags = warFlags.attacker.length;
+  warFlags.attacker.forEach((marker, i) => {
     const t = (i - (numFlags - 1) / 2) / numFlags;
-    const lat = frontLat + py * spread * t - uy * 0.05;
-    const lng = frontLng + px * spread * t - ux * 0.05;
-    f.marker.setLatLng([lat, lng]);
+    marker.setLatLng([
+      frontLat + py * spread * t - uy * 0.05,
+      frontLng + px * spread * t - ux * 0.05
+    ]);
   });
 
-  // Defender flaggen just hinter der Front
-  warFlags.defender.forEach((f, i) => {
-    const numFlags = warFlags.defender.length;
+  warFlags.defender.forEach((marker, i) => {
     const t = (i - (numFlags - 1) / 2) / numFlags;
-    const lat = frontLat + py * spread * t + uy * 0.05;
-    const lng = frontLng + px * spread * t + ux * 0.05;
-    f.marker.setLatLng([lat, lng]);
+    marker.setLatLng([
+      frontLat + py * spread * t + uy * 0.05,
+      frontLng + px * spread * t + ux * 0.05
+    ]);
   });
 
-  // Front line aktualisieren
   if (warFlags.frontLine) {
     const pts = [];
     for (let i = -10; i <= 10; i++) {
@@ -892,8 +905,8 @@ function updateWarFlags() {
 }
 
 function cleanupWarFlags() {
-  warFlags.attacker.forEach(f => map.removeLayer(f.marker));
-  warFlags.defender.forEach(f => map.removeLayer(f.marker));
+  warFlags.attacker.forEach(m => map.removeLayer(m));
+  warFlags.defender.forEach(m => map.removeLayer(m));
   if (warFlags.frontLine) map.removeLayer(warFlags.frontLine);
   warFlags = { attacker: [], defender: [], frontLine: null };
 }
@@ -904,32 +917,30 @@ function cleanupWarFlags() {
 function updateWarVisuals() {
   if (!war) return;
 
-  // Verteidiger-Farbe interpolieren
   const defenderLayer = countryLayers[war.defender];
   const defenderColor = countryData[war.defender].color;
   const attackerColor = "#22d3ee";
   const mixed = interpolateColor(defenderColor, attackerColor, war.progress);
 
   if (defenderLayer) {
+    // Während der Schlacht: kein Rand, damit es fließend aussieht
     defenderLayer.setStyle({
       fillColor: mixed,
       fillOpacity: 0.88,
-      color: '#ffd54f',
-      weight: 3
+      color: mixed,
+      weight: 0,
+      opacity: 0.88
     });
   }
 
-  // Flaggen bewegen
   updateWarFlags();
 
-  // UI Update
   document.getElementById("abAttackerTroops").textContent = formatTroops(war.attackerTroops);
   document.getElementById("abDefenderTroops").textContent = formatTroops(war.defenderTroops);
 
   const pct = Math.round(war.progress * 100);
   document.getElementById("warProgressFill").style.width = pct + "%";
-  document.getElementById("warProgressText").textContent =
-    "SCHLACHT — " + pct + "% erobert";
+  document.getElementById("warProgressText").textContent = "SCHLACHT — " + pct + "% erobert";
 }
 
 /* ============================================================
@@ -947,14 +958,12 @@ function endWar(attackerWon) {
   const survivors = Math.floor(war.attackerTroops);
   const defendersLeft = Math.floor(war.defenderTroops);
 
-  // Flaggen entfernen
   cleanupWarFlags();
 
   if (attackerWon) {
-    // Verteidiger erobert
     conqueredCountries.add(defenderIso);
     currentTroops[defenderIso] = survivors;
-    player.territories = [...conqueredCountries].length + 1;
+    player.territories = conqueredCountries.size + 1;
     player.money += 200;
 
     showToast("SIEG!",
@@ -962,16 +971,13 @@ function endWar(attackerWon) {
       "success", 5000);
     notify("🏆 " + defenderInfo.german + " erobert!");
   } else {
-    // Angreifer verliert
     currentTroops[defenderIso] = defendersLeft;
-
     showToast("NIEDERLAGE",
       `${defenderInfo.german} hat den Angriff abgewehrt! ${formatTroops(defendersLeft)} überleben.`,
       "error", 5000);
     notify("💀 Angriff auf " + defenderInfo.german + " gescheitert!");
   }
 
-  // Aufräumen
   war = null;
   attackBar.classList.remove("war-mode");
   attackBar.classList.add("hidden");
@@ -979,8 +985,10 @@ function endWar(attackerWon) {
   document.getElementById("warProgressWrap").style.display = "none";
   document.getElementById("warProgressFill").style.width = "0%";
 
-  updateUI();
+  // WICHTIG: Grenzen + Labels aktualisieren
   refreshAllCountries();
+  refreshAllLabels();
+  updateUI();
   updateAttackBar();
 }
 
@@ -1005,12 +1013,10 @@ function updateUI() {
   document.getElementById("money").innerText = money;
   document.getElementById("moneyTop").innerText = money;
 
-  // Territorien
-  const terr = n ? (conqueredCountries.size + 1) : 0;
+  const terr = n ? conqueredCountries.size + 1 : 0;
   document.getElementById("territories").innerText = terr;
   document.getElementById("terrTop").innerText = terr;
 
-  // Gesamttruppen = Summe aller eigenen Gebiete
   let total = 0;
   if (n) {
     if (isPlayerOwned(n.iso)) total += currentTroops[n.iso];
@@ -1045,11 +1051,13 @@ function updateSourceInfo() {
     return;
   }
   const info = countryData[selectedOwn];
+  const isHome = player.nation && player.nation.iso === selectedOwn;
   el.innerHTML = `
     <div style="font-size:17px;font-weight:700;margin-bottom:8px">
-      ${info.flag} ${info.german}
+      ${info.flag} ${info.german} ${isHome ? '🏛️' : ''}
     </div>
-    <div class="stat"><span>Truppen</span><span class="cyan">${formatTroops(currentTroops[selectedOwn])}</span></div>`;
+    <div class="stat"><span>Truppen</span><span class="cyan">${formatTroops(currentTroops[selectedOwn])}</span></div>
+    ${isHome ? '' : `<div class="stat"><span>Status</span><span class="yellow">Erobert</span></div>`}`;
 }
 
 /* ============================================================
@@ -1065,9 +1073,7 @@ function collectTaxes() {
 function recruit() {
   if (!player.nation) return showToast("Aktion blockiert", "Wähle zuerst eine Nation.", "warning");
   if (player.money < 100) return showToast("Zu wenig Geld", "Rekrutierung kostet 100 💰.", "error");
-
   player.money -= 100;
-  // Rekrutiere Truppen in die Hauptstadt
   currentTroops[player.nation.iso] += 50000;
   updateUI();
   showToast("Rekrutiert", "+50K Truppen in " + player.nation.german, "success");
@@ -1092,14 +1098,12 @@ function openCountryMenu() {
     const owned = isPlayerOwned(iso);
     html += `
       <div class="country" onclick="selectRealCountry('${iso}');closeModal()">
-        <div class="country-name">${c.flag} ${c.german} ${owned ? '🔵' : ''}</div>
+        <div class="country-name">${c.flag} ${c.german} ${owned ? '🟦' : ''}</div>
         <div class="country-info">Truppen: ${formatTroops(currentTroops[iso])} &nbsp;|&nbsp; Pop: ${c.population}M</div>
       </div>`;
   });
   openModal("EUROPEAN NATIONS", html);
 }
-
-function openDiplomacy() { openCountryMenu(); }
 
 function openBuildMenu() {
   openModal("CONSTRUCTION", `
@@ -1188,17 +1192,14 @@ setInterval(() => {
    SAVE / LOAD / NEW
 ============================================================ */
 function saveGame() {
-  localStorage.setItem("ironNationsV3", JSON.stringify({
-    player,
-    conquered: [...conqueredCountries],
-    currentTroops,
-    year, month
+  localStorage.setItem("ironNationsV4", JSON.stringify({
+    player, conquered: [...conqueredCountries], currentTroops, year, month
   }));
   showToast("Gespeichert", "Fortschritt gesichert.", "success");
 }
 
 function loadGame() {
-  const raw = localStorage.getItem("ironNationsV3");
+  const raw = localStorage.getItem("ironNationsV4");
   if (!raw) return showToast("Kein Save", "Kein Spielstand gefunden.", "warning");
   try {
     const d = JSON.parse(raw);
@@ -1208,12 +1209,15 @@ function loadGame() {
     if (d.currentTroops) Object.assign(currentTroops, d.currentTroops);
     year = d.year; month = d.month;
     selectedOwn = null; selectedEnemy = null; war = null;
+
     document.getElementById("year").innerText = year;
     document.getElementById("month").innerText = months[month];
     document.getElementById("mapYear").innerText = year;
     document.getElementById("mapMonth").innerText = months[month].toUpperCase();
-    updateUI();
+
     refreshAllCountries();
+    refreshAllLabels();
+    updateUI();
     attackBar.classList.add("hidden");
     showToast("Geladen", "Spielstand wiederhergestellt.", "success");
   } catch (e) {
@@ -1222,7 +1226,7 @@ function loadGame() {
 }
 
 function newGame() {
-  player = { nation: null, money: 1000, territories: 1, population: 10, income: 50 };
+  player = { nation: null, money: 1000, territories: 0, population: 0, income: 50 };
   selectedOwn = null; selectedEnemy = null; war = null;
   conqueredCountries.clear();
   Object.keys(countryData).forEach(iso => {
@@ -1234,8 +1238,9 @@ function newGame() {
   document.getElementById("mapYear").innerText = "2026";
   document.getElementById("mapMonth").innerText = "JANUARY";
   document.getElementById("speedText").innerText = "1×";
-  updateUI();
   refreshAllCountries();
+  refreshAllLabels();
+  updateUI();
   resetMap();
   cleanupWarFlags();
   attackBar.classList.add("hidden");

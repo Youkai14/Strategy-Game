@@ -8,14 +8,13 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0a1510;--panel:#0e1a1c;--border:#1e3025;--border2:#2a4435;
+  --bg:#0a1510;--border2:#2a4435;
   --text:#e8f0e8;--muted:#6f8577;--green:#5fcc8f;--cyan:#4a90e2;
-  --red:#e74c3c;--yellow:#e8c547;--dark-green:#1a2f22;
+  --red:#e74c3c;--yellow:#ffd54f;
 }
 html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
   color:var(--text);font-family:'Segoe UI',system-ui,Arial,sans-serif;
   user-select:none}
-
 #game{height:100vh;position:relative}
 
 /* ============ MAP ============ */
@@ -26,253 +25,195 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
   color:#4a5c52!important;font-size:9px!important;font-family:monospace}
 .leaflet-control-attribution a{color:#6f8577!important}
 
-/* Country terrain labels - very subtle */
-.terrain-label{
-  background:transparent!important;border:none!important;
-  box-shadow:none!important;
-  color:rgba(200,220,200,.35);
-  font-size:11px;font-weight:600;
-  letter-spacing:3px;text-transform:uppercase;
-  text-shadow:0 1px 2px rgba(0,0,0,.8);
-  padding:0!important;
-  white-space:nowrap}
-.terrain-label::before{display:none!important}
-
-/* ============ CITY MARKERS ============ */
-.city-marker{
-  background:transparent!important;border:none!important;
-  box-shadow:none!important}
-.city-icon{
-  display:flex;flex-direction:column;align-items:center;
-  transform:translate(-50%,-50%);position:relative;
-  pointer-events:none}
-.city-dot{
-  width:8px;height:8px;background:#e8e8e8;
-  border:2px solid #0a1a14;border-radius:50%;
-  box-shadow:0 0 6px rgba(255,255,255,.4)}
-.city-dot.capital{
-  width:12px;height:12px;background:#ffd54f;
-  box-shadow:0 0 12px rgba(255,213,79,.8)}
-.city-name{
-  margin-top:4px;font-size:10px;color:#d0e0d0;
-  font-weight:600;letter-spacing:.5px;
-  white-space:nowrap;
+/* City markers */
+.city-marker{background:transparent!important;border:none!important;box-shadow:none!important}
+.city-icon{display:flex;flex-direction:column;align-items:center;
+  transform:translate(-50%,-50%);position:relative;pointer-events:none}
+.city-dot{width:6px;height:6px;background:#c8d8c8;border:2px solid #0a1a14;
+  border-radius:50%;box-shadow:0 0 5px rgba(200,220,200,.4)}
+.city-dot.capital{width:10px;height:10px;background:#ffd54f;
+  box-shadow:0 0 10px rgba(255,213,79,.8)}
+.city-name{margin-top:3px;font-size:10px;color:rgba(200,220,200,.7);
+  font-weight:600;letter-spacing:.5px;white-space:nowrap;
   text-shadow:0 1px 3px #000,0 0 6px #000}
 
-/* ============ UNIT MARKERS ============ */
-.unit-marker{
-  background:transparent!important;border:none!important;
-  box-shadow:none!important;cursor:pointer;
-  transition:filter .15s}
-.unit-wrapper{
-  position:relative;
-  width:56px;height:56px;
-  transform:translate(-50%,-50%);
-  pointer-events:auto}
-.unit-strength{
-  position:absolute;top:-2px;left:50%;
-  transform:translateX(-50%);
-  padding:1px 6px;
-  font-size:10px;font-weight:800;
-  font-family:'Consolas',monospace;
-  letter-spacing:.5px;
-  border-radius:3px;
-  white-space:nowrap;
-  box-shadow:0 2px 6px rgba(0,0,0,.7);
-  z-index:3}
-.unit-rect{
-  position:absolute;
-  top:14px;left:50%;
-  transform:translateX(-50%);
-  width:44px;height:26px;
-  border:2px solid currentColor;
-  border-radius:2px;
-  background:rgba(10,20,15,.9);
-  z-index:2}
-.unit-rect svg{
-  position:absolute;inset:0;
-  width:100%;height:100%}
-.unit-level{
-  position:absolute;bottom:-6px;left:50%;
-  transform:translateX(-50%);
-  font-size:9px;font-weight:800;
-  letter-spacing:1px;
-  color:#fff;
-  text-shadow:0 1px 2px #000;
-  background:rgba(10,20,15,.85);
-  padding:0 3px;
-  border-radius:2px;
-  z-index:3}
+/* ============ UNITS ============ */
+.unit-marker{background:transparent!important;border:none!important;
+  box-shadow:none!important;cursor:pointer;transition:filter .15s}
+.unit-wrapper{position:relative;width:56px;height:56px;
+  transform:translate(-50%,-50%);pointer-events:auto}
 
-/* Player units - blue */
-.unit-marker.player .unit-rect{color:#4a90e2;border-color:#4a90e2}
-.unit-marker.player .unit-strength{
-  background:#4a90e2;color:#fff}
-.unit-marker.player .unit-rect svg{color:#4a90e2}
+.unit-strength{position:absolute;top:-4px;left:50%;transform:translateX(-50%);
+  padding:1px 6px;font-size:10px;font-weight:800;
+  font-family:'Consolas',monospace;letter-spacing:.5px;border-radius:3px;
+  white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.7);z-index:3}
 
-/* Enemy units - red */
-.unit-marker.enemy .unit-rect{color:#e74c3c;border-color:#e74c3c}
-.unit-marker.enemy .unit-strength{
-  background:#e74c3c;color:#fff}
-.unit-marker.enemy .unit-rect svg{color:#e74c3c}
+.unit-rect{position:absolute;top:14px;left:50%;transform:translateX(-50%);
+  width:44px;height:26px;border:2px solid currentColor;border-radius:2px;
+  background:rgba(10,20,15,.9);z-index:2}
+.unit-rect svg{position:absolute;inset:0;width:100%;height:100%}
 
-/* Selected */
+.unit-level{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);
+  font-size:9px;font-weight:800;letter-spacing:1px;color:#fff;
+  text-shadow:0 1px 2px #000;background:rgba(10,20,15,.85);
+  padding:0 3px;border-radius:2px;z-index:3}
+
+.unit-marker.player .unit-rect{color:#4a90e2}
+.unit-marker.player .unit-strength{background:#4a90e2;color:#fff}
+.unit-marker.enemy .unit-rect{color:#e74c3c}
+.unit-marker.enemy .unit-strength{background:#e74c3c;color:#fff}
+
 .unit-marker.selected .unit-rect{
   box-shadow:0 0 0 2px #ffd54f,0 0 16px rgba(255,213,79,.9);
   border-color:#ffd54f!important}
 .unit-marker.selected .unit-rect svg{color:#ffd54f!important}
 
-/* Highlight targetable */
-.unit-marker.targetable .unit-rect{
-  animation:pulse-red 1s infinite}
+.unit-marker.targetable .unit-rect{animation:pulse-red 1s infinite}
 @keyframes pulse-red{
   0%,100%{box-shadow:0 0 0 0 rgba(231,76,60,0)}
   50%{box-shadow:0 0 0 6px rgba(231,76,60,.5),0 0 12px rgba(231,76,60,.8)}}
 
-/* In battle */
-.unit-marker.in-battle .unit-rect{
-  animation:shake .3s infinite}
+.unit-marker.in-battle .unit-rect{animation:shake .25s infinite}
 @keyframes shake{
   0%,100%{transform:translateX(-50%) translateY(0)}
   25%{transform:translateX(-50%) translateY(-1px)}
   75%{transform:translateX(-50%) translateY(1px)}}
 
+/* ============ BATTLE FLAGS (nur während Schlacht sichtbar) ============ */
+.battle-flag{
+  background:transparent!important;border:none!important;
+  box-shadow:none!important;pointer-events:none}
+.battle-flag-inner{
+  transform:translate(-50%,-50%);
+  display:flex;flex-direction:column;align-items:center;
+  animation:flagFloat .8s ease-in-out infinite alternate}
+@keyframes flagFloat{
+  from{transform:translate(-50%,-50%) translateY(0)}
+  to{transform:translate(-50%,-50%) translateY(-4px)}}
+
+.battle-flag-img{
+  width:34px;height:24px;object-fit:cover;
+  border:2px solid #fff;border-radius:3px;
+  box-shadow:0 0 14px rgba(0,0,0,.9),0 4px 12px rgba(0,0,0,.8);
+  background:#fff}
+.battle-flag-img.attacker{
+  border-color:#4a90e2;
+  box-shadow:0 0 18px rgba(74,144,226,.9),
+             0 0 8px rgba(74,144,226,.7),
+             0 4px 12px rgba(0,0,0,.8)}
+.battle-flag-img.defender{
+  border-color:#e74c3c;
+  box-shadow:0 0 18px rgba(231,76,60,.9),
+             0 0 8px rgba(231,76,60,.7),
+             0 4px 12px rgba(0,0,0,.8)}
+.battle-flag-troops{
+  margin-top:3px;
+  padding:1px 6px;
+  font-size:10px;font-weight:800;
+  font-family:'Consolas',monospace;
+  background:rgba(6,14,10,.95);
+  border-radius:3px;
+  letter-spacing:.5px;
+  white-space:nowrap}
+.battle-flag-troops.attacker{color:#4a90e2;border:1px solid rgba(74,144,226,.6)}
+.battle-flag-troops.defender{color:#e74c3c;border:1px solid rgba(231,76,60,.6)}
+
 /* ============ TOP BAR ============ */
-.topbar{
-  position:absolute;top:0;left:0;right:0;height:52px;
+.topbar{position:absolute;top:0;left:0;right:0;height:52px;
   background:linear-gradient(180deg,rgba(6,14,10,.96),rgba(6,14,10,.85));
   border-bottom:1px solid var(--border2);
-  display:flex;align-items:center;
-  padding:0 20px;
-  z-index:500;
+  display:flex;align-items:center;padding:0 20px;z-index:500;
   backdrop-filter:blur(8px)}
-.topbar h1{
-  font-size:15px;font-weight:800;
-  letter-spacing:4px;
-  color:#e8f0e8}
+.topbar h1{font-size:15px;font-weight:800;letter-spacing:4px;color:#e8f0e8}
 .topbar h1 span{color:var(--cyan)}
-.topbar .stats{
-  margin-left:auto;display:flex;gap:22px;
-  font-size:12px;color:var(--muted);
-  align-items:center}
-.topbar .stats .item{
-  display:flex;align-items:center;gap:6px;
+.topbar .stats{margin-left:auto;display:flex;gap:22px;font-size:12px;
+  color:var(--muted);align-items:center}
+.topbar .stats .item{display:flex;align-items:center;gap:6px;
   font-variant-numeric:tabular-nums}
-.topbar .stats .item b{
-  color:#e8f0e8;font-weight:700;font-size:13px}
-.topbar .stats .item .dot{
-  width:6px;height:6px;border-radius:50%;display:inline-block}
-.topbar .stats .item .dot.cyan{background:var(--cyan)}
-.topbar .stats .item .dot.red{background:var(--red)}
-.topbar .stats .item .dot.green{background:var(--green)}
+.topbar .stats .item b{color:#e8f0e8;font-weight:700;font-size:13px}
+.topbar .stats .dot{width:6px;height:6px;border-radius:50%;display:inline-block}
+.topbar .stats .dot.cyan{background:var(--cyan)}
+.topbar .stats .dot.red{background:var(--red)}
+.topbar .stats .dot.green{background:var(--green)}
 
 /* ============ ATTACK BAR ============ */
 .attack-bar{
   position:absolute;bottom:0;left:0;right:0;
   background:linear-gradient(0deg,rgba(6,14,10,.98),rgba(6,14,10,.88));
   border-top:1px solid var(--border2);
-  padding:14px 24px;
-  z-index:500;
+  padding:14px 24px;z-index:500;
   display:flex;align-items:center;gap:22px;
   backdrop-filter:blur(10px);
   transform:translateY(0);
   transition:transform .25s cubic-bezier(.34,1.4,.4,1)}
 .attack-bar.hidden{transform:translateY(120%)}
 
-.ab-info{flex:0 0 auto;text-align:center;min-width:120px}
+.ab-info{flex:0 0 auto;text-align:center;min-width:130px}
 .ab-info .label{font-size:9px;letter-spacing:2px;color:var(--muted)}
 .ab-info .name{font-size:14px;font-weight:800;margin-top:2px;color:#e8f0e8}
-.ab-info .troops{
-  font-size:16px;font-weight:800;
-  font-family:'Consolas',monospace;
-  margin-top:2px}
+.ab-info .troops{font-size:16px;font-weight:800;
+  font-family:'Consolas',monospace;margin-top:2px;
+  font-variant-numeric:tabular-nums}
 .ab-info.attacker .troops{color:var(--cyan)}
 .ab-info.defender .troops{color:var(--red)}
 
 .ab-slider-wrap{flex:1;display:flex;flex-direction:column;gap:6px}
-.ab-slider{
-  -webkit-appearance:none;appearance:none;
-  width:100%;height:6px;background:#16261e;
-  border-radius:3px;outline:none}
+.ab-slider{-webkit-appearance:none;appearance:none;
+  width:100%;height:6px;background:#16261e;border-radius:3px;outline:none}
 .ab-slider::-webkit-slider-thumb{
   -webkit-appearance:none;appearance:none;
-  width:20px;height:20px;border-radius:50%;
-  background:var(--cyan);
+  width:20px;height:20px;border-radius:50%;background:var(--cyan);
   cursor:pointer;border:2px solid #0a1a14;
   box-shadow:0 0 12px rgba(74,144,226,.8)}
 .ab-slider::-moz-range-thumb{
-  width:18px;height:18px;border-radius:50%;
-  background:var(--cyan);cursor:pointer;border:2px solid #0a1a14}
+  width:18px;height:18px;border-radius:50%;background:var(--cyan);
+  cursor:pointer;border:2px solid #0a1a14}
 .ab-slider:disabled{opacity:.4}
 
-.ab-meta{
-  display:flex;justify-content:space-between;
-  font-size:11px;color:var(--muted);
-  font-family:'Consolas',monospace}
+.ab-meta{display:flex;justify-content:space-between;
+  font-size:11px;color:var(--muted);font-family:'Consolas',monospace}
 .ab-meta b{color:#ffd54f}
 
-.ab-btn{
-  flex:0 0 auto;padding:14px 28px;
+.ab-btn{flex:0 0 auto;padding:14px 28px;
   background:linear-gradient(180deg,#c73a3a,#8a1a1a);
   border:1px solid #e05a5a;border-radius:6px;
   color:#fff;font-weight:800;font-size:12px;
   letter-spacing:2px;text-transform:uppercase;
-  cursor:pointer;font-family:inherit;
-  transition:.15s;
-  min-width:160px}
+  cursor:pointer;font-family:inherit;transition:.15s;min-width:180px}
 .ab-btn:hover:not(:disabled){
   filter:brightness(1.15);transform:translateY(-1px);
   box-shadow:0 6px 20px rgba(199,58,58,.5)}
 .ab-btn:disabled{opacity:.4;cursor:not-allowed}
 
-/* Battle progress (replaces slider during battle) */
-.ab-progress{
-  flex:1;display:flex;flex-direction:column;gap:8px}
-.ab-progress-bar{
-  height:16px;background:#050f0a;
-  border-radius:8px;overflow:hidden;
+.ab-progress{flex:1;display:flex;flex-direction:column;gap:8px}
+.ab-progress-bar{height:18px;background:#050f0a;
+  border-radius:9px;overflow:hidden;
   border:1px solid #1a3025;position:relative}
-.ab-progress-fill{
-  height:100%;width:0;
+.ab-progress-fill{height:100%;width:0;
   background:linear-gradient(90deg,#4a90e2,#3a70b2);
-  transition:width .1s linear;
+  transition:width .08s linear;
   box-shadow:0 0 12px rgba(74,144,226,.7)}
-.ab-progress-text{
-  position:absolute;inset:0;
+.ab-progress-text{position:absolute;inset:0;
   display:flex;align-items:center;justify-content:center;
-  font-size:10px;font-weight:800;letter-spacing:2px;
+  font-size:11px;font-weight:800;letter-spacing:3px;
   color:#fff;text-shadow:0 1px 3px #000}
 
-/* ============ MESSAGE / TOAST ============ */
-#message{
-  position:absolute;top:64px;left:50%;transform:translateX(-50%);
-  background:rgba(6,14,10,.95);
-  border:1px solid var(--border2);
-  padding:8px 18px;border-radius:5px;
-  font-size:12px;color:#d0e0d0;
-  z-index:450;
-  white-space:nowrap;
-  transition:opacity .3s;
-  letter-spacing:.5px;
-  font-family:'Consolas',monospace}
+/* ============ MESSAGE ============ */
+#message{position:absolute;top:64px;left:50%;transform:translateX(-50%);
+  background:rgba(6,14,10,.95);border:1px solid var(--border2);
+  padding:8px 18px;border-radius:5px;font-size:12px;color:#d0e0d0;
+  z-index:450;white-space:nowrap;transition:opacity .3s;
+  letter-spacing:.5px;font-family:'Consolas',monospace}
 
-#toasts{
-  position:fixed;top:64px;right:20px;
-  z-index:1000;
-  display:flex;flex-direction:column;gap:8px;
-  pointer-events:none}
-.toast{
-  background:rgba(10,26,20,.98);
-  border:1px solid var(--border2);
-  border-left:3px solid var(--cyan);
-  border-radius:6px;
-  padding:12px 16px;
-  font-size:12px;color:#e8f0e8;
+/* ============ TOASTS ============ */
+#toasts{position:fixed;top:64px;right:20px;z-index:1000;
+  display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{background:rgba(10,26,20,.98);border:1px solid var(--border2);
+  border-left:3px solid var(--cyan);border-radius:6px;
+  padding:12px 16px;font-size:12px;color:#e8f0e8;
   min-width:240px;max-width:340px;
   box-shadow:0 8px 24px rgba(0,0,0,.7);
-  animation:toastIn .3s cubic-bezier(.34,1.4,.4,1);
-  pointer-events:auto;
-  font-family:'Segoe UI',sans-serif}
+  animation:toastIn .3s cubic-bezier(.34,1.4,.4,1);pointer-events:auto}
 .toast.success{border-left-color:var(--green)}
 .toast.error{border-left-color:var(--red)}
 .toast.warning{border-left-color:var(--yellow)}
@@ -280,36 +221,51 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
 @keyframes toastIn{from{opacity:0;transform:translateX(30px)}
   to{opacity:1;transform:translateX(0)}}
 @keyframes toastOut{to{opacity:0;transform:translateX(30px)}}
-.toast-title{
-  font-weight:800;font-size:11px;
-  letter-spacing:1.5px;text-transform:uppercase;
-  color:#fff;margin-bottom:3px}
+.toast-title{font-weight:800;font-size:11px;letter-spacing:1.5px;
+  text-transform:uppercase;color:#fff;margin-bottom:3px}
 .toast-msg{font-size:12px;color:#8fa49a;line-height:1.5}
 
 /* ============ MAP CONTROLS ============ */
-.map-controls{
-  position:absolute;right:14px;bottom:88px;
-  display:flex;flex-direction:column;gap:4px;
-  z-index:450}
-.map-controls button{
-  width:36px;height:36px;
-  background:rgba(6,14,10,.9);
-  border:1px solid var(--border2);
-  color:#c8d8c8;border-radius:4px;
+.map-controls{position:absolute;right:14px;bottom:88px;
+  display:flex;flex-direction:column;gap:4px;z-index:450}
+.map-controls button{width:36px;height:36px;background:rgba(6,14,10,.9);
+  border:1px solid var(--border2);color:#c8d8c8;border-radius:4px;
   cursor:pointer;font-size:18px;font-family:inherit;
   transition:.15s;font-weight:600}
-.map-controls button:hover{
-  border-color:var(--cyan);background:#14261c;color:#fff}
+.map-controls button:hover{border-color:var(--cyan);
+  background:#14261c;color:#fff}
 
 /* ============ LOADING ============ */
-#loading{
-  position:absolute;inset:0;
+#loading{position:absolute;inset:0;
   display:flex;align-items:center;justify-content:center;
-  background:#0a1a14;z-index:2000;
-  color:var(--muted);
-  font-family:'Consolas',monospace;
-  letter-spacing:3px;font-size:13px}
+  background:#0a1a14;z-index:2000;color:var(--muted);
+  font-family:'Consolas',monospace;letter-spacing:3px;font-size:13px}
 #loading.hidden{display:none}
+
+/* ============ BATTLE BANNER (Mitte) ============ */
+#battleBanner{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(.8);
+  padding:16px 36px;
+  background:linear-gradient(180deg,rgba(20,10,10,.98),rgba(10,6,6,.98));
+  border:2px solid #e74c3c;
+  border-radius:8px;
+  font-size:22px;font-weight:900;
+  letter-spacing:5px;
+  color:#fff;
+  text-shadow:0 0 20px rgba(231,76,60,.9),0 2px 8px #000;
+  z-index:800;
+  pointer-events:none;
+  opacity:0;
+  box-shadow:0 0 40px rgba(231,76,60,.6),
+             0 10px 40px rgba(0,0,0,.9)}
+#battleBanner.show{
+  animation:bannerPulse 1.2s ease-out}
+@keyframes bannerPulse{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}
+  20%{opacity:1;transform:translate(-50%,-50%) scale(1.05)}
+  80%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(1.1)}}
 
 ::-webkit-scrollbar{width:6px}
 ::-webkit-scrollbar-track{background:#08120d}
@@ -319,15 +275,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
 <body>
 
 <div id="game">
-
   <div id="map"></div>
 
   <div class="topbar">
     <h1>ATLAS<span>//</span>BLITZ</h1>
     <div class="stats">
       <div class="item"><span class="dot cyan"></span>Achse <b id="statPlayer">0K</b></div>
-      <div class="item"><span class="dot red"></span>Feind <b id="statEnemy">0K</b></div>
-      <div class="item"><span class="dot green"></span>Fronten <b id="statFronts">0</b></div>
+      <div class="item"><span class="dot red"></span>Alliierte <b id="statEnemy">0K</b></div>
+      <div class="item"><span class="dot green"></span>Einheiten <b id="statUnits">0</b></div>
     </div>
   </div>
 
@@ -338,8 +293,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
   </div>
 
   <div id="message">Einheit auswählen...</div>
-
   <div id="loading">KARTE WIRD GELADEN...</div>
+  <div id="battleBanner">⚔ SCHLACHT ⚔</div>
 
   <div class="attack-bar hidden" id="attackBar">
     <div class="ab-info attacker">
@@ -372,7 +327,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
 
     <button class="ab-btn" id="abBtn">⚔ ANGRIFF</button>
   </div>
-
 </div>
 
 <div id="toasts"></div>
@@ -380,16 +334,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 /* ============================================================
-   KONFIGURATION
-============================================================ */
-const MAP_CENTER = [52.0, 20.0];
-const MAP_BOUNDS = L.latLngBounds(L.latLng(35, -12), L.latLng(72, 45));
-
-const START_TROOPS_RANGE = [40, 150]; // in K
-const BATTLE_RATE = 12; // K Truppen pro Sekunde
-
-/* ============================================================
-   NATO-SYMBOLE (SVG)
+   NATO SYMBOLE
 ============================================================ */
 const NATO_SYMBOLS = {
   infantry: `<svg viewBox="0 0 44 26" preserveAspectRatio="none">
@@ -399,9 +344,6 @@ const NATO_SYMBOLS = {
   armor: `<svg viewBox="0 0 44 26" preserveAspectRatio="none">
     <ellipse cx="22" cy="13" rx="12" ry="7" fill="none" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke"/>
   </svg>`,
-  artillery: `<svg viewBox="0 0 44 26" preserveAspectRatio="none">
-    <circle cx="22" cy="13" r="5" fill="currentColor"/>
-  </svg>`,
   mechanized: `<svg viewBox="0 0 44 26" preserveAspectRatio="none">
     <line x1="2" y1="2" x2="42" y2="24" stroke="currentColor" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
     <line x1="42" y1="2" x2="2" y2="24" stroke="currentColor" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
@@ -410,7 +352,7 @@ const NATO_SYMBOLS = {
 };
 
 /* ============================================================
-   STÄDTE — Positionen für Einheiten
+   STÄDTE
 ============================================================ */
 const CITIES = {
   Berlin:    {lat: 52.52, lng: 13.40, capital: true},
@@ -443,48 +385,47 @@ const CITIES = {
   Sofia:     {lat: 42.70, lng: 23.32, capital: true},
   Istanbul:  {lat: 41.01, lng: 28.98},
   Bern:      {lat: 46.95, lng:  7.45, capital: true},
-  Dublin:    {lat: 53.35, lng: -6.26, capital: true},
-  Reykjavik: {lat: 64.15, lng:-21.94, capital: true}
+  Dublin:    {lat: 53.35, lng: -6.26, capital: true}
 };
 
 /* ============================================================
-   START-EINHEITEN
+   START-EINHEITEN (mit Flaggen-Code für die Schlacht-Visualisierung)
 ============================================================ */
 const STARTING_UNITS = [
-  // ===== SPIELER (Achse - Deutschland & Verbündete) =====
-  {city:'Berlin',    side:'player', type:'armor',      troops:140},
-  {city:'Hamburg',   side:'player', type:'infantry',   troops:80},
-  {city:'München',   side:'player', type:'mechanized', troops:95},
-  {city:'Wien',      side:'player', type:'infantry',   troops:65},
-  {city:'Rom',       side:'player', type:'infantry',   troops:70},
-  {city:'Mailand',   side:'player', type:'armor',      troops:75},
-  {city:'Amsterdam', side:'player', type:'infantry',   troops:40},
-  {city:'Brüssel',   side:'player', type:'infantry',   troops:35},
-  {city:'Kopenhagen',side:'player', type:'infantry',   troops:30},
-  {city:'Oslo',      side:'player', type:'infantry',   troops:35},
-  {city:'Stockholm', side:'player', type:'infantry',   troops:45},
-  {city:'Helsinki',  side:'player', type:'infantry',   troops:40},
-  {city:'Budapest',  side:'player', type:'mechanized', troops:55},
+  // ACHSE (Spieler)
+  {city:'Berlin',    side:'player', type:'armor',      troops:140, flag:'de'},
+  {city:'Hamburg',   side:'player', type:'infantry',   troops:80,  flag:'de'},
+  {city:'München',   side:'player', type:'mechanized', troops:95,  flag:'de'},
+  {city:'Wien',      side:'player', type:'infantry',   troops:65,  flag:'at'},
+  {city:'Rom',       side:'player', type:'infantry',   troops:70,  flag:'it'},
+  {city:'Mailand',   side:'player', type:'armor',      troops:75,  flag:'it'},
+  {city:'Amsterdam', side:'player', type:'infantry',   troops:40,  flag:'nl'},
+  {city:'Brüssel',   side:'player', type:'infantry',   troops:35,  flag:'be'},
+  {city:'Kopenhagen',side:'player', type:'infantry',   troops:30,  flag:'dk'},
+  {city:'Oslo',      side:'player', type:'infantry',   troops:35,  flag:'no'},
+  {city:'Stockholm', side:'player', type:'infantry',   troops:45,  flag:'se'},
+  {city:'Helsinki',  side:'player', type:'infantry',   troops:40,  flag:'fi'},
+  {city:'Budapest',  side:'player', type:'mechanized', troops:55,  flag:'hu'},
 
-  // ===== FEIND (Alliierte) =====
-  {city:'London',    side:'enemy', type:'armor',       troops:110},
-  {city:'Dublin',    side:'enemy', type:'infantry',    troops:30},
-  {city:'Paris',     side:'enemy', type:'armor',       troops:130},
-  {city:'Lyon',      side:'enemy', type:'infantry',    troops:70},
-  {city:'Madrid',    side:'enemy', type:'infantry',    troops:80},
-  {city:'Lissabon',  side:'enemy', type:'infantry',    troops:40},
-  {city:'Bern',      side:'enemy', type:'infantry',    troops:50},
-  {city:'Prag',      side:'enemy', type:'infantry',    troops:75},
-  {city:'Warschau',  side:'enemy', type:'armor',       troops:120},
-  {city:'Krakau',    side:'enemy', type:'infantry',    troops:80},
-  {city:'Belgrad',   side:'enemy', type:'infantry',    troops:65},
-  {city:'Bukarest',  side:'enemy', type:'mechanized',  troops:85},
-  {city:'Sofia',     side:'enemy', type:'infantry',    troops:55},
-  {city:'Athen',     side:'enemy', type:'infantry',    troops:60},
-  {city:'Istanbul',  side:'enemy', type:'infantry',    troops:70},
-  {city:'Minsk',     side:'enemy', type:'armor',       troops:150},
-  {city:'Kiew',      side:'enemy', type:'mechanized',  troops:135},
-  {city:'Moskau',    side:'enemy', type:'armor',       troops:200}
+  // ALLIIERTE (Feind)
+  {city:'London',    side:'enemy', type:'armor',       troops:110, flag:'gb'},
+  {city:'Dublin',    side:'enemy', type:'infantry',    troops:30,  flag:'ie'},
+  {city:'Paris',     side:'enemy', type:'armor',       troops:130, flag:'fr'},
+  {city:'Lyon',      side:'enemy', type:'infantry',    troops:70,  flag:'fr'},
+  {city:'Madrid',    side:'enemy', type:'infantry',    troops:80,  flag:'es'},
+  {city:'Lissabon',  side:'enemy', type:'infantry',    troops:40,  flag:'pt'},
+  {city:'Bern',      side:'enemy', type:'infantry',    troops:50,  flag:'ch'},
+  {city:'Prag',      side:'enemy', type:'infantry',    troops:75,  flag:'cz'},
+  {city:'Warschau',  side:'enemy', type:'armor',       troops:120, flag:'pl'},
+  {city:'Krakau',    side:'enemy', type:'infantry',    troops:80,  flag:'pl'},
+  {city:'Belgrad',   side:'enemy', type:'infantry',    troops:65,  flag:'rs'},
+  {city:'Bukarest',  side:'enemy', type:'mechanized',  troops:85,  flag:'ro'},
+  {city:'Sofia',     side:'enemy', type:'infantry',    troops:55,  flag:'bg'},
+  {city:'Athen',     side:'enemy', type:'infantry',    troops:60,  flag:'gr'},
+  {city:'Istanbul',  side:'enemy', type:'infantry',    troops:70,  flag:'tr'},
+  {city:'Minsk',     side:'enemy', type:'armor',       troops:150, flag:'by'},
+  {city:'Kiew',      side:'enemy', type:'mechanized',  troops:135, flag:'ua'},
+  {city:'Moskau',    side:'enemy', type:'armor',       troops:200, flag:'ru'}
 ];
 
 /* ============================================================
@@ -496,31 +437,28 @@ const state = {
   selectedUnit: null,
   targetUnit: null,
   battle: null,
-  fronts: [],
   gameOver: false,
-  side: 'player' // Spieler-Seite
+  side: 'player',
+  battleLayers: []  // Flaggen & Frontlinie — nur während Schlacht aktiv
 };
 
 /* ============================================================
    KARTE
 ============================================================ */
+const MAP_CENTER = [52.0, 20.0];
+const MAP_BOUNDS = L.latLngBounds(L.latLng(35, -12), L.latLng(72, 45));
+
 const map = L.map("map", {
-  zoomControl: false,
-  attributionControl: true,
-  minZoom: 4,
-  maxZoom: 9,
-  maxBounds: MAP_BOUNDS,
-  maxBoundsViscosity: 1.0,
-  worldCopyJump: false,
-  zoomSnap: 0.25,
-  zoomDelta: 0.5,
-  preferCanvas: true,
-  zoomAnimation: true
+  zoomControl: false, attributionControl: true,
+  minZoom: 4, maxZoom: 9,
+  maxBounds: MAP_BOUNDS, maxBoundsViscosity: 1.0,
+  worldCopyJump: false, zoomSnap: 0.25, zoomDelta: 0.5,
+  preferCanvas: true, zoomAnimation: true
 });
 map.setView(MAP_CENTER, 5);
 
 /* ============================================================
-   LÄNDER LADEN (dunkle taktische Karte)
+   LÄNDER LADEN
 ============================================================ */
 const GEOJSON_URL = "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_admin_0_countries.geojson";
 
@@ -530,24 +468,17 @@ fetch(GEOJSON_URL)
     L.geoJSON(data, {
       filter: f => f.properties.CONTINENT === "Europe",
       style: () => ({
-        color: '#1e3025',
-        weight: 1,
-        opacity: 0.9,
-        fillColor: '#1a2f22',
-        fillOpacity: 0.6,
+        color: '#1e3025', weight: 1, opacity: 0.9,
+        fillColor: '#1a2f22', fillOpacity: 0.7,
         interactive: false
       })
     }).addTo(map);
 
-    // Zweite Ebene: etwas hellere Highlights
     L.geoJSON(data, {
       filter: f => f.properties.CONTINENT === "Europe",
       style: () => ({
-        color: '#2a4435',
-        weight: 0.5,
-        opacity: 0.4,
-        fillColor: '#22392a',
-        fillOpacity: 0.35,
+        color: '#2a4435', weight: 0.5, opacity: 0.4,
+        fillColor: '#22392a', fillOpacity: 0.3,
         interactive: false
       })
     }).addTo(map);
@@ -563,7 +494,7 @@ fetch(GEOJSON_URL)
   });
 
 /* ============================================================
-   STÄDTE ZEICHNEN
+   STÄDTE
 ============================================================ */
 function addCities() {
   Object.entries(CITIES).forEach(([name, info]) => {
@@ -573,36 +504,30 @@ function addCities() {
         <div class="city-dot ${info.capital ? 'capital' : ''}"></div>
         <div class="city-name">${name}</div>
       </div>`,
-      iconSize: [0, 0],
-      iconAnchor: [0, 0]
+      iconSize: [0, 0], iconAnchor: [0, 0]
     });
     L.marker([info.lat, info.lng], { icon, interactive: false }).addTo(map);
   });
 }
 
 /* ============================================================
-   EINHEITEN ERZEUGEN
+   EINHEITEN
 ============================================================ */
 function addUnits() {
   STARTING_UNITS.forEach(u => {
     const city = CITIES[u.city];
     if (!city) return;
-    createUnit(u.side, u.type, u.troops, city.lat, city.lng, u.city);
+    createUnit(u.side, u.type, u.troops, u.flag, city.lat, city.lng, u.city);
   });
-  updateFronts();
+  updateStats();
 }
 
-function createUnit(side, type, troops, lat, lng, cityName) {
+function createUnit(side, type, troops, flag, lat, lng, cityName) {
   const id = ++state.unitIdCounter;
-  const unit = {
-    id, side, type, troops, lat, lng, city: cityName,
-    maxTroops: troops
-  };
+  const unit = { id, side, type, troops, flag, lat, lng, city: cityName, maxTroops: troops };
 
   unit.marker = L.marker([lat, lng], {
-    icon: makeUnitIcon(unit),
-    draggable: false,
-    keyboard: false
+    icon: makeUnitIcon(unit), draggable: false, keyboard: false
   }).addTo(map);
 
   unit.marker.on('click', (e) => {
@@ -628,9 +553,7 @@ function makeUnitIcon(unit) {
     </div>`;
   return L.divIcon({
     className: 'unit-marker ' + unit.side,
-    html,
-    iconSize: [56, 56],
-    iconAnchor: [28, 28]
+    html, iconSize: [56, 56], iconAnchor: [28, 28]
   });
 }
 
@@ -639,12 +562,11 @@ function updateUnitIcon(unit) {
 }
 
 /* ============================================================
-   KLICK-LOGIK
+   KLICK
 ============================================================ */
 function onUnitClick(unit) {
   if (state.battle || state.gameOver) return;
 
-  // Wenn nichts ausgewählt → eigene Einheit auswählen
   if (!state.selectedUnit) {
     if (unit.side !== state.side) {
       showToast("Nur eigene Einheiten", "Wähle eine blaue Einheit aus.", "warning");
@@ -654,21 +576,15 @@ function onUnitClick(unit) {
     return;
   }
 
-  // Wenn eigene Einheit angeklickt → umwählen
   if (unit.side === state.side) {
-    if (unit === state.selectedUnit) {
-      deselectUnit();
-    } else {
-      selectUnit(unit);
-    }
+    unit === state.selectedUnit ? deselectUnit() : selectUnit(unit);
     return;
   }
 
-  // Feind angeklickt → Ziel setzen
   state.targetUnit = unit;
   updateTargetable();
   updateAttackBar();
-  notify("Ziel: " + unit.city + " (" + unit.side.toUpperCase() + ")");
+  notify("Ziel: " + unit.city);
 }
 
 function selectUnit(unit) {
@@ -677,7 +593,7 @@ function selectUnit(unit) {
   updateSelection();
   updateTargetable();
   updateAttackBar();
-  notify("Ausgewählt: " + unit.city + " — jetzt Feind anklicken");
+  notify("Ausgewählt: " + unit.city + " — Feind anklicken");
 }
 
 function deselectUnit() {
@@ -693,28 +609,19 @@ function updateSelection() {
   state.units.forEach(u => {
     u.marker.getElement()?.classList.remove('selected');
   });
-  if (state.selectedUnit) {
-    state.selectedUnit.marker.getElement()?.classList.add('selected');
-  }
+  state.selectedUnit?.marker.getElement()?.classList.add('selected');
 }
 
 function updateTargetable() {
-  const selected = state.selectedUnit;
-  // Alle markierungen entfernen
   state.units.forEach(u => {
     u.marker.getElement()?.classList.remove('targetable');
   });
-
-  // Angreifbare Einheiten markieren
+  const selected = state.selectedUnit;
   if (!selected) return;
   state.units.forEach(u => {
     if (u.side === state.side) return;
-    if (u === selected) return;
-    // Nur in Reichweite
     const d = map.distance([selected.lat, selected.lng], [u.lat, u.lng]);
-    if (d <= 600000) { // 600 km
-      u.marker.getElement()?.classList.add('targetable');
-    }
+    if (d <= 600000) u.marker.getElement()?.classList.add('targetable');
   });
 }
 
@@ -783,7 +690,7 @@ document.getElementById('abBtn').addEventListener('click', () => {
 });
 
 /* ============================================================
-   SCHLACHT
+   SCHLACHT — automatisch, mit Flaggen & Frontlinie
 ============================================================ */
 function startBattle() {
   const att = state.selectedUnit;
@@ -806,31 +713,189 @@ function startBattle() {
     initialAtt: send,
     initialDef: def.troops,
     progress: 0,
-    lastTick: performance.now()
+    lastTick: performance.now(),
+    startTime: performance.now()
   };
 
-  // UI wechselt in Schlacht-Modus
+  // Schlacht-Banner
+  const banner = document.getElementById('battleBanner');
+  banner.textContent = '⚔ ' + def.city.toUpperCase() + ' ⚔';
+  banner.classList.remove('show');
+  void banner.offsetWidth;
+  banner.classList.add('show');
+
+  // UI Modus
   attackSlider.disabled = true;
   document.getElementById('abBtn').disabled = true;
   document.getElementById('abBtn').textContent = '⚔ SCHLACHT';
   document.getElementById('abSliderWrap').style.display = 'none';
   document.getElementById('abProgressWrap').style.display = 'flex';
 
-  // Markierungen
+  // Einheiten wackeln
   att.marker.getElement()?.classList.add('in-battle');
   def.marker.getElement()?.classList.add('in-battle');
 
-  // Kamera folgt
+  // BATTLE VISUALS ERZEUGEN (Flaggen + Frontlinie)
+  createBattleVisuals();
+
+  // Kamera auf Schlachtfeld
   const midLat = (att.lat + def.lat) / 2;
   const midLng = (att.lng + def.lng) / 2;
   map.flyTo([midLat, midLng], Math.max(6, map.getZoom()), { duration: 0.8 });
 
-  updateFrontLines();
   requestAnimationFrame(battleLoop);
-
   notify("⚔ SCHLACHT um " + def.city.toUpperCase());
 }
 
+/* ============================================================
+   BATTLE VISUALS — nur während Schlacht sichtbar
+   ------------------------------------------------------------
+   - Flaggen beider Seiten (mit Truppenstärke darunter)
+   - Frontlinie, die sich zwischen den Flaggen verschiebt
+============================================================ */
+function createBattleVisuals() {
+  const b = state.battle;
+  if (!b) return;
+
+  const att = b.attacker;
+  const def = b.defender;
+
+  const dLng = def.lng - att.lng;
+  const dLat = def.lat - att.lat;
+  const len = Math.sqrt(dLng*dLng + dLat*dLat) || 0.001;
+  const ux = dLng / len;
+  const uy = dLat / len;
+  const px = -uy, py = ux;
+
+  // Fünf Flaggen pro Seite, fächerförmig angeordnet
+  const numFlags = 5;
+  const spread = Math.min(len * 0.5, 2.0);
+
+  const flagLayers = { attacker: [], defender: [] };
+
+  for (let i = 0; i < numFlags; i++) {
+    const t = (i - (numFlags - 1) / 2) / numFlags;
+
+    // Angreifer-Flagge
+    const attLat = att.lat + py * spread * t;
+    const attLng = att.lng + px * spread * t;
+
+    const attIcon = L.divIcon({
+      className: 'battle-flag',
+      html: `<div class="battle-flag-inner">
+        <img class="battle-flag-img attacker"
+             src="https://flagcdn.com/w40/${att.flag}.png"
+             onerror="this.src='https://flagcdn.com/w40/un.png'">
+        <div class="battle-flag-troops attacker" data-side="attacker" data-idx="${i}">—K</div>
+      </div>`,
+      iconSize: [0, 0], iconAnchor: [0, 0]
+    });
+    const attMarker = L.marker([attLat, attLng], {
+      icon: attIcon, interactive: false, zIndexOffset: 3000
+    }).addTo(map);
+    flagLayers.attacker.push(attMarker);
+
+    // Verteidiger-Flagge
+    const defLat = def.lat + py * spread * t;
+    const defLng = def.lng + px * spread * t;
+
+    const defIcon = L.divIcon({
+      className: 'battle-flag',
+      html: `<div class="battle-flag-inner">
+        <img class="battle-flag-img defender"
+             src="https://flagcdn.com/w40/${def.flag}.png"
+             onerror="this.src='https://flagcdn.com/w40/un.png'">
+        <div class="battle-flag-troops defender" data-side="defender" data-idx="${i}">—K</div>
+      </div>`,
+      iconSize: [0, 0], iconAnchor: [0, 0]
+    });
+    const defMarker = L.marker([defLat, defLng], {
+      icon: defIcon, interactive: false, zIndexOffset: 3000
+    }).addTo(map);
+    flagLayers.defender.push(defMarker);
+  }
+
+  // Frontlinie
+  const frontPts = [];
+  for (let i = -10; i <= 10; i++) {
+    const t = i / 10;
+    frontPts.push([
+      att.lat + py * spread * t * 0.8,
+      att.lng + px * spread * t * 0.8
+    ]);
+  }
+  const frontLine = L.polyline(frontPts, {
+    color: '#ffd54f', weight: 3, opacity: 0.9,
+    dashArray: '10,8', interactive: false
+  }).addTo(map);
+
+  state.battleLayers = [
+    ...flagLayers.attacker,
+    ...flagLayers.defender,
+    frontLine
+  ];
+  state.battleFlagData = { flagLayers, frontLine, spread, ux, uy, px, py, len };
+}
+
+function updateBattleFlagPositions() {
+  const b = state.battle;
+  const data = state.battleFlagData;
+  if (!b || !data) return;
+
+  const att = b.attacker;
+  const def = b.defender;
+  const { flagLayers, frontLine, spread, ux, uy, px, py, len } = data;
+
+  // Frontposition (0.4 → 0.95)
+  const frontPos = 0.4 + b.progress * 0.55;
+  const frontLat = att.lat + uy * len * frontPos;
+  const frontLng = att.lng + ux * len * frontPos;
+
+  // Angreifer-Flaggen: hinter der Front (leicht zurückversetzt)
+  flagLayers.attacker.forEach((marker, i) => {
+    const t = (i - (flagLayers.attacker.length - 1) / 2) / flagLayers.attacker.length;
+    const lat = frontLat + py * spread * t - uy * 0.08;
+    const lng = frontLng + px * spread * t - ux * 0.08;
+    marker.setLatLng([lat, lng]);
+  });
+
+  // Verteidiger-Flaggen: vor der Front (zurückweichend)
+  flagLayers.defender.forEach((marker, i) => {
+    const t = (i - (flagLayers.defender.length - 1) / 2) / flagLayers.defender.length;
+    const lat = frontLat + py * spread * t + uy * 0.08;
+    const lng = frontLng + px * spread * t + ux * 0.08;
+    marker.setLatLng([lat, lng]);
+  });
+
+  // Frontlinie verschieben
+  if (frontLine) {
+    const pts = [];
+    for (let i = -10; i <= 10; i++) {
+      const t = i / 10;
+      pts.push([
+        frontLat + py * spread * t * 0.8,
+        frontLng + px * spread * t * 0.8
+      ]);
+    }
+    frontLine.setLatLngs(pts);
+  }
+
+  // Truppenstärken in den Flaggen aktualisieren
+  const attEls = document.querySelectorAll('.battle-flag-troops.attacker');
+  const defEls = document.querySelectorAll('.battle-flag-troops.defender');
+  attEls.forEach(el => el.textContent = Math.floor(b.attTroops) + 'K');
+  defEls.forEach(el => el.textContent = Math.floor(b.defTroops) + 'K');
+}
+
+function destroyBattleVisuals() {
+  state.battleLayers.forEach(l => map.removeLayer(l));
+  state.battleLayers = [];
+  state.battleFlagData = null;
+}
+
+/* ============================================================
+   BATTLE LOOP — automatisch
+============================================================ */
 function battleLoop(now) {
   const b = state.battle;
   if (!b) return;
@@ -838,9 +903,9 @@ function battleLoop(now) {
   const dt = Math.min(0.05, (now - b.lastTick) / 1000);
   b.lastTick = now;
 
-  // Truppenverluste proportional
-  b.attTroops = Math.max(0, b.attTroops - b.defTroops * 0.05 * dt);
-  b.defTroops = Math.max(0, b.defTroops - b.attTroops * 0.05 * dt);
+  // Truppenverluste
+  b.attTroops = Math.max(0, b.attTroops - b.defTroops * 0.06 * dt);
+  b.defTroops = Math.max(0, b.defTroops - b.attTroops * 0.06 * dt);
 
   b.progress = 1 - b.defTroops / b.initialDef;
 
@@ -851,16 +916,15 @@ function battleLoop(now) {
   document.getElementById('abProgressFill').style.width = pct + '%';
   document.getElementById('abProgressText').textContent = 'SCHLACHT — ' + pct + '%';
 
-  // Einheiten-Truppen aktualisieren
+  // Einheiten-Truppen live
   b.attacker.troops = b.attTroops;
   b.defender.troops = b.defTroops;
   updateUnitIcon(b.attacker);
   updateUnitIcon(b.defender);
 
-  // Frontbewegung während Schlacht
-  updateFrontLines();
+  // Flaggen & Front bewegen
+  updateBattleFlagPositions();
 
-  // Ende?
   if (b.defTroops <= 0.5) { endBattle(true); return; }
   if (b.attTroops <= 0.5) { endBattle(false); return; }
 
@@ -874,15 +938,14 @@ function endBattle(attackerWon) {
   const att = b.attacker;
   const def = b.defender;
 
-  // Markierungen entfernen
   att.marker.getElement()?.classList.remove('in-battle');
   def.marker.getElement()?.classList.remove('in-battle');
 
-  if (attackerWon) {
-    // Verteidiger entfernen
-    removeUnit(def);
+  // Battle-Visuals entfernen — Karte wird wieder sauber
+  destroyBattleVisuals();
 
-    // Angreifer zieht in die Stadt
+  if (attackerWon) {
+    removeUnit(def);
     att.lat = def.lat;
     att.lng = def.lng;
     att.city = def.city;
@@ -890,10 +953,9 @@ function endBattle(attackerWon) {
     att.marker.setLatLng([att.lat, att.lng]);
     updateUnitIcon(att);
 
-    showToast("SIEG", att.city + " eingenommen! " + Math.floor(b.attTroops) + "K stationiert.", "success", 5000);
+    showToast("SIEG", def.city + " eingenommen! " + Math.floor(b.attTroops) + "K stationiert.", "success", 5000);
     notify("🏆 " + def.city + " erobert!");
   } else {
-    // Verteidiger überlebt
     def.troops = b.defTroops;
     att.troops = b.attTroops;
     updateUnitIcon(att);
@@ -912,7 +974,6 @@ function endBattle(attackerWon) {
   attackSlider.disabled = false;
   document.getElementById('abBtn').disabled = false;
 
-  // Auswahl aufheben
   if (attackerWon) {
     state.selectedUnit = null;
     state.targetUnit = null;
@@ -923,10 +984,8 @@ function endBattle(attackerWon) {
 
   updateSelection();
   updateTargetable();
-  updateFronts();
   updateStats();
 
-  // Kamera zurück
   setTimeout(() => {
     map.flyTo(MAP_CENTER, 5, { duration: 1 });
   }, 800);
@@ -935,62 +994,6 @@ function endBattle(attackerWon) {
 function removeUnit(unit) {
   map.removeLayer(unit.marker);
   state.units = state.units.filter(u => u !== unit);
-}
-
-/* ============================================================
-   FRONTLINIEN
-============================================================ */
-let frontLayers = [];
-
-function updateFronts() {
-  // Alle alten Fronten löschen
-  frontLayers.forEach(l => map.removeLayer(l));
-  frontLayers = [];
-
-  // Für jedes Paar gegnerischer Einheiten in Reichweite eine Frontlinie zeichnen
-  const processed = new Set();
-
-  for (let i = 0; i < state.units.length; i++) {
-    const a = state.units[i];
-    for (let j = i + 1; j < state.units.length; j++) {
-      const b = state.units[j];
-      if (a.side === b.side) continue;
-
-      const key = Math.min(a.id, b.id) + '-' + Math.max(a.id, b.id);
-      if (processed.has(key)) continue;
-      processed.add(key);
-
-      const d = map.distance([a.lat, a.lng], [b.lat, b.lng]);
-      if (d > 600000) continue; // 600 km Reichweite
-
-      // Frontlinie: senkrechte Linie zwischen den beiden Einheiten
-      const midLat = (a.lat + b.lat) / 2;
-      const midLng = (a.lng + b.lng) / 2;
-
-      const dLng = b.lng - a.lng;
-      const dLat = b.lat - a.lat;
-      const len = Math.sqrt(dLng*dLng + dLat*dLat) || 1;
-      const px = -dLat / len;
-      const py = dLng / len;
-
-      const perpLength = 0.8; // Grad
-      const p1 = [midLat + px * perpLength, midLng + py * perpLength];
-      const p2 = [midLat - px * perpLength, midLng - py * perpLength];
-
-      const line = L.polyline([p1, p2], {
-        color: '#ffd54f',
-        weight: 2,
-        opacity: 0.5,
-        dashArray: '6,6',
-        interactive: false
-      }).addTo(map);
-
-      frontLayers.push(line);
-    }
-  }
-
-  state.fronts = frontLayers.length;
-  updateStats();
 }
 
 /* ============================================================
@@ -1006,18 +1009,14 @@ function updateStats() {
 
   document.getElementById('statPlayer').textContent = Math.floor(playerTroops) + 'K';
   document.getElementById('statEnemy').textContent = Math.floor(enemyTroops) + 'K';
-  document.getElementById('statFronts').textContent = state.fronts;
+  document.getElementById('statUnits').textContent = state.units.length;
 }
 
 /* ============================================================
    MAP CONTROLS
 ============================================================ */
-function zoomMap(dir) {
-  dir > 0 ? map.zoomIn(0.5) : map.zoomOut(0.5);
-}
-function resetMap() {
-  map.flyTo(MAP_CENTER, 5, { duration: 0.8 });
-}
+function zoomMap(dir) { dir > 0 ? map.zoomIn(0.5) : map.zoomOut(0.5); }
+function resetMap() { map.flyTo(MAP_CENTER, 5, { duration: 0.8 }); }
 
 /* ============================================================
    TOASTS / NOTIFY
@@ -1043,14 +1042,12 @@ function showToast(title, message, type = 'info', duration = 3500) {
 }
 
 /* ============================================================
-   RESSOURCEN-PRODUKTION (alle 3 Sekunden etwas Truppen aufstocken)
+   NACHschub (nur außerhalb von Schlachten)
 ============================================================ */
 setInterval(() => {
   if (state.gameOver || state.battle) return;
   state.units.forEach(u => {
-    // Alle Einheiten erhalten leichten Nachschub
-    const rate = u.side === 'player' ? 0.3 : 0.25;
-    u.troops += rate;
+    u.troops += 0.3;
     if (u.troops > u.maxTroops * 1.5) u.troops = u.maxTroops * 1.5;
     updateUnitIcon(u);
   });
